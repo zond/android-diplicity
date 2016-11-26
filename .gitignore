@@ -7,7 +7,6 @@
 
 # Java class files
 *.class
-.DS_STORE
 
 # Generated files
 bin/
@@ -36,6 +35,10 @@ captures/
 # Intellij
 *.iml
 .idea/workspace.xml
+.idea
 
 # Keystore files
 *.jks
+
+# Mac files
+.DS_STORE
