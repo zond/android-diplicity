@@ -5,4 +5,14 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+    <string name="games">Games</string>
+    <string name="users">Users</string>
+    <string name="my_started">My started</string>
+    <string name="my_staging">My staging</string>
+    <string name="my_finished">My finished</string>
+    <string name="open">Open</string>
+    <string name="started">Started</string>
+    <string name="finished">Finished</string>
+    <string name="top_rated">Top rated</string>
+    <string name="top_hated">Top hated</string>
 </resources>

@@ -21,8 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,46 +38,45 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
 
         List<Map<String, String>> groupData = new ArrayList<Map<String, String>>() {{
             add(new HashMap<String, String>() {{
-                put("ROOT_NAME", "Games");
+                put("ROOT_NAME", getResources().getString(R.string.games));
             }});
             add(new HashMap<String, String>() {{
-                put("ROOT_NAME", "Users");
+                put("ROOT_NAME", getResources().getString(R.string.users));
             }});
         }};
         List<List<Map<String, String>>> listOfChildGroups = new ArrayList<List<Map<String, String>>>();
 
         List<Map<String, String>> childGroupForFirstGroupRow = new ArrayList<Map<String, String>>(){{
             add(new HashMap<String, String>() {{
-                put("CHILD_NAME", "My started");
+                put("CHILD_NAME", getResources().getString(R.string.my_started));
             }});
             add(new HashMap<String, String>() {{
-                put("CHILD_NAME", "My staging");
+                put("CHILD_NAME", getResources().getString(R.string.my_staging));
             }});
             add(new HashMap<String, String>() {{
-                put("CHILD_NAME", "My finished");
+                put("CHILD_NAME", getResources().getString(R.string.my_finished));
             }});
             add(new HashMap<String, String>() {{
-                put("CHILD_NAME", "Open");
+                put("CHILD_NAME", getResources().getString(R.string.open));
             }});
             add(new HashMap<String, String>() {{
-                put("CHILD_NAME", "Started");
+                put("CHILD_NAME", getResources().getString(R.string.started));
             }});
             add(new HashMap<String, String>() {{
-                put("CHILD_NAME", "Finished");
+                put("CHILD_NAME", getResources().getString(R.string.finished));
             }});
         }};
         listOfChildGroups.add(childGroupForFirstGroupRow);
 
         List<Map<String, String>> childGroupForSecondGroupRow = new ArrayList<Map<String, String>>(){{
             add(new HashMap<String, String>() {{
-                put("CHILD_NAME", "Top rated");
+                put("CHILD_NAME", getResources().getString(R.string.top_rated));
             }});
             add(new HashMap<String, String>() {{
-                put("CHILD_NAME", "Top hated");
+                put("CHILD_NAME", getResources().getString(R.string.top_hated));
             }});
         }};
         listOfChildGroups.add(childGroupForSecondGroupRow);
@@ -130,15 +128,4 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
 }
