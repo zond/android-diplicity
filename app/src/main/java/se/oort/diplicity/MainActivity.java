@@ -104,27 +104,7 @@ public class MainActivity extends RetrofitActivity {
                 case 0: // Games
                     switch (i1) {
                     case 0: // My started
-                        Observable<GamesContainer> call = gameService.MyStartedGames();
-                        Subscription subscription = call
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(new Subscriber<GamesContainer>() {
-                                    @Override
-                                    public void onCompleted() {
-                                        Log.d("Diplicity", "Loaded games");
-                                    }
-
-                                    @Override
-                                    public void onError(Throwable e) {
-                                        Log.d("Diplicity", "Got error " + e);
-                                        Toast.makeText(MainActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
-                                    }
-
-                                    @Override
-                                    public void onNext(GamesContainer gamesContainer) {
-                                        Log.d("Diplicity", "Got games " + gamesContainer);
-                                    }
-                                });
+                        displayGames(gameService.MyStartedGames());
                     case 1: // My staging
                     case 2: // My finished
                     case 3: // Open
@@ -140,6 +120,28 @@ public class MainActivity extends RetrofitActivity {
                 return false;
             }
         });
+    }
+
+    private void displayGames(Observable<GamesContainer> call) {
+        call
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<GamesContainer>() {
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("Diplicity", "Error loading games " + e);
+                        Toast.makeText(MainActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onNext(GamesContainer gamesContainer) {
+                    }
+                });
+
     }
 
     @Override
