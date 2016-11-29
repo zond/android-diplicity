@@ -1,27 +1,32 @@
-package diplicity.oort.se.diplicity;
+package se.oort.diplicity;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatDelegate;
-import android.view.View;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
+import rx.Observable;
+import rx.Subscriber;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import se.oort.diplicity.apigen.GamesContainer;
+
+public class MainActivity extends RetrofitActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +41,6 @@ public class MainActivity extends AppCompatActivity {
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 
         List<Map<String, String>> groupData = new ArrayList<Map<String, String>>() {{
             add(new HashMap<String, String>() {{
@@ -94,6 +97,49 @@ public class MainActivity extends AppCompatActivity {
 
         ExpandableListView navigationList = (ExpandableListView) findViewById(R.id.nav_list);
         navigationList.setAdapter(navigationListAdapter);
+        navigationList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
+                switch (i) {
+                case 0: // Games
+                    switch (i1) {
+                    case 0: // My started
+                        Observable<GamesContainer> call = gameService.MyStartedGames();
+                        Subscription subscription = call
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Subscriber<GamesContainer>() {
+                                    @Override
+                                    public void onCompleted() {
+                                        Log.d("Diplicity", "Loaded games");
+                                    }
+
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        Log.d("Diplicity", "Got error " + e);
+                                        Toast.makeText(MainActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    @Override
+                                    public void onNext(GamesContainer gamesContainer) {
+                                        Log.d("Diplicity", "Got games " + gamesContainer);
+                                    }
+                                });
+                    case 1: // My staging
+                    case 2: // My finished
+                    case 3: // Open
+                    case 4: // Started
+                    case 5: // Finished
+                    }
+                case 1: // Users
+                    switch (i1) {
+                    case 0: // Top rated
+                    case 1: // Top hated
+                    }
+                }
+                return false;
+            }
+        });
     }
 
     @Override
