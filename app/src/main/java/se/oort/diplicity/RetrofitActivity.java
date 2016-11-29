@@ -83,6 +83,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                             .addHeader("Authorization", "bearer " + authToken)
                             .build();
                 }
+                Log.d("Diplicity", "" + chain.request().method() + "ing " + chain.request().url());
                 return chain.proceed(toIssue);
             }
         });
