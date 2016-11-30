@@ -17,4 +17,5 @@
     <string name="top_hated">Top hated</string>
     <string name="network_error">Network error</string>
     <string name="loading_x">Loading %s</string>
+    <string name="no_data_available">No data available</string>
 </resources>

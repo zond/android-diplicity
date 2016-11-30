@@ -38,7 +38,6 @@ public class MainActivity extends RetrofitActivity {
 
     private RecyclerView contentList;
     private EndlessRecyclerViewScrollListener scrollListener;
-    private GamesAdapter gamesAdapter = new GamesAdapter(new GamesContainer());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,7 +164,6 @@ public class MainActivity extends RetrofitActivity {
             }
         };
         contentList.addOnScrollListener(scrollListener);
-        contentList.setAdapter(gamesAdapter);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, contentLayoutManager.getOrientation());
         contentList.addItemDecoration(dividerItemDecoration);
     }
@@ -195,9 +193,13 @@ public class MainActivity extends RetrofitActivity {
 
                     @Override
                     public void onNext(GamesContainer gamesContainer) {
-                        gamesAdapter.setGamesContainer(gamesContainer);
+                        contentList.setAdapter(new GamesAdapter(gamesContainer));
                         scrollListener.resetState();
-                        gamesAdapter.notifyDataSetChanged();
+                        if (gamesContainer.Properties.isEmpty()) {
+                            findViewById(R.id.empty_view).setVisibility(View.VISIBLE);
+                        } else {
+                            findViewById(R.id.empty_view).setVisibility(View.GONE);
+                        }
                         progress.dismiss();
                     }
                 });

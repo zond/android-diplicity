@@ -20,4 +20,14 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:id="@+id/content_list" />
+    
+    <TextView
+        android:id="@+id/empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:visibility="gone"
+        android:textColor="?android:attr/textColorPrimary"
+        android:text="@string/no_data_available"/>
+
 </RelativeLayout>
