@@ -1,20 +1,24 @@
 package se.oort.diplicity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.preference.EditTextPreference;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -25,20 +29,26 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.HttpException;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.HTTP;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import se.oort.diplicity.apigen.GameService;
+import se.oort.diplicity.apigen.UserStatsService;
 
 public abstract class RetrofitActivity extends AppCompatActivity {
 
     static final int LOGIN_REQUEST = 1;
+    static final String API_URL_KEY = "api_url";
+    static final String DEFAULT_URL = "https://diplicity-engine.appspot.com";
 
     AuthenticatingCallAdapterFactory adapterFactory;
     Retrofit retrofit;
     GameService gameService;
+    UserStatsService userStatsService;
+
+    private SharedPreferences prefs;
+    private SharedPreferences.OnSharedPreferenceChangeListener prefsListener;
 
     private class LoginSubscriber<R> {
         private Subscriber<? super R> subscriber;
@@ -69,7 +79,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         }
     }
 
-    public RetrofitActivity() {
+    protected void setBaseURL(String baseURL) {
         adapterFactory = new AuthenticatingCallAdapterFactory();
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.addInterceptor(new Interceptor() {
@@ -88,12 +98,48 @@ public abstract class RetrofitActivity extends AppCompatActivity {
             }
         });
         retrofit = new Retrofit.Builder()
-                .baseUrl("https://diplicity-engine.appspot.com")
+                .baseUrl(baseURL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(adapterFactory)
                 .client(builder.build())
                 .build();
         gameService = retrofit.create(GameService.class);
+        userStatsService = retrofit.create(UserStatsService.class);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefsListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+                if (s.equals(API_URL_KEY)) {
+                    setBaseURL(sharedPreferences.getString(API_URL_KEY, ""));
+                }
+            }
+        };
+        prefs.registerOnSharedPreferenceChangeListener(prefsListener);
+
+        String baseURL = prefs.getString(API_URL_KEY, "");
+        HttpUrl httpUrl = HttpUrl.parse(baseURL);
+        Log.d("Diplicity", "HttpUrl of " + baseURL + " = " + httpUrl);
+        if (httpUrl != null) {
+            if (baseURL.lastIndexOf("/") != baseURL.length() - 1) {
+                baseURL = baseURL + "/";
+            }
+            setBaseURL(baseURL);
+        } else {
+            Log.d("Diplicity", "Malformed URL " + baseURL + ", resetting to default URL " + DEFAULT_URL);
+            prefs.edit().putString(API_URL_KEY, DEFAULT_URL).commit();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        prefs.unregisterOnSharedPreferenceChangeListener(prefsListener);
+        super.onPause();
     }
 
     private class AuthenticatingCallAdapterFactory extends CallAdapter.Factory {

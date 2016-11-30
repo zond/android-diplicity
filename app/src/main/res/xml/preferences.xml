@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-  <EditTextPreference android:title="API URL"
-                      android:key="api_url"
-                      android:summary="Diplicity API service to use."/>
+  <se.oort.diplicity.URLEditTextPreference android:title="API URL"
+                                           android:inputType="textUri"
+                                           android:key="api_url" />
 </PreferenceScreen>

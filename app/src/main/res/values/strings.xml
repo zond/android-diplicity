@@ -20,4 +20,6 @@
     <string name="no_data_available">No data available</string>
     <string name="loading_x_games">Loading %s games</string>
     <string name="x_games">%s games</string>
+    <string name="invalid_url">Invalid URL</string>
+    <string name="api_url_must_end_with_slash">API URL must end with &quot;/&quot;</string>
 </resources>
