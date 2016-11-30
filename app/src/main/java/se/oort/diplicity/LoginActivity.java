@@ -19,8 +19,8 @@ public class LoginActivity extends RetrofitActivity {
             WebView mWebView = new WebView(this);
             mWebView.getSettings().setJavaScriptEnabled(true);
             final String fakeHost = "android-diplicity";
-            String redirectTo = URLEncoder.encode("https://android-diplicity/", "UTF-8");
-            mWebView.loadUrl("https://diplicity-engine.appspot.com/Auth/Login?redirect-to=" + redirectTo);
+            String redirectTo = URLEncoder.encode("https://" + fakeHost + "/", "UTF-8");
+            mWebView.loadUrl(((App) getApplication()).baseURL + "Auth/Login?redirect-to=" + redirectTo);
             mWebView.setWebViewClient(new WebViewClient() {
                 @SuppressWarnings("deprecation")
                 @Override

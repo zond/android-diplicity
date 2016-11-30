@@ -8,18 +8,18 @@ public interface UserStatsService {
   Observable<UserStatsContainer> UserStatsLoad(@Path("user_id") String user_id);
 
   @GET("/Users/TopRated")
-  Observable<UserStatssContainer> ListTopRatedPlayers();
+  Observable<UserStatssContainer> ListTopRatedPlayers(@Query("limit") String limit, @Query("cursor") String cursor);
 
   @GET("/Users/TopReliable")
-  Observable<UserStatssContainer> ListTopReliablePlayers();
+  Observable<UserStatssContainer> ListTopReliablePlayers(@Query("limit") String limit, @Query("cursor") String cursor);
 
   @GET("/Users/TopHated")
-  Observable<UserStatssContainer> ListTopHatedPlayers();
+  Observable<UserStatssContainer> ListTopHatedPlayers(@Query("limit") String limit, @Query("cursor") String cursor);
 
   @GET("/Users/TopHater")
-  Observable<UserStatssContainer> ListTopHaterPlayers();
+  Observable<UserStatssContainer> ListTopHaterPlayers(@Query("limit") String limit, @Query("cursor") String cursor);
 
   @GET("/Users/TopQuick")
-  Observable<UserStatssContainer> ListTopQuickPlayers();
+  Observable<UserStatssContainer> ListTopQuickPlayers(@Query("limit") String limit, @Query("cursor") String cursor);
 
 }

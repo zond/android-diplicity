@@ -80,6 +80,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     }
 
     protected void setBaseURL(String baseURL) {
+        ((App) getApplication()).baseURL = baseURL;
         adapterFactory = new AuthenticatingCallAdapterFactory();
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.addInterceptor(new Interceptor() {
@@ -124,7 +125,6 @@ public abstract class RetrofitActivity extends AppCompatActivity {
 
         String baseURL = prefs.getString(API_URL_KEY, "");
         HttpUrl httpUrl = HttpUrl.parse(baseURL);
-        Log.d("Diplicity", "HttpUrl of " + baseURL + " = " + httpUrl);
         if (httpUrl != null) {
             if (baseURL.lastIndexOf("/") != baseURL.length() - 1) {
                 baseURL = baseURL + "/";

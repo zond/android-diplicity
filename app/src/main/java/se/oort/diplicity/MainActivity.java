@@ -2,6 +2,7 @@ package se.oort.diplicity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,18 +36,26 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import se.oort.diplicity.apigen.Game;
+import se.oort.diplicity.apigen.GameContainer;
 import se.oort.diplicity.apigen.GamesContainer;
+import se.oort.diplicity.apigen.Link;
 
 public class MainActivity extends RetrofitActivity {
 
     private RecyclerView contentList;
     private EndlessRecyclerViewScrollListener scrollListener;
+
+    private List<String> nextCursorContainer = new ArrayList<String>(Arrays.asList(new String[]{""}));
     private Callable<String> nextCursor = new Callable<String>() {
         @Override
         public String call() throws Exception {
-            return "";
+            return nextCursorContainer.get(0);
         }
     };
+
+    private List<Sendable<String>> loadMoreProcContainer;
+
+    private GamesAdapter gamesAdapter = new GamesAdapter(new ArrayList<GameContainer>());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +126,33 @@ public class MainActivity extends RetrofitActivity {
 
         ExpandableListView navigationList = (ExpandableListView) findViewById(R.id.nav_list);
         navigationList.setAdapter(navigationListAdapter);
+        connectNavigationList(listOfChildGroups, navigationList);
+
+        contentList = (RecyclerView) findViewById(R.id.content_list);
+        LinearLayoutManager contentLayoutManager = new LinearLayoutManager(this);
+        contentLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        contentList.setLayoutManager(contentLayoutManager);
+        scrollListener = new EndlessRecyclerViewScrollListener(contentLayoutManager, nextCursor) {
+            @Override
+            public void onLoadMore(String cursor, int totalItemsCount, RecyclerView view) {
+                if (cursor.length() > 0) {
+                    loadMoreProcContainer.get(0).Send(cursor);
+                }
+            }
+        };
+        contentList.addOnScrollListener(scrollListener);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, contentLayoutManager.getOrientation());
+        contentList.addItemDecoration(dividerItemDecoration);
+
+        loadMoreProcContainer = new ArrayList<Sendable<String>>();
+        loadMoreProcContainer.add(new Sendable<String>() {
+            public void Send(String s) {
+            }
+        });
+
+    }
+
+    private void connectNavigationList(final List<List<Map<String, String>>> listOfChildGroups, ExpandableListView navigationList) {
         navigationList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
@@ -123,22 +160,58 @@ public class MainActivity extends RetrofitActivity {
                 case 0: // Games
                     switch (i1) {
                     case 0: // My started
-                        displayGames(gameService.MyStartedGames(), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"));
+                        loadMoreProcContainer.set(0, new Sendable<String>() {
+                            @Override
+                            public void Send(String s) {
+                                appendGames(gameService.MyStartedGames(null, null, null, null, null, null, null, null, s), null);
+                            }
+                        });
+                        displayGames(gameService.MyStartedGames(null, null, null, null, null, null, null, null, null), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"));
                         break;
                     case 1: // My staging
-                        displayGames(gameService.MyStagingGames(), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"));
+                        loadMoreProcContainer.set(0, new Sendable<String>() {
+                            @Override
+                            public void Send(String s) {
+                                appendGames(gameService.MyStagingGames(null, null, null, null, null, null, null, null, s), null);
+                            }
+                        });
+                        displayGames(gameService.MyStagingGames(null, null, null, null, null, null, null, null, null), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"));
                         break;
                     case 2: // My finished
-                        displayGames(gameService.MyFinishedGames(), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"));
+                        loadMoreProcContainer.set(0, new Sendable<String>() {
+                            @Override
+                            public void Send(String s) {
+                                appendGames(gameService.MyFinishedGames(null, null, null, null, null, null, null, null, s), null);
+                            }
+                        });
+                        displayGames(gameService.MyFinishedGames(null, null, null, null, null, null, null, null, null), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"));
                         break;
                     case 3: // Open
-                        displayGames(gameService.OpenGames(), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"));
+                        loadMoreProcContainer.set(0, new Sendable<String>() {
+                            @Override
+                            public void Send(String s) {
+                                appendGames(gameService.OpenGames(null, null, null, null, null, null, null, null, s), null);
+                            }
+                        });
+                        displayGames(gameService.OpenGames(null, null, null, null, null, null, null, null, null), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"));
                         break;
                     case 4: // Started
-                        displayGames(gameService.StartedGames(), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"));
+                        loadMoreProcContainer.set(0, new Sendable<String>() {
+                            @Override
+                            public void Send(String s) {
+                                appendGames(gameService.StartedGames(null, null, null, null, null, null, null, null, s), null);
+                            }
+                        });
+                        displayGames(gameService.StartedGames(null, null, null, null, null, null, null, null, null), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"));
                         break;
                     case 5: // Finished
-                        displayGames(gameService.FinishedGames(), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"));
+                        loadMoreProcContainer.set(0, new Sendable<String>() {
+                            @Override
+                            public void Send(String s) {
+                                appendGames(gameService.FinishedGames(null, null, null, null, null, null, null, null, s), null);
+                            }
+                        });
+                        displayGames(gameService.FinishedGames(null, null, null, null, null, null, null, null, null), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"));
                         break;
                     }
                     break;
@@ -154,28 +227,16 @@ public class MainActivity extends RetrofitActivity {
                 return false;
             }
         });
-
-        contentList = (RecyclerView) findViewById(R.id.content_list);
-        LinearLayoutManager contentLayoutManager = new LinearLayoutManager(this);
-        contentLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        contentList.setLayoutManager(contentLayoutManager);
-        scrollListener = new EndlessRecyclerViewScrollListener(contentLayoutManager, nextCursor) {
-            @Override
-            public void onLoadMore(String cursor, int totalItemsCount, RecyclerView view) {
-                Log.d("Diplicity", "Wanting to load more.");
-            }
-        };
-        contentList.addOnScrollListener(scrollListener);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, contentLayoutManager.getOrientation());
-        contentList.addItemDecoration(dividerItemDecoration);
     }
 
-    private void displayGames(Observable<GamesContainer> call, final String what) {
+    private void appendGames(Observable<GamesContainer> call, final String what) {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
 
         final ProgressDialog progress = new ProgressDialog(this);
-        progress.setTitle(getResources().getString(R.string.loading_x_games, what));
+        if (what != null) {
+            progress.setTitle(getResources().getString(R.string.loading_x_games, what));
+        }
         progress.setCancelable(false);
         progress.show();
 
@@ -195,8 +256,17 @@ public class MainActivity extends RetrofitActivity {
 
                     @Override
                     public void onNext(GamesContainer gamesContainer) {
-                        contentList.setAdapter(new GamesAdapter(gamesContainer));
-                        scrollListener.resetState();
+                        Log.d("Diplicity", "Finally received " + gamesContainer.Properties.size() + " games");
+                        nextCursorContainer.set(0, "");
+                        for (Link link : gamesContainer.Links) {
+                            if (link.Rel.equals("next")) {
+                                Uri uri = Uri.parse(link.URL);
+                                nextCursorContainer.set(0, uri.getQueryParameter("cursor"));
+                            }
+                        }
+
+                        gamesAdapter.AddAll(gamesContainer.Properties);
+
                         ((TextView) findViewById(R.id.content_title)).setText(getResources().getString(R.string.x_games, what));
                         ((TextView) findViewById(R.id.content_title)).setVisibility(View.VISIBLE);
                         if (gamesContainer.Properties.isEmpty()) {
@@ -204,10 +274,19 @@ public class MainActivity extends RetrofitActivity {
                         } else {
                             findViewById(R.id.empty_view).setVisibility(View.GONE);
                         }
+
                         progress.dismiss();
                     }
                 });
 
+
+    }
+
+    private void displayGames(Observable<GamesContainer> call, final String what) {
+        gamesAdapter.Clear();
+        contentList.setAdapter(gamesAdapter);
+        scrollListener.resetState();
+        appendGames(call, what);
     }
 
     @Override
