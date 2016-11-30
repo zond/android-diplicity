@@ -107,7 +107,16 @@ public class MainActivity extends RetrofitActivity {
                 put("CHILD_NAME", getResources().getString(R.string.top_rated));
             }});
             add(new HashMap<String, String>() {{
+                put("CHILD_NAME", getResources().getString(R.string.top_reliable));
+            }});
+            add(new HashMap<String, String>() {{
+                put("CHILD_NAME", getResources().getString(R.string.top_quick));
+            }});
+            add(new HashMap<String, String>() {{
                 put("CHILD_NAME", getResources().getString(R.string.top_hated));
+            }});
+            add(new HashMap<String, String>() {{
+                put("CHILD_NAME", getResources().getString(R.string.top_hater));
             }});
         }};
         listOfChildGroups.add(childGroupForSecondGroupRow);
@@ -225,7 +234,25 @@ public class MainActivity extends RetrofitActivity {
                         });
                         displayItems(userStatsService.ListTopRatedPlayers(null, null), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"), groupData.get(i).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
                         break;
-                    case 1: // Top hated
+                    case 1: // Top reliable
+                        loadMoreProcContainer.set(0, new Sendable<String>() {
+                            @Override
+                            public void Send(String s) {
+                                appendItems(userStatsService.ListTopReliablePlayers(null, s), null, null, userStatsAdapter);
+                            }
+                        });
+                        displayItems(userStatsService.ListTopReliablePlayers(null, null), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"), groupData.get(i).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
+                        break;
+                    case 2: // Top quick
+                        loadMoreProcContainer.set(0, new Sendable<String>() {
+                            @Override
+                            public void Send(String s) {
+                                appendItems(userStatsService.ListTopQuickPlayers(null, s), null, null, userStatsAdapter);
+                            }
+                        });
+                        displayItems(userStatsService.ListTopQuickPlayers(null, null), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"), groupData.get(i).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
+                        break;
+                    case 3: // Top hated
                         loadMoreProcContainer.set(0, new Sendable<String>() {
                             @Override
                             public void Send(String s) {
@@ -233,6 +260,15 @@ public class MainActivity extends RetrofitActivity {
                             }
                         });
                         displayItems(userStatsService.ListTopHatedPlayers(null, null), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"), groupData.get(i).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
+                        break;
+                    case 4: // Top hater
+                        loadMoreProcContainer.set(0, new Sendable<String>() {
+                            @Override
+                            public void Send(String s) {
+                                appendItems(userStatsService.ListTopHaterPlayers(null, s), null, null, userStatsAdapter);
+                            }
+                        });
+                        displayItems(userStatsService.ListTopHaterPlayers(null, null), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"), groupData.get(i).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
                         break;
                     }
                     break;

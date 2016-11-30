@@ -24,4 +24,7 @@
     <string name="api_url_must_end_with_slash">API URL must end with &quot;/&quot;</string>
     <string name="loading_x_y">Loading %1$s %2$s</string>
     <string name="x_y">%1$s %2$s</string>
+    <string name="top_reliable">Top reliable</string>
+    <string name="top_quick">Top quick</string>
+    <string name="top_hater">Top hater</string>
 </resources>
