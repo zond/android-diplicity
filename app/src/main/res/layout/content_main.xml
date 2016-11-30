@@ -13,12 +13,21 @@
     tools:context="se.oort.diplicity.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <android.support.v7.widget.RecyclerView
+    <TextView
+        android:id="@+id/content_title"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
+        android:visibility="gone"
+        android:gravity="center_horizontal"
+        android:textColor="?android:attr/textColorPrimary" />
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_below="@id/content_title"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
         android:id="@+id/content_list" />
     
     <TextView

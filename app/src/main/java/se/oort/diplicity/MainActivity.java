@@ -1,6 +1,7 @@
 package se.oort.diplicity;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -16,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -38,6 +40,12 @@ public class MainActivity extends RetrofitActivity {
 
     private RecyclerView contentList;
     private EndlessRecyclerViewScrollListener scrollListener;
+    private Callable<String> nextCursor = new Callable<String>() {
+        @Override
+        public String call() throws Exception {
+            return "";
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,13 +159,7 @@ public class MainActivity extends RetrofitActivity {
         LinearLayoutManager contentLayoutManager = new LinearLayoutManager(this);
         contentLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         contentList.setLayoutManager(contentLayoutManager);
-        scrollListener = new EndlessRecyclerViewScrollListener(contentLayoutManager, new Callable<String>() {
-            @Override
-            public String call() throws Exception {
-                Log.d("Diplicity", "Wanting the next cursor.");
-                return "";
-            }
-        }) {
+        scrollListener = new EndlessRecyclerViewScrollListener(contentLayoutManager, nextCursor) {
             @Override
             public void onLoadMore(String cursor, int totalItemsCount, RecyclerView view) {
                 Log.d("Diplicity", "Wanting to load more.");
@@ -168,12 +170,12 @@ public class MainActivity extends RetrofitActivity {
         contentList.addItemDecoration(dividerItemDecoration);
     }
 
-    private void displayGames(Observable<GamesContainer> call, String what) {
+    private void displayGames(Observable<GamesContainer> call, final String what) {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
 
         final ProgressDialog progress = new ProgressDialog(this);
-        progress.setTitle(getResources().getString(R.string.loading_x, what));
+        progress.setTitle(getResources().getString(R.string.loading_x_games, what));
         progress.setCancelable(false);
         progress.show();
 
@@ -195,6 +197,8 @@ public class MainActivity extends RetrofitActivity {
                     public void onNext(GamesContainer gamesContainer) {
                         contentList.setAdapter(new GamesAdapter(gamesContainer));
                         scrollListener.resetState();
+                        ((TextView) findViewById(R.id.content_title)).setText(getResources().getString(R.string.x_games, what));
+                        ((TextView) findViewById(R.id.content_title)).setVisibility(View.VISIBLE);
                         if (gamesContainer.Properties.isEmpty()) {
                             findViewById(R.id.empty_view).setVisibility(View.VISIBLE);
                         } else {
@@ -225,13 +229,11 @@ public class MainActivity extends RetrofitActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent i = new Intent(this, PreferenceActivity.class);
+            startActivity(i);
             return true;
         }
 
