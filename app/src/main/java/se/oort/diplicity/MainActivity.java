@@ -122,12 +122,16 @@ public class MainActivity extends RetrofitActivity {
                         displayGames(gameService.MyStagingGames(), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"));
                         break;
                     case 2: // My finished
+                        displayGames(gameService.MyFinishedGames(), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"));
                         break;
                     case 3: // Open
+                        displayGames(gameService.OpenGames(), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"));
                         break;
                     case 4: // Started
+                        displayGames(gameService.StartedGames(), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"));
                         break;
                     case 5: // Finished
+                        displayGames(gameService.FinishedGames(), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"));
                         break;
                     }
                     break;
