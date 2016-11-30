@@ -5,9 +5,9 @@ import rx.*;
 	
 public interface RedirectURLService {
   @DELETE("/RedirectURL/{id}")
-  Observable<RedirectURLContainer> RedirectURLDelete(@Path("id") String id);
+  Observable<SingleContainer<RedirectURL>> RedirectURLDelete(@Path("id") String id);
 
   @GET("/User/{user_id}/RedirectURLs")
-  Observable<RedirectURLsContainer> ListRedirectURLs(@Path("user_id") String user_id);
+  Observable<MultiContainer<RedirectURL>> ListRedirectURLs(@Path("user_id") String user_id);
 
 }

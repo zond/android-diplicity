@@ -5,21 +5,21 @@ import rx.*;
 	
 public interface UserStatsService {
   @GET("/User/{user_id}/Stats")
-  Observable<UserStatsContainer> UserStatsLoad(@Path("user_id") String user_id);
+  Observable<SingleContainer<UserStats>> UserStatsLoad(@Path("user_id") String user_id);
 
   @GET("/Users/TopRated")
-  Observable<UserStatssContainer> ListTopRatedPlayers(@Query("limit") String limit, @Query("cursor") String cursor);
+  Observable<MultiContainer<UserStats>> ListTopRatedPlayers(@Query("limit") String limit, @Query("cursor") String cursor);
 
   @GET("/Users/TopReliable")
-  Observable<UserStatssContainer> ListTopReliablePlayers(@Query("limit") String limit, @Query("cursor") String cursor);
+  Observable<MultiContainer<UserStats>> ListTopReliablePlayers(@Query("limit") String limit, @Query("cursor") String cursor);
 
   @GET("/Users/TopHated")
-  Observable<UserStatssContainer> ListTopHatedPlayers(@Query("limit") String limit, @Query("cursor") String cursor);
+  Observable<MultiContainer<UserStats>> ListTopHatedPlayers(@Query("limit") String limit, @Query("cursor") String cursor);
 
   @GET("/Users/TopHater")
-  Observable<UserStatssContainer> ListTopHaterPlayers(@Query("limit") String limit, @Query("cursor") String cursor);
+  Observable<MultiContainer<UserStats>> ListTopHaterPlayers(@Query("limit") String limit, @Query("cursor") String cursor);
 
   @GET("/Users/TopQuick")
-  Observable<UserStatssContainer> ListTopQuickPlayers(@Query("limit") String limit, @Query("cursor") String cursor);
+  Observable<MultiContainer<UserStats>> ListTopQuickPlayers(@Query("limit") String limit, @Query("cursor") String cursor);
 
 }

@@ -5,9 +5,9 @@ import rx.*;
 	
 public interface MessageService {
   @POST("/Game/{game_id}/Messages")
-  Observable<MessageContainer> MessageCreate(@Body Message message, @Path("game_id") String game_id);
+  Observable<SingleContainer<Message>> MessageCreate(@Body Message message, @Path("game_id") String game_id);
 
   @GET("/Game/{game_id}/Channel/{channel_members}/Messages")
-  Observable<MessagesContainer> ListMessages(@Path("game_id") String game_id, @Path("channel_members") String channel_members);
+  Observable<MultiContainer<Message>> ListMessages(@Path("game_id") String game_id, @Path("channel_members") String channel_members);
 
 }

@@ -5,6 +5,6 @@ import rx.*;
 	
 public interface FlaggedMessagesService {
   @GET("/FlaggedMessages")
-  Observable<FlaggedMessagessContainer> ListFlaggedMessages();
+  Observable<MultiContainer<FlaggedMessages>> ListFlaggedMessages();
 
 }
