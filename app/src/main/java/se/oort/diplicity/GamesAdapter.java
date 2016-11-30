@@ -7,9 +7,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import rx.Single;
 import se.oort.diplicity.apigen.Game;
-import se.oort.diplicity.apigen.GameContainer;
 import se.oort.diplicity.apigen.SingleContainer;
 
 public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAdapter.ViewHolder> {

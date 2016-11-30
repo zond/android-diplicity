@@ -21,8 +21,6 @@ import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,17 +30,13 @@ import java.util.concurrent.Callable;
 
 import rx.Observable;
 import rx.Subscriber;
-import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import se.oort.diplicity.apigen.Game;
-import se.oort.diplicity.apigen.GameContainer;
-import se.oort.diplicity.apigen.GamesContainer;
 import se.oort.diplicity.apigen.Link;
 import se.oort.diplicity.apigen.MultiContainer;
 import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.apigen.UserStats;
-import se.oort.diplicity.apigen.UserStatsContainer;
 
 public class MainActivity extends RetrofitActivity {
 

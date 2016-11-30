@@ -1,18 +1,11 @@
 package se.oort.diplicity;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-import android.view.LayoutInflater;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import se.oort.diplicity.apigen.GameContainer;
-import se.oort.diplicity.apigen.GamesContainer;
-import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.SingleContainer;
 
 public abstract class RecycleAdapter<T extends SingleContainer<?>,VH extends RecycleAdapter.ViewHolder> extends RecyclerView.Adapter<VH> {

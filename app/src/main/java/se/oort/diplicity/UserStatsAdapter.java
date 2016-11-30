@@ -7,11 +7,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import rx.Single;
-import se.oort.diplicity.apigen.GameContainer;
 import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.apigen.UserStats;
-import se.oort.diplicity.apigen.UserStatsContainer;
 
 public class UserStatsAdapter extends RecycleAdapter<SingleContainer<UserStats>, UserStatsAdapter.ViewHolder> {
 

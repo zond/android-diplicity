@@ -1,6 +1,7 @@
 package se.oort.diplicity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +18,7 @@ public class LoginActivity extends RetrofitActivity {
         try {
             super.onCreate(savedInstanceState);
             WebView mWebView = new WebView(this);
+            mWebView.setBackgroundColor(Color.parseColor("#212121"));
             mWebView.getSettings().setJavaScriptEnabled(true);
             final String fakeHost = "android-diplicity";
             String redirectTo = URLEncoder.encode("https://" + fakeHost + "/", "UTF-8");
