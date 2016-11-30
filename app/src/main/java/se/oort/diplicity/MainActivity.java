@@ -1,5 +1,6 @@
 package se.oort.diplicity;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -61,7 +62,7 @@ public class MainActivity extends RetrofitActivity {
                 put("ROOT_NAME", getResources().getString(R.string.users));
             }});
         }};
-        List<List<Map<String, String>>> listOfChildGroups = new ArrayList<List<Map<String, String>>>();
+        final List<List<Map<String, String>>> listOfChildGroups = new ArrayList<List<Map<String, String>>>();
 
         List<Map<String, String>> childGroupForFirstGroupRow = new ArrayList<Map<String, String>>(){{
             add(new HashMap<String, String>() {{
@@ -115,10 +116,10 @@ public class MainActivity extends RetrofitActivity {
                 case 0: // Games
                     switch (i1) {
                     case 0: // My started
-                        displayGames(gameService.MyStartedGames());
+                        displayGames(gameService.MyStartedGames(), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"));
                         break;
                     case 1: // My staging
-                        displayGames(gameService.MyStagingGames());
+                        displayGames(gameService.MyStagingGames(), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"));
                         break;
                     case 2: // My finished
                         break;
@@ -165,7 +166,15 @@ public class MainActivity extends RetrofitActivity {
         contentList.addItemDecoration(dividerItemDecoration);
     }
 
-    private void displayGames(Observable<GamesContainer> call) {
+    private void displayGames(Observable<GamesContainer> call, String what) {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+
+        final ProgressDialog progress = new ProgressDialog(this);
+        progress.setTitle(getResources().getString(R.string.loading_x, what));
+        progress.setCancelable(false);
+        progress.show();
+
         call
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -185,8 +194,7 @@ public class MainActivity extends RetrofitActivity {
                         gamesAdapter.setGamesContainer(gamesContainer);
                         scrollListener.resetState();
                         gamesAdapter.notifyDataSetChanged();
-                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                        drawer.closeDrawer(GravityCompat.START);
+                        progress.dismiss();
                     }
                 });
 

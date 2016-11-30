@@ -138,8 +138,12 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                                     if (e instanceof HttpException) {
                                         HttpException he = (HttpException) e;
                                         if (he.code() == 401) {
-                                            loginSubscribers.add(new LoginSubscriber<R>(subscriber, thisOnSubscribe));
-                                            startActivityForResult(new Intent(RetrofitActivity.this, LoginActivity.class), LOGIN_REQUEST);
+                                            synchronized (loginSubscribers) {
+                                                loginSubscribers.add(new LoginSubscriber<R>(subscriber, thisOnSubscribe));
+                                                if (loginSubscribers.size() == 1) {
+                                                    startActivityForResult(new Intent(RetrofitActivity.this, LoginActivity.class), LOGIN_REQUEST);
+                                                }
+                                            }
                                             return;
                                         }
                                     }
