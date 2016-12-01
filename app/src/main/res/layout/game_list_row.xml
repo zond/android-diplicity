@@ -51,6 +51,7 @@
     <RelativeLayout
         android:focusable="true"
         android:clickable="true"
+        android:layout_below="@id/variant"
         android:background="?android:attr/selectableItemBackground"
         android:orientation="vertical"
         android:layout_width="match_parent"

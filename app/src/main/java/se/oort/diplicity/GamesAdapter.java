@@ -1,6 +1,8 @@
 package se.oort.diplicity;
 
 import android.content.Context;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +20,14 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
 
     public class ViewHolder extends RecycleAdapter<SingleContainer<Game>, GamesAdapter.ViewHolder>.ViewHolder {
         public TextView desc, variant, deadline, state;
+        public RecyclerView members;
         public ViewHolder(View view) {
             super(view);
             desc = (TextView) view.findViewById(R.id.desc);
             variant = (TextView) view.findViewById(R.id.variant);
             deadline = (TextView) view.findViewById(R.id.deadline);
             state = (TextView) view.findViewById(R.id.state);
+            members = (RecyclerView) view.findViewById(R.id.member_list);
         }
         @Override
         public void bind(SingleContainer<Game> game) {
@@ -63,6 +67,11 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                 PhaseMeta phaseMeta = game.Properties.NewestPhaseMeta.get(0);
                 state.setText(ctx.getResources().getString(R.string.season_year_type, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type));
             }
+
+            LinearLayoutManager membersLayoutManager = new LinearLayoutManager(ctx);
+            membersLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+            members.setLayoutManager(membersLayoutManager);
+            members.setAdapter(new MemberAdapter(ctx, game.Properties.Members));
         }
     }
     public GamesAdapter(Context ctx, List<SingleContainer<Game>> games) {
