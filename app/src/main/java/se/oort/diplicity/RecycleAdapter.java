@@ -9,7 +9,7 @@ import java.util.List;
 
 import se.oort.diplicity.apigen.SingleContainer;
 
-public abstract class RecycleAdapter<T extends SingleContainer<?>,VH extends RecycleAdapter.ViewHolder> extends RecyclerView.Adapter<VH> {
+public abstract class RecycleAdapter<T,VH extends RecycleAdapter.ViewHolder> extends RecyclerView.Adapter<VH> {
 
     private List<T> items;
     protected Context ctx;
