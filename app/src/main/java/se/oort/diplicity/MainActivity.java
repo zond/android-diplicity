@@ -21,6 +21,8 @@ import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -59,6 +61,7 @@ public class MainActivity extends RetrofitActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -154,10 +157,10 @@ public class MainActivity extends RetrofitActivity {
 
         loadMoreProcContainer = new ArrayList<Sendable<String>>();
         loadMoreProcContainer.add(new Sendable<String>() {
+            @Override
             public void Send(String s) {
             }
         });
-
     }
 
     private void connectNavigationList(final List<List<Map<String, String>>> listOfChildGroups, final List<Map<String, String>> groupData, ExpandableListView navigationList) {
@@ -286,7 +289,7 @@ public class MainActivity extends RetrofitActivity {
         if (what != null) {
             progress.setTitle(getResources().getString(R.string.loading_x_y, what, typ));
         }
-        progress.setCancelable(false);
+        progress.setCancelable(true);
         progress.show();
 
         call
@@ -295,17 +298,18 @@ public class MainActivity extends RetrofitActivity {
                 .subscribe(new Subscriber<MultiContainer<T>>() {
                     @Override
                     public void onCompleted() {
+                        progress.dismiss();
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         Log.e("Diplicity", "Error loading " + what + " " + typ + ": " + e);
                         Toast.makeText(MainActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+                        progress.dismiss();
                     }
 
                     @Override
                     public void onNext(MultiContainer<T> container) {
-                        Log.d("Diplicity", "Finally received " + container.Properties.size() + " items");
                         nextCursorContainer.set(0, "");
                         for (Link link : container.Links) {
                             if (link.Rel.equals("next")) {
@@ -313,8 +317,7 @@ public class MainActivity extends RetrofitActivity {
                                 nextCursorContainer.set(0, uri.getQueryParameter("cursor"));
                             }
                         }
-
-                        adapter.AddAll(container.Properties);
+                        adapter.addAll(container.Properties);
 
                         if (what != null) {
                             ((TextView) findViewById(R.id.content_title)).setText(getResources().getString(R.string.x_y, what, typ));
@@ -322,11 +325,11 @@ public class MainActivity extends RetrofitActivity {
                         ((TextView) findViewById(R.id.content_title)).setVisibility(View.VISIBLE);
                         if (container.Properties.isEmpty()) {
                             findViewById(R.id.empty_view).setVisibility(View.VISIBLE);
+                            contentList.setVisibility(View.GONE);
                         } else {
                             findViewById(R.id.empty_view).setVisibility(View.GONE);
+                            contentList.setVisibility(View.VISIBLE);
                         }
-
-                        progress.dismiss();
                     }
                 });
 
@@ -334,7 +337,7 @@ public class MainActivity extends RetrofitActivity {
     }
 
     private <T> void displayItems(Observable<MultiContainer<T>> call, String what, String typ, RecycleAdapter<SingleContainer<T>,?> adapter) {
-        adapter.Clear();
+        adapter.clear();
         contentList.setAdapter(adapter);
         scrollListener.resetState();
         appendItems(call, what, typ, adapter);

@@ -23,13 +23,13 @@ public abstract class RecycleAdapter<T extends SingleContainer<?>,VH extends Rec
         this.items = items;
     }
 
-    public void Clear() {
+    public void clear() {
         int before = this.items.size();
         this.items.clear();
         notifyItemRangeRemoved(0, before);
     }
 
-    public void AddAll(List<T> games) {
+    public void addAll(List<T> games) {
         int before = this.items.size();
         this.items.addAll(games);
         notifyItemRangeInserted(before, games.size());

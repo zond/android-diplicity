@@ -19,7 +19,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:visibility="gone"
         android:gravity="center_horizontal"
         android:textColor="?android:attr/textColorPrimary" />
 
@@ -34,6 +33,8 @@
         android:id="@+id/empty_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/content_title"
+        android:layout_alignParentBottom="true"
         android:gravity="center"
         android:visibility="gone"
         android:textColor="?android:attr/textColorPrimary"

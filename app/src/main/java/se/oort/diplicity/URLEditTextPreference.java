@@ -41,9 +41,7 @@ public class URLEditTextPreference extends EditTextPreference {
         positiveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("Diplicity", "Clicked positive button!");
                 String errorMessage = onValidate(getEditText().getText().toString());
-                Log.d("Diplicity", "error message: " + errorMessage);
                 if (errorMessage == null) {
                     getEditText().setError(null);
                     URLEditTextPreference.this.onClick(getDialog(), DialogInterface.BUTTON_POSITIVE);

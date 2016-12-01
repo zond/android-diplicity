@@ -18,6 +18,7 @@ public class Game {
   public Double MinQuickness;
   public Long NMembers;
   public java.util.List<Member> Members;
+  public java.util.List<PhaseMeta> NewestPhaseMeta;
   public java.util.List<Ban> ActiveBans;
   public java.util.List<String> FailedRequirements;
   public java.util.Date CreatedAt;

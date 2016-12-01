@@ -2,9 +2,7 @@ package se.oort.diplicity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
-import android.preference.EditTextPreference;
-import android.preference.Preference;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,8 +10,6 @@ import android.util.Log;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -61,7 +57,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
             this.onSubscribe.call(this.subscriber);
         }
     }
-    private List<LoginSubscriber<?>> loginSubscribers = Collections.synchronizedList(new ArrayList<LoginSubscriber<?>>());
+    private static List<LoginSubscriber<?>> loginSubscribers = Collections.synchronizedList(new ArrayList<LoginSubscriber<?>>());
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -109,8 +105,8 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefsListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -132,14 +128,15 @@ public abstract class RetrofitActivity extends AppCompatActivity {
             setBaseURL(baseURL);
         } else {
             Log.d("Diplicity", "Malformed URL " + baseURL + ", resetting to default URL " + DEFAULT_URL);
+            setBaseURL(DEFAULT_URL);
             prefs.edit().putString(API_URL_KEY, DEFAULT_URL).commit();
         }
     }
 
     @Override
-    public void onPause() {
+    public void onDestroy() {
         prefs.unregisterOnSharedPreferenceChangeListener(prefsListener);
-        super.onPause();
+        super.onDestroy();
     }
 
     private class AuthenticatingCallAdapterFactory extends CallAdapter.Factory {
