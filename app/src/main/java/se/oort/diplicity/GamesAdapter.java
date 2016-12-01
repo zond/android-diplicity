@@ -1,5 +1,6 @@
 package se.oort.diplicity;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,17 +10,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import se.oort.diplicity.apigen.Game;
+import se.oort.diplicity.apigen.Phase;
+import se.oort.diplicity.apigen.PhaseMeta;
 import se.oort.diplicity.apigen.SingleContainer;
 
 public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAdapter.ViewHolder> {
 
     public class ViewHolder extends RecycleAdapter<SingleContainer<Game>, GamesAdapter.ViewHolder>.ViewHolder {
-        public TextView desc, variant, deadline;
+        public TextView desc, variant, deadline, state;
         public ViewHolder(View view) {
             super(view);
             desc = (TextView) view.findViewById(R.id.desc);
             variant = (TextView) view.findViewById(R.id.variant);
             deadline = (TextView) view.findViewById(R.id.deadline);
+            state = (TextView) view.findViewById(R.id.state);
         }
         @Override
         public void bind(SingleContainer<Game> game) {
@@ -28,7 +32,9 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             } else {
                 desc.setText(game.Properties.Desc);
             }
+
             variant.setText(game.Properties.Variant);
+
             long days = game.Properties.PhaseLengthMinutes / (60 * 24);
             long hours = (game.Properties.PhaseLengthMinutes - (60 * 24 * days)) / 60;
             long minutes = game.Properties.PhaseLengthMinutes - (60 * 24 * days) - (60 * hours);
@@ -50,10 +56,17 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                 }
             }
             deadline.setText(timeLabel.toString());
+
+            if (!game.Properties.Started) {
+                state.setText(ctx.getResources().getQuantityString(R.plurals.player, game.Properties.NMembers.intValue(), game.Properties.NMembers));
+            } else if (game.Properties.NewestPhaseMeta.size() > 0) {
+                PhaseMeta phaseMeta = game.Properties.NewestPhaseMeta.get(0);
+                state.setText(ctx.getResources().getString(R.string.season_year_type, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type));
+            }
         }
     }
-    public GamesAdapter(List<SingleContainer<Game>> games) {
-        super(games);
+    public GamesAdapter(Context ctx, List<SingleContainer<Game>> games) {
+        super(ctx, games);
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

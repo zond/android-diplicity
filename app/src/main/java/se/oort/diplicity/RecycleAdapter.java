@@ -1,5 +1,6 @@
 package se.oort.diplicity;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import se.oort.diplicity.apigen.SingleContainer;
 public abstract class RecycleAdapter<T extends SingleContainer<?>,VH extends RecycleAdapter.ViewHolder> extends RecyclerView.Adapter<VH> {
 
     private List<T> items;
+    protected Context ctx;
 
     public abstract class ViewHolder extends RecyclerView.ViewHolder {
         public ViewHolder(View view) {
@@ -19,8 +21,9 @@ public abstract class RecycleAdapter<T extends SingleContainer<?>,VH extends Rec
         public abstract void bind(T item);
     }
 
-    public RecycleAdapter(List<T> items) {
+    public RecycleAdapter(Context ctx, List<T> items) {
         this.items = items;
+        this.ctx = ctx;
     }
 
     public void clear() {

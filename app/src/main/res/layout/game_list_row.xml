@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:minHeight="?attr/listPreferredItemHeight"
-    android:mode="twoLine"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:focusable="true"
@@ -11,35 +10,42 @@
 
     <TextView
         android:layout_marginTop="8dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
         android:textAppearance="?attr/textAppearanceListItem"
         android:layout_margin="2dp"
-        android:id="@+id/desc"
-        android:layout_width="match_parent"
+        android:id="@+id/state"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="?android:attr/textColorPrimary" />
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <TextView
+        android:layout_marginTop="8dp"
+        android:layout_alignBaseline="@id/state"
+        android:layout_alignParentStart="true"
+        android:textAppearance="?attr/textAppearanceListItem"
+        android:layout_margin="2dp"
+        android:id="@+id/desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="?android:attr/textColorPrimary" />
 
-        <TextView
-            android:id="@+id/variant"
-            android:layout_margin="2dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="?android:attr/textColorPrimary" />
+    <TextView
+        android:id="@+id/variant"
+        android:layout_margin="2dp"
+        android:layout_below="@id/state"
+        android:layout_alignParentStart="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="?android:attr/textColorPrimary" />
 
-        <TextView
-            android:id="@+id/deadline"
-            android:layout_alignParentTop="true"
-            android:layout_margin="2dp"
-            android:layout_toRightOf="@id/variant"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="?android:attr/textColorPrimary" />
+    <TextView
+        android:id="@+id/deadline"
+        android:layout_margin="2dp"
+        android:layout_toEndOf="@id/variant"
+        android:layout_alignBaseline="@id/variant"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="?android:attr/textColorPrimary" />
 
-    </RelativeLayout>
-
-</LinearLayout>
+</RelativeLayout>

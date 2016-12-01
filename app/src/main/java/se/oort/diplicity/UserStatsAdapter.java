@@ -1,5 +1,6 @@
 package se.oort.diplicity;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,8 +24,8 @@ public class UserStatsAdapter extends RecycleAdapter<SingleContainer<UserStats>,
             name.setText(user.Properties.User.Name);
         }
     }
-    public UserStatsAdapter(List<SingleContainer<UserStats>> users) {
-        super(users);
+    public UserStatsAdapter(Context ctx, List<SingleContainer<UserStats>> users) {
+        super(ctx, users);
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

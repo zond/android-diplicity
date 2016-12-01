@@ -55,8 +55,8 @@ public class MainActivity extends RetrofitActivity {
 
     private List<Sendable<String>> loadMoreProcContainer = new ArrayList<>();
 
-    private GamesAdapter gamesAdapter = new GamesAdapter(new ArrayList<SingleContainer<Game>>());
-    private UserStatsAdapter userStatsAdapter = new UserStatsAdapter(new ArrayList<SingleContainer<UserStats>>());
+    private GamesAdapter gamesAdapter = new GamesAdapter(this, new ArrayList<SingleContainer<Game>>());
+    private UserStatsAdapter userStatsAdapter = new UserStatsAdapter(this, new ArrayList<SingleContainer<UserStats>>());
 
     private List<List<Map<String, String>>> navigationChildGroups;
     private List<Map<String, String>> navigationRootGroups;

@@ -27,4 +27,6 @@
     <string name="top_reliable">Top reliable</string>
     <string name="top_quick">Top quick</string>
     <string name="top_hater">Top hater</string>
+    <string name="season_year_type">%1$s %2$s, %3$s</string>
+    <string name="x_players">%s players</string>
 </resources>
