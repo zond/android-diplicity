@@ -53,14 +53,17 @@ public class MainActivity extends RetrofitActivity {
         }
     };
 
-    private List<Sendable<String>> loadMoreProcContainer;
+    private List<Sendable<String>> loadMoreProcContainer = new ArrayList<>();
 
     private GamesAdapter gamesAdapter = new GamesAdapter(new ArrayList<SingleContainer<Game>>());
     private UserStatsAdapter userStatsAdapter = new UserStatsAdapter(new ArrayList<SingleContainer<UserStats>>());
 
+    private List<List<Map<String, String>>> navigationChildGroups;
+    private List<Map<String, String>> navigationRootGroups;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
 
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
         setContentView(R.layout.activity_main);
@@ -73,7 +76,31 @@ public class MainActivity extends RetrofitActivity {
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        List<Map<String, String>> groupData = new ArrayList<Map<String, String>>() {{
+        setupNavigation();
+
+        contentList = (RecyclerView) findViewById(R.id.content_list);
+        LinearLayoutManager contentLayoutManager = new LinearLayoutManager(this);
+        contentLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        contentList.setLayoutManager(contentLayoutManager);
+        scrollListener = new EndlessRecyclerViewScrollListener(contentLayoutManager, nextCursor) {
+            @Override
+            public void onLoadMore(String cursor, int totalItemsCount, RecyclerView view) {
+                if (cursor.length() > 0) {
+                    loadMoreProcContainer.get(0).Send(cursor);
+                }
+            }
+        };
+        contentList.addOnScrollListener(scrollListener);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, contentLayoutManager.getOrientation());
+        contentList.addItemDecoration(dividerItemDecoration);
+
+        loadMoreProcContainer.add(null);
+
+        navigateTo(0, 0);
+    }
+
+    private void setupNavigation() {
+        navigationRootGroups = new ArrayList<Map<String, String>>() {{
             add(new HashMap<String, String>() {{
                 put("ROOT_NAME", getResources().getString(R.string.games));
             }});
@@ -81,7 +108,7 @@ public class MainActivity extends RetrofitActivity {
                 put("ROOT_NAME", getResources().getString(R.string.users));
             }});
         }};
-        final List<List<Map<String, String>>> listOfChildGroups = new ArrayList<List<Map<String, String>>>();
+        navigationChildGroups = new ArrayList<List<Map<String, String>>>();
 
         List<Map<String, String>> childGroupForFirstGroupRow = new ArrayList<Map<String, String>>(){{
             add(new HashMap<String, String>() {{
@@ -103,7 +130,7 @@ public class MainActivity extends RetrofitActivity {
                 put("CHILD_NAME", getResources().getString(R.string.finished));
             }});
         }};
-        listOfChildGroups.add(childGroupForFirstGroupRow);
+        navigationChildGroups.add(childGroupForFirstGroupRow);
 
         List<Map<String, String>> childGroupForSecondGroupRow = new ArrayList<Map<String, String>>(){{
             add(new HashMap<String, String>() {{
@@ -122,14 +149,15 @@ public class MainActivity extends RetrofitActivity {
                 put("CHILD_NAME", getResources().getString(R.string.top_hater));
             }});
         }};
-        listOfChildGroups.add(childGroupForSecondGroupRow);
+        navigationChildGroups.add(childGroupForSecondGroupRow);
+
         SimpleExpandableListAdapter navigationListAdapter = new SimpleExpandableListAdapter(
                 this,
-                groupData,
+                navigationRootGroups,
                 android.R.layout.simple_expandable_list_item_1,
                 new String[] { "ROOT_NAME" },
                 new int[] { android.R.id.text1 },
-                listOfChildGroups,
+                navigationChildGroups,
                 android.R.layout.simple_expandable_list_item_1,
                 new String[] { "CHILD_NAME" },
                 new int[] { android.R.id.text1 }
@@ -137,148 +165,130 @@ public class MainActivity extends RetrofitActivity {
 
         ExpandableListView navigationList = (ExpandableListView) findViewById(R.id.nav_list);
         navigationList.setAdapter(navigationListAdapter);
-        connectNavigationList(listOfChildGroups, groupData, navigationList);
+        connectNavigationList(navigationList);
 
-        contentList = (RecyclerView) findViewById(R.id.content_list);
-        LinearLayoutManager contentLayoutManager = new LinearLayoutManager(this);
-        contentLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        contentList.setLayoutManager(contentLayoutManager);
-        scrollListener = new EndlessRecyclerViewScrollListener(contentLayoutManager, nextCursor) {
-            @Override
-            public void onLoadMore(String cursor, int totalItemsCount, RecyclerView view) {
-                if (cursor.length() > 0) {
-                    loadMoreProcContainer.get(0).Send(cursor);
-                }
-            }
-        };
-        contentList.addOnScrollListener(scrollListener);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, contentLayoutManager.getOrientation());
-        contentList.addItemDecoration(dividerItemDecoration);
+    }
 
-        loadMoreProcContainer = new ArrayList<Sendable<String>>();
-        loadMoreProcContainer.add(new Sendable<String>() {
+    private void connectNavigationList(ExpandableListView navigationList) {
+        navigationList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
-            public void Send(String s) {
+            public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
+                navigateTo(i, i1);
+                return false;
             }
         });
     }
 
-    private void connectNavigationList(final List<List<Map<String, String>>> listOfChildGroups, final List<Map<String, String>> groupData, ExpandableListView navigationList) {
-        navigationList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
-                switch (i) {
-                case 0: // Games
-                    switch (i1) {
-                    case 0: // My started
-                        loadMoreProcContainer.set(0, new Sendable<String>() {
-                            @Override
-                            public void Send(String s) {
-                                appendItems(gameService.MyStartedGames(null, null, null, null, null, null, null, null, s), null, null, gamesAdapter);
-                            }
-                        });
-                        displayItems(gameService.MyStartedGames(null, null, null, null, null, null, null, null, null), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"), groupData.get(i).get("ROOT_NAME").toLowerCase(), gamesAdapter);
-                        break;
-                    case 1: // My staging
-                        loadMoreProcContainer.set(0, new Sendable<String>() {
-                            @Override
-                            public void Send(String s) {
-                                appendItems(gameService.MyStagingGames(null, null, null, null, null, null, null, null, s), null, null, gamesAdapter);
-                            }
-                        });
-                        displayItems(gameService.MyStagingGames(null, null, null, null, null, null, null, null, null), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"), groupData.get(i).get("ROOT_NAME").toLowerCase(), gamesAdapter);
-                        break;
-                    case 2: // My finished
-                        loadMoreProcContainer.set(0, new Sendable<String>() {
-                            @Override
-                            public void Send(String s) {
-                                appendItems(gameService.MyFinishedGames(null, null, null, null, null, null, null, null, s), null, null, gamesAdapter);
-                            }
-                        });
-                        displayItems(gameService.MyFinishedGames(null, null, null, null, null, null, null, null, null), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"), groupData.get(i).get("ROOT_NAME").toLowerCase(), gamesAdapter);
-                        break;
-                    case 3: // Open
-                        loadMoreProcContainer.set(0, new Sendable<String>() {
-                            @Override
-                            public void Send(String s) {
-                                appendItems(gameService.OpenGames(null, null, null, null, null, null, null, null, s), null, null, gamesAdapter);
-                            }
-                        });
-                        displayItems(gameService.OpenGames(null, null, null, null, null, null, null, null, null), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"), groupData.get(i).get("ROOT_NAME").toLowerCase(), gamesAdapter);
-                        break;
-                    case 4: // Started
-                        loadMoreProcContainer.set(0, new Sendable<String>() {
-                            @Override
-                            public void Send(String s) {
-                                appendItems(gameService.StartedGames(null, null, null, null, null, null, null, null, s), null, null, gamesAdapter);
-                            }
-                        });
-                        displayItems(gameService.StartedGames(null, null, null, null, null, null, null, null, null), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"), groupData.get(i).get("ROOT_NAME").toLowerCase(), gamesAdapter);
-                        break;
-                    case 5: // Finished
-                        loadMoreProcContainer.set(0, new Sendable<String>() {
-                            @Override
-                            public void Send(String s) {
-                                appendItems(gameService.FinishedGames(null, null, null, null, null, null, null, null, s), null, null, gamesAdapter);
-                            }
-                        });
-                        displayItems(gameService.FinishedGames(null, null, null, null, null, null, null, null, null), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"), groupData.get(i).get("ROOT_NAME").toLowerCase(), gamesAdapter);
-                        break;
+    private void navigateTo(int root, int child) {
+        switch (root) {
+        case 0: // Games
+            switch (child) {
+            case 0: // My started
+                loadMoreProcContainer.set(0, new Sendable<String>() {
+                    @Override
+                    public void Send(String s) {
+                        appendItems(gameService.MyStartedGames(null, null, null, null, null, null, null, null, s), null, null, gamesAdapter);
                     }
-                    break;
-                case 1: // Users
-                    switch (i1) {
-                    case 0: // Top rated
-                        loadMoreProcContainer.set(0, new Sendable<String>() {
-                            @Override
-                            public void Send(String s) {
-                                appendItems(userStatsService.ListTopRatedPlayers(null, s), null, null, userStatsAdapter);
-                            }
-                        });
-                        displayItems(userStatsService.ListTopRatedPlayers(null, null), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"), groupData.get(i).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
-                        break;
-                    case 1: // Top reliable
-                        loadMoreProcContainer.set(0, new Sendable<String>() {
-                            @Override
-                            public void Send(String s) {
-                                appendItems(userStatsService.ListTopReliablePlayers(null, s), null, null, userStatsAdapter);
-                            }
-                        });
-                        displayItems(userStatsService.ListTopReliablePlayers(null, null), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"), groupData.get(i).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
-                        break;
-                    case 2: // Top quick
-                        loadMoreProcContainer.set(0, new Sendable<String>() {
-                            @Override
-                            public void Send(String s) {
-                                appendItems(userStatsService.ListTopQuickPlayers(null, s), null, null, userStatsAdapter);
-                            }
-                        });
-                        displayItems(userStatsService.ListTopQuickPlayers(null, null), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"), groupData.get(i).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
-                        break;
-                    case 3: // Top hated
-                        loadMoreProcContainer.set(0, new Sendable<String>() {
-                            @Override
-                            public void Send(String s) {
-                                appendItems(userStatsService.ListTopHatedPlayers(null, s), null, null, userStatsAdapter);
-                            }
-                        });
-                        displayItems(userStatsService.ListTopHatedPlayers(null, null), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"), groupData.get(i).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
-                        break;
-                    case 4: // Top hater
-                        loadMoreProcContainer.set(0, new Sendable<String>() {
-                            @Override
-                            public void Send(String s) {
-                                appendItems(userStatsService.ListTopHaterPlayers(null, s), null, null, userStatsAdapter);
-                            }
-                        });
-                        displayItems(userStatsService.ListTopHaterPlayers(null, null), listOfChildGroups.get(i).get(i1).get("CHILD_NAME"), groupData.get(i).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
-                        break;
+                });
+                displayItems(gameService.MyStartedGames(null, null, null, null, null, null, null, null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
+                break;
+            case 1: // My staging
+                loadMoreProcContainer.set(0, new Sendable<String>() {
+                    @Override
+                    public void Send(String s) {
+                        appendItems(gameService.MyStagingGames(null, null, null, null, null, null, null, null, s), null, null, gamesAdapter);
                     }
-                    break;
-                }
-                return false;
+                });
+                displayItems(gameService.MyStagingGames(null, null, null, null, null, null, null, null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
+                break;
+            case 2: // My finished
+                loadMoreProcContainer.set(0, new Sendable<String>() {
+                    @Override
+                    public void Send(String s) {
+                        appendItems(gameService.MyFinishedGames(null, null, null, null, null, null, null, null, s), null, null, gamesAdapter);
+                    }
+                });
+                displayItems(gameService.MyFinishedGames(null, null, null, null, null, null, null, null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
+                break;
+            case 3: // Open
+                loadMoreProcContainer.set(0, new Sendable<String>() {
+                    @Override
+                    public void Send(String s) {
+                        appendItems(gameService.OpenGames(null, null, null, null, null, null, null, null, s), null, null, gamesAdapter);
+                    }
+                });
+                displayItems(gameService.OpenGames(null, null, null, null, null, null, null, null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
+                break;
+            case 4: // Started
+                loadMoreProcContainer.set(0, new Sendable<String>() {
+                    @Override
+                    public void Send(String s) {
+                        appendItems(gameService.StartedGames(null, null, null, null, null, null, null, null, s), null, null, gamesAdapter);
+                    }
+                });
+                displayItems(gameService.StartedGames(null, null, null, null, null, null, null, null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
+                break;
+            case 5: // Finished
+                loadMoreProcContainer.set(0, new Sendable<String>() {
+                    @Override
+                    public void Send(String s) {
+                        appendItems(gameService.FinishedGames(null, null, null, null, null, null, null, null, s), null, null, gamesAdapter);
+                    }
+                });
+                displayItems(gameService.FinishedGames(null, null, null, null, null, null, null, null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
+                break;
             }
-        });
+            break;
+        case 1: // Users
+            switch (child) {
+            case 0: // Top rated
+                loadMoreProcContainer.set(0, new Sendable<String>() {
+                    @Override
+                    public void Send(String s) {
+                        appendItems(userStatsService.ListTopRatedPlayers(null, s), null, null, userStatsAdapter);
+                    }
+                });
+                displayItems(userStatsService.ListTopRatedPlayers(null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
+                break;
+            case 1: // Top reliable
+                loadMoreProcContainer.set(0, new Sendable<String>() {
+                    @Override
+                    public void Send(String s) {
+                        appendItems(userStatsService.ListTopReliablePlayers(null, s), null, null, userStatsAdapter);
+                    }
+                });
+                displayItems(userStatsService.ListTopReliablePlayers(null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
+                break;
+            case 2: // Top quick
+                loadMoreProcContainer.set(0, new Sendable<String>() {
+                    @Override
+                    public void Send(String s) {
+                        appendItems(userStatsService.ListTopQuickPlayers(null, s), null, null, userStatsAdapter);
+                    }
+                });
+                displayItems(userStatsService.ListTopQuickPlayers(null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
+                break;
+            case 3: // Top hated
+                loadMoreProcContainer.set(0, new Sendable<String>() {
+                    @Override
+                    public void Send(String s) {
+                        appendItems(userStatsService.ListTopHatedPlayers(null, s), null, null, userStatsAdapter);
+                    }
+                });
+                displayItems(userStatsService.ListTopHatedPlayers(null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
+                break;
+            case 4: // Top hater
+                loadMoreProcContainer.set(0, new Sendable<String>() {
+                    @Override
+                    public void Send(String s) {
+                        appendItems(userStatsService.ListTopHaterPlayers(null, s), null, null, userStatsAdapter);
+                    }
+                });
+                displayItems(userStatsService.ListTopHaterPlayers(null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
+                break;
+            }
+            break;
+        }
     }
 
     private <T> void appendItems(Observable<MultiContainer<T>> call, final String what, final String typ, final RecycleAdapter<SingleContainer<T>,?> adapter) {
