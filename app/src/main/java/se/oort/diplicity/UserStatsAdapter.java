@@ -14,14 +14,14 @@ import se.oort.diplicity.apigen.UserStats;
 public class UserStatsAdapter extends RecycleAdapter<SingleContainer<UserStats>, UserStatsAdapter.ViewHolder> {
 
     public class ViewHolder extends RecycleAdapter<SingleContainer<UserStats>, UserStatsAdapter.ViewHolder>.ViewHolder {
-        public TextView name;
+        public UserView userView;
         public ViewHolder(View view) {
             super(view);
-            name = (TextView) view.findViewById(R.id.name);
+            userView = (UserView) view.findViewById(R.id.user);
         }
         @Override
         public void bind(SingleContainer<UserStats> user) {
-            name.setText(user.Properties.User.Name);
+            userView.setUser(user.Properties.User);
         }
     }
     public UserStatsAdapter(Context ctx, List<SingleContainer<UserStats>> users) {

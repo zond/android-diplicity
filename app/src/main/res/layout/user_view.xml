@@ -1,18 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:minHeight="?attr/listPreferredItemHeight"
-    android:mode="twoLine"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:focusable="true"
-    android:clickable="true"
-    android:background="?android:attr/selectableItemBackground"
-    android:orientation="vertical">
+    android:layout_width="match_parent" android:layout_height="match_parent">
 
-    <se.oort.diplicity.UserView
+    <TextView
         android:layout_marginTop="8dp"
         android:textAppearance="?attr/textAppearanceListItem"
-        android:id="@+id/user"
+        android:id="@+id/name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="?android:attr/textColorPrimary" />

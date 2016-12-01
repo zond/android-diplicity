@@ -48,4 +48,20 @@
         android:layout_height="wrap_content"
         android:textColor="?android:attr/textColorPrimary" />
 
+    <RelativeLayout
+        android:focusable="true"
+        android:clickable="true"
+        android:background="?android:attr/selectableItemBackground"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/member_list"
+            android:layout_alignParentTop="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
+
 </RelativeLayout>
