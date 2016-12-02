@@ -3,13 +3,17 @@ package se.oort.diplicity;
 import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Phase;
@@ -17,10 +21,12 @@ import se.oort.diplicity.apigen.PhaseMeta;
 import se.oort.diplicity.apigen.SingleContainer;
 
 public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAdapter.ViewHolder> {
-
+    private Set<Integer> expandedItems = new HashSet<>();
     public class ViewHolder extends RecycleAdapter<SingleContainer<Game>, GamesAdapter.ViewHolder>.ViewHolder {
         public TextView desc, variant, deadline, state;
         public RecyclerView members;
+        public RelativeLayout expanded;
+        public View.OnClickListener delegateClickListener;
         public ViewHolder(View view) {
             super(view);
             desc = (TextView) view.findViewById(R.id.desc);
@@ -28,9 +34,10 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             deadline = (TextView) view.findViewById(R.id.deadline);
             state = (TextView) view.findViewById(R.id.state);
             members = (RecyclerView) view.findViewById(R.id.member_list);
+            expanded = (RelativeLayout) view.findViewById(R.id.expanded);
         }
         @Override
-        public void bind(SingleContainer<Game> game) {
+        public void bind(SingleContainer<Game> game, int pos) {
             if (game.Properties.Desc == null || game.Properties.Desc.equals("")) {
                 desc.setVisibility(View.GONE);
             } else {
@@ -68,10 +75,16 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                 state.setText(ctx.getResources().getString(R.string.season_year_type, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type));
             }
 
+            if (expandedItems.contains(pos)) {
+                expanded.setVisibility(View.VISIBLE);
+            } else {
+                expanded.setVisibility(View.GONE);
+            }
+
             LinearLayoutManager membersLayoutManager = new LinearLayoutManager(ctx);
             membersLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
             members.setLayoutManager(membersLayoutManager);
-            members.setAdapter(new MemberAdapter(ctx, game.Properties.Members));
+            members.setAdapter(new MemberAdapter(ctx, game.Properties.Members, delegateClickListener));
         }
     }
     public GamesAdapter(Context ctx, List<SingleContainer<Game>> games) {
@@ -81,7 +94,20 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.game_list_row, parent, false);
-
-        return new ViewHolder(itemView);
+        final ViewHolder vh = new ViewHolder(itemView);
+        View.OnClickListener clickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (expandedItems.contains(vh.getAdapterPosition())) {
+                    expandedItems.remove(vh.getAdapterPosition());
+                } else {
+                    expandedItems.add(vh.getAdapterPosition());
+                }
+                notifyItemChanged(vh.getAdapterPosition());
+            }
+        };
+        itemView.setOnClickListener(clickListener);
+        vh.delegateClickListener = clickListener;
+        return vh;
     }
 }

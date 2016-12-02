@@ -20,7 +20,7 @@ public class UserStatsAdapter extends RecycleAdapter<SingleContainer<UserStats>,
             userView = (UserView) view.findViewById(R.id.user);
         }
         @Override
-        public void bind(SingleContainer<UserStats> user) {
+        public void bind(SingleContainer<UserStats> user, int pos) {
             userView.setUser(user.Properties.User);
         }
     }

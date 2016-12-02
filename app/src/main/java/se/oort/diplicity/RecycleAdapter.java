@@ -18,7 +18,7 @@ public abstract class RecycleAdapter<T,VH extends RecycleAdapter.ViewHolder> ext
         public ViewHolder(View view) {
             super(view);
         }
-        public abstract void bind(T item);
+        public abstract void bind(T item, int pos);
     }
 
     public RecycleAdapter(Context ctx, List<T> items) {
@@ -44,7 +44,7 @@ public abstract class RecycleAdapter<T,VH extends RecycleAdapter.ViewHolder> ext
     @Override
     public void onBindViewHolder(VH holder, int position) {
         T item = items.get(position);
-        holder.bind(item);
+        holder.bind(item, position);
     }
 
     @Override
