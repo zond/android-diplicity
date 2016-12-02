@@ -8,13 +8,17 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:id="@+id/avatar"
-        android:layout_margin="1dp"
-        android:layout_width="24dp"
-        android:layout_height="24dp" />
+        android:padding="1dp"
+        android:paddingLeft="5dp"
+        android:paddingStart="5dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp" />
 
     <TextView
         android:textAppearance="?attr/textAppearanceListItem"
         android:id="@+id/name"
+        android:paddingLeft="3dp"
+        android:paddingStart="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@id/avatar"
