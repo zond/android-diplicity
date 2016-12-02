@@ -2,7 +2,7 @@ package se.oort.diplicity.apigen;
 
 import retrofit2.http.*;
 	
-public class Game {
+public class Game implements java.io.Serializable {
   public String ID;
   public Boolean Started;
   public Boolean Closed;

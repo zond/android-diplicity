@@ -54,6 +54,7 @@
         android:textColor="?android:attr/textColorPrimary" />
 
     <RelativeLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/expanded"
         android:layout_below="@id/variant"
         android:background="?android:attr/selectableItemBackground"
@@ -148,6 +149,19 @@
             android:layout_below="@id/meta_labels"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
+
+        <android.support.design.widget.FloatingActionButton
+            app:elevation="@dimen/elevation_high"
+            app:fabSize="mini"
+            app:rippleColor="@color/colorPrimary"
+            app:useCompatPadding="true"
+            android:tint="@android:color/white"
+            android:id="@+id/button"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
     </RelativeLayout>
 

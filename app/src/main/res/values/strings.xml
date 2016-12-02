@@ -37,4 +37,6 @@
     <string name="max_hated">Max hated</string>
     <string name="max_hater">Max hater</string>
     <string name="logging_in">Logging in</string>
+    <string name="x_to_y">%1$s - %2$s</string>
+    <string name="leaving_game">Leaving game</string>
 </resources>

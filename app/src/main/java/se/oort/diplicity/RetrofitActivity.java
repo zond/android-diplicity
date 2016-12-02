@@ -1,13 +1,20 @@
 package se.oort.diplicity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Toast;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -30,18 +37,29 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import se.oort.diplicity.apigen.GameService;
+import se.oort.diplicity.apigen.MemberService;
+import se.oort.diplicity.apigen.MultiContainer;
+import se.oort.diplicity.apigen.User;
 import se.oort.diplicity.apigen.UserStatsService;
+
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 public abstract class RetrofitActivity extends AppCompatActivity {
 
     static final int LOGIN_REQUEST = 1;
     static final String API_URL_KEY = "api_url";
     static final String DEFAULT_URL = "https://diplicity-engine.appspot.com";
+    static final String LOGGED_IN_USER_KEY = "logged_in_user";
 
     AuthenticatingCallAdapterFactory adapterFactory;
     Retrofit retrofit;
-    GameService gameService;
-    UserStatsService userStatsService;
+
+    public User loggedInUser;
+
+    public GameService gameService;
+    public UserStatsService userStatsService;
+    public MemberService memberService;
+    public RootService rootService;
 
     private SharedPreferences prefs;
     private SharedPreferences.OnSharedPreferenceChangeListener prefsListener;
@@ -59,18 +77,85 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     }
     private static List<LoginSubscriber<?>> loginSubscribers = Collections.synchronizedList(new ArrayList<LoginSubscriber<?>>());
 
+    public static Serializable unserialize(byte[] b) {
+        ByteArrayInputStream bis = null;
+        ObjectInputStream ois = null;
+        Serializable o;
+        try {
+            bis = new ByteArrayInputStream(b);
+            ois = new ObjectInputStream(bis);
+            o = (Serializable) ois.readObject();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                ois.close();
+                bis.close();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return o;
+    }
+
+    public static byte[] serialize(Serializable o) {
+        ObjectOutputStream objectOutputStream = null;
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        try {
+            objectOutputStream = new ObjectOutputStream(bout);
+            objectOutputStream.writeObject(o);
+            objectOutputStream.flush();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                bout.close();
+                objectOutputStream.close();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return bout.toByteArray();
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == LOGIN_REQUEST) {
             if (resultCode == RESULT_OK) {
-                List<LoginSubscriber<?>> subscribersCopy;
-                synchronized (loginSubscribers) {
-                    subscribersCopy = new ArrayList<LoginSubscriber<?>>(loginSubscribers);
-                    loginSubscribers.clear();
-                }
-                for (LoginSubscriber<?> subscriber : subscribersCopy) {
-                    subscriber.retry();
-                }
+                final ProgressDialog progress = new ProgressDialog(this);
+                progress.setTitle(getResources().getString(R.string.logging_in));
+                progress.setCancelable(true);
+                progress.show();
+
+                rootService.GetRoot()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<RootService.Root>() {
+                            @Override
+                            public void onCompleted() {
+                                progress.dismiss();
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                Log.e("Diplicity", "Error loading user: " + e);
+                                Toast.makeText(RetrofitActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+                                progress.dismiss();
+                            }
+
+                            @Override
+                            public void onNext(RootService.Root root) {
+                                loggedInUser = root.Properties.User;
+                                List<LoginSubscriber<?>> subscribersCopy;
+                                synchronized (loginSubscribers) {
+                                    subscribersCopy = new ArrayList<LoginSubscriber<?>>(loginSubscribers);
+                                    loginSubscribers.clear();
+                                }
+                                for (LoginSubscriber<?> subscriber : subscribersCopy) {
+                                    subscriber.retry();
+                                }
+                            }
+                        });
             }
         }
     }
@@ -102,6 +187,8 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                 .build();
         gameService = retrofit.create(GameService.class);
         userStatsService = retrofit.create(UserStatsService.class);
+        memberService = retrofit.create(MemberService.class);
+        rootService = retrofit.create(RootService.class);
     }
 
     @Override

@@ -2,7 +2,7 @@ package se.oort.diplicity.apigen;
 
 import retrofit2.http.*;
 	
-public class GameResult {
+public class GameResult implements java.io.Serializable {
   public String GameID;
   public String SoloWinnerMember;
   public String SoloWinnerUser;

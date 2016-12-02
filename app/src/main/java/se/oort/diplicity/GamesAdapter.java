@@ -1,6 +1,10 @@
 package se.oort.diplicity;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Loader;
+import android.graphics.Color;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -9,27 +13,34 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import rx.Subscriber;
 import se.oort.diplicity.apigen.Game;
+import se.oort.diplicity.apigen.Link;
+import se.oort.diplicity.apigen.Member;
 import se.oort.diplicity.apigen.Phase;
 import se.oort.diplicity.apigen.PhaseMeta;
 import se.oort.diplicity.apigen.SingleContainer;
 
 public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAdapter.ViewHolder> {
+    private RetrofitActivity retrofitActivity;
     private Set<Integer> expandedItems = new HashSet<>();
     public class ViewHolder extends RecycleAdapter<SingleContainer<Game>, GamesAdapter.ViewHolder>.ViewHolder {
-        public TextView desc, variant, deadline, state, rating,
+        TextView desc, variant, deadline, state, rating,
                 minReliability, minQuickness, maxHated, maxHater,
                 ratingLabel, minReliabilityLabel, minQuicknessLabel,
                 maxHatedLabel, maxHaterLabel;
-        public RecyclerView members;
-        public RelativeLayout expanded;
-        public View.OnClickListener delegateClickListener;
+        RecyclerView members;
+        RelativeLayout expanded;
+        View.OnClickListener delegateClickListener;
+        FloatingActionButton button;
+
         public ViewHolder(View view) {
             super(view);
             desc = (TextView) view.findViewById(R.id.desc);
@@ -48,16 +59,17 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             minQuicknessLabel = (TextView) view.findViewById(R.id.min_quickness_label);
             maxHatedLabel = (TextView) view.findViewById(R.id.max_hated_label);
             maxHaterLabel = (TextView) view.findViewById(R.id.max_hater_label);
+            button = (FloatingActionButton) view.findViewById(R.id.button);
         }
         @Override
-        public void bind(SingleContainer<Game> game, int pos) {
+        public void bind(final SingleContainer<Game> game, final int pos) {
             if (game.Properties.Desc == null || game.Properties.Desc.equals("")) {
                 desc.setVisibility(View.GONE);
             } else {
                 desc.setText(game.Properties.Desc);
             }
             if (game.Properties.MinRating != 0 || game.Properties.MaxRating != 0) {
-                rating.setText(ctx.getResources().getString(R.id.x_to_y, game.Properties.MinRating, game.Properties.MaxRating));
+                rating.setText(ctx.getResources().getString(R.string.x_to_y, game.Properties.MinRating, game.Properties.MaxRating));
                 rating.setVisibility(View.VISIBLE);
                 ratingLabel.setVisibility(View.VISIBLE);
             } else {
@@ -138,10 +150,77 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             membersLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
             members.setLayoutManager(membersLayoutManager);
             members.setAdapter(new MemberAdapter(ctx, game.Properties.Members, delegateClickListener));
+
+            boolean hasLeave = false;
+            boolean hasJoin = false;
+            for (Link link : game.Links) {
+                if (link.Rel.equals("leave")) {
+                    hasLeave = true;
+                    hasJoin = false;
+                }
+                if (link.Rel.equals("join")) {
+                    hasJoin = true;
+                    hasLeave = false;
+                }
+            }
+            if (hasLeave) {
+                button.setVisibility(View.VISIBLE);
+                button.setImageDrawable(ctx.getResources().getDrawable(android.R.drawable.ic_input_delete, null));
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        final ProgressDialog progress = new ProgressDialog(retrofitActivity);
+                        progress.setTitle(ctx.getResources().getString(R.string.leaving_game));
+                        progress.setCancelable(true);
+                        progress.show();
+
+                        retrofitActivity.memberService
+                                .MemberDelete(game.Properties.ID, retrofitActivity.loggedInUser.Id)
+                                .subscribe(new Subscriber<SingleContainer<Member>>() {
+                                    @Override
+                                    public void onCompleted() {
+                                        progress.dismiss();
+                                    }
+
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        Log.e("Diplicity", "Error leaving game: " + e);
+                                        Toast.makeText(retrofitActivity, R.string.network_error, Toast.LENGTH_SHORT).show();
+                                        progress.dismiss();
+                                    }
+
+                                    @Override
+                                    public void onNext(SingleContainer<Member> memberSingleContainer) {
+                                        for (int i = 0; i < game.Properties.Members.size(); i++) {
+                                            if (game.Properties.Members.get(i).User.Id.equals(memberSingleContainer.Properties.User.Id)) {
+                                                game.Properties.Members.remove(i);
+                                                break;
+                                            }
+                                        }
+                                        game.Properties.NMembers--;
+                                        if (game.Properties.NMembers == 0) {
+                                            GamesAdapter.this.items.remove(pos);
+                                            GamesAdapter.this.expandedItems.remove(pos);
+                                            GamesAdapter.this.notifyItemRemoved(pos);
+                                        } else {
+                                            GamesAdapter.this.notifyItemChanged(pos);
+                                        }
+                                        progress.dismiss();
+                                    }
+                                });
+                    }
+                });
+            } else if (hasJoin) {
+                button.setVisibility(View.VISIBLE);
+                button.setImageDrawable(ctx.getResources().getDrawable(android.R.drawable.ic_input_add, null));
+            } else {
+                button.setVisibility(View.GONE);
+            }
         }
     }
-    public GamesAdapter(Context ctx, List<SingleContainer<Game>> games) {
-        super(ctx, games);
+    public GamesAdapter(RetrofitActivity activity, List<SingleContainer<Game>> games) {
+        super(activity, games);
+        retrofitActivity = activity;
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -151,6 +230,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
         View.OnClickListener clickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d("Diplicity", "*** " + view + " got click");
                 if (expandedItems.contains(vh.getAdapterPosition())) {
                     expandedItems.remove(vh.getAdapterPosition());
                 } else {

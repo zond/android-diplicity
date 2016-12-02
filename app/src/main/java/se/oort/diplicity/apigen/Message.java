@@ -2,7 +2,7 @@ package se.oort.diplicity.apigen;
 
 import retrofit2.http.*;
 	
-public class Message {
+public class Message implements java.io.Serializable {
   public String ID;
   public String GameID;
   public java.util.List<String> ChannelMembers;

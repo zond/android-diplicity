@@ -2,7 +2,7 @@ package se.oort.diplicity.apigen;
 
 import retrofit2.http.*;
 	
-public class PhaseResult {
+public class PhaseResult implements java.io.Serializable {
   public String GameID;
   public Long PhaseOrdinal;
   public java.util.List<String> NMRUsers;

@@ -2,7 +2,7 @@ package se.oort.diplicity.apigen;
 
 import retrofit2.http.*;
 	
-public class PhaseMeta {
+public class PhaseMeta implements java.io.Serializable {
   public Long PhaseOrdinal;
   public String Season;
   public Long Year;

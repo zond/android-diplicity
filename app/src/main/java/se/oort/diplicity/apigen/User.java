@@ -2,7 +2,7 @@ package se.oort.diplicity.apigen;
 
 import retrofit2.http.*;
 	
-public class User {
+public class User implements java.io.Serializable {
   public String Email;
   public String FamilyName;
   public String Gender;

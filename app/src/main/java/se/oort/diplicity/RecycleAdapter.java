@@ -11,7 +11,7 @@ import se.oort.diplicity.apigen.SingleContainer;
 
 public abstract class RecycleAdapter<T,VH extends RecycleAdapter.ViewHolder> extends RecyclerView.Adapter<VH> {
 
-    private List<T> items;
+    protected List<T> items;
     protected Context ctx;
 
     public abstract class ViewHolder extends RecyclerView.ViewHolder {

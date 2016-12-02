@@ -2,7 +2,7 @@ package se.oort.diplicity.apigen;
 
 import retrofit2.http.*;
 	
-public class UserStats {
+public class UserStats implements java.io.Serializable {
   public String UserId;
   public Long StartedGames;
   public Long FinishedGames;
