@@ -50,11 +50,10 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     static final String API_URL_KEY = "api_url";
     static final String DEFAULT_URL = "https://diplicity-engine.appspot.com";
     static final String LOGGED_IN_USER_KEY = "logged_in_user";
+    static final String AUTH_TOKEN_KEY = "auth_token";
 
     AuthenticatingCallAdapterFactory adapterFactory;
     Retrofit retrofit;
-
-    public User loggedInUser;
 
     public GameService gameService;
     public UserStatsService userStatsService;
@@ -145,7 +144,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
 
                             @Override
                             public void onNext(RootService.Root root) {
-                                loggedInUser = root.Properties.User;
+                                App.loggedInUser = root.Properties.User;
                                 List<LoginSubscriber<?>> subscribersCopy;
                                 synchronized (loginSubscribers) {
                                     subscribersCopy = new ArrayList<LoginSubscriber<?>>(loginSubscribers);
@@ -161,7 +160,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     }
 
     protected void setBaseURL(String baseURL) {
-        ((App) getApplication()).baseURL = baseURL;
+        App.baseURL = baseURL;
         adapterFactory = new AuthenticatingCallAdapterFactory();
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.addInterceptor(new Interceptor() {
@@ -169,7 +168,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
             public Response intercept(Chain chain) throws IOException {
                 Request toIssue = chain.request().newBuilder()
                         .addHeader("Accept", "application/json; charset=UTF-8").build();
-                String authToken = ((App) getApplication()).authToken;
+                String authToken = App.authToken;
                 if (authToken != null) {
                     toIssue = toIssue.newBuilder()
                             .addHeader("Authorization", "bearer " + authToken)
@@ -192,8 +191,29 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putByteArray(LOGGED_IN_USER_KEY, serialize(App.loggedInUser));
+        outState.putString(AUTH_TOKEN_KEY, App.authToken);
+    }
+
+    private void loadSavedInstance(Bundle savedInstanceState) {
+        String s = savedInstanceState.getString(AUTH_TOKEN_KEY);
+        if (s != null) {
+            App.authToken = s;
+        }
+        byte[] b = savedInstanceState.getByteArray(LOGGED_IN_USER_KEY);
+        if (b != null) {
+            App.loggedInUser = (User) unserialize(b);
+        }
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            loadSavedInstance(savedInstanceState);
+        }
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefsListener = new SharedPreferences.OnSharedPreferenceChangeListener() {

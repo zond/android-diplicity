@@ -175,7 +175,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                         progress.show();
 
                         retrofitActivity.memberService
-                                .MemberDelete(game.Properties.ID, retrofitActivity.loggedInUser.Id)
+                                .MemberDelete(game.Properties.ID, App.loggedInUser.Id)
                                 .subscribe(new Subscriber<SingleContainer<Member>>() {
                                     @Override
                                     public void onCompleted() {

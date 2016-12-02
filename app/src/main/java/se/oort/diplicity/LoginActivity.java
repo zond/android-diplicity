@@ -23,14 +23,14 @@ public class LoginActivity extends RetrofitActivity {
             mWebView.getSettings().setJavaScriptEnabled(true);
             final String fakeHost = "android-diplicity";
             String redirectTo = URLEncoder.encode("https://" + fakeHost + "/", "UTF-8");
-            mWebView.loadUrl(((App) getApplication()).baseURL + "Auth/Login?redirect-to=" + redirectTo);
+            mWebView.loadUrl(App.baseURL + "Auth/Login?redirect-to=" + redirectTo);
             mWebView.setWebViewClient(new WebViewClient() {
                 @SuppressWarnings("deprecation")
                 @Override
                 public boolean shouldOverrideUrlLoading(WebView view, String url) {
                     Uri parsedURI = Uri.parse(url);
                     if (parsedURI.getHost().equals(fakeHost)) {
-                        ((App) getApplication()).authToken = parsedURI.getQueryParameter("token");
+                        App.authToken = parsedURI.getQueryParameter("token");
                         Intent returnIntent = new Intent();
                         setResult(RESULT_OK,returnIntent);
                         finish();
