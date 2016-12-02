@@ -17,6 +17,7 @@ public class LoginActivity extends RetrofitActivity {
     protected void onCreate(Bundle savedInstanceState) {
         try {
             super.onCreate(savedInstanceState);
+            setTitle(R.string.logging_in);
             WebView mWebView = new WebView(this);
             mWebView.setBackgroundColor(Color.parseColor("#212121"));
             mWebView.getSettings().setJavaScriptEnabled(true);

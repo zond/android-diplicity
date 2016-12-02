@@ -22,6 +22,9 @@ import rx.schedulers.Schedulers;
 import se.oort.diplicity.apigen.User;
 
 public class UserView extends FrameLayout {
+
+    private static LRUCache<String,Bitmap> pictureCache = new LRUCache<>(128);
+
     public UserView(Context context, AttributeSet attrs) {
         super(context, attrs);
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -31,27 +34,30 @@ public class UserView extends FrameLayout {
         Log.d("Diplicity", "setting user to " + user.Name);
         ((TextView) findViewById(R.id.name)).setText(user.Name);
         final ImageView avatar = (ImageView) findViewById(R.id.avatar);
-        Log.d("Diplicity", "Subscribing to " + user.Picture);
         Observable.create(new Observable.OnSubscribe<Bitmap>() {
             @Override
             public void call(final Subscriber<? super Bitmap> subscriber) {
-                try {
-                    URL url = new URL(user.Picture);
-                    subscriber.onNext(ThumbnailUtils.extractThumbnail(
-                            BitmapFactory.decodeStream(url.openConnection().getInputStream()),
-                            avatar.getWidth(), avatar.getHeight()));
-                    subscriber.onCompleted();
-                } catch(IOException e) {
-                    subscriber.onError(e);
+                Bitmap bmp = pictureCache.get(user.Picture);
+                if (bmp == null) {
+                    try {
+                        URL url = new URL(user.Picture);
+                        bmp = ThumbnailUtils.extractThumbnail(
+                                BitmapFactory.decodeStream(url.openConnection().getInputStream()),
+                                avatar.getWidth(), avatar.getHeight());
+                        pictureCache.put(user.Picture, bmp);
+                    } catch(IOException e) {
+                        subscriber.onError(e);
+                        return;
+                    }
                 }
-
+                subscriber.onNext(bmp);
+                subscriber.onCompleted();
             }
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Bitmap>() {
                     @Override
                     public void onCompleted() {
-                        Log.d("Diplicity", "Finished loading " + user.Picture);
                     }
 
                     @Override

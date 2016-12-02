@@ -29,4 +29,12 @@
     <string name="top_hater">Top hater</string>
     <string name="season_year_type">%1$s %2$s, %3$s</string>
     <string name="x_players">%s players</string>
+    <string name="rating">Rating</string>
+    <string name="reliability">Reliability</string>
+    <string name="quickness">Quickness</string>
+    <string name="min_reliability">Min reliability</string>
+    <string name="min_quickness">Min quickness</string>
+    <string name="max_hated">Max hated</string>
+    <string name="max_hater">Max hater</string>
+    <string name="logging_in">Logging in</string>
 </resources>
