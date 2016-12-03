@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import retrofit2.adapter.rxjava.HttpException;
 import rx.Subscriber;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Link;
@@ -173,20 +174,21 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                                 new Sendable<SingleContainer<Member>>() {
                                     @Override
                                     public void Send(SingleContainer<Member> memberSingleContainer) {
-                                        for (int i = 0; i < game.Properties.Members.size(); i++) {
-                                            if (game.Properties.Members.get(i).User.Id.equals(memberSingleContainer.Properties.User.Id)) {
-                                                game.Properties.Members.remove(i);
-                                                break;
-                                            }
-                                        }
-                                        game.Properties.NMembers--;
-                                        if (game.Properties.NMembers == 0) {
-                                            GamesAdapter.this.items.remove(pos);
-                                            GamesAdapter.this.expandedItems.remove(pos);
-                                            GamesAdapter.this.notifyItemRemoved(pos);
-                                        } else {
-                                            GamesAdapter.this.notifyItemChanged(pos);
-                                        }
+                                        retrofitActivity.handleReq(retrofitActivity.gameService.GameLoad(game.Properties.ID),
+                                                new Sendable<SingleContainer<Game>>() {
+                                                    @Override
+                                                    public void Send(SingleContainer<Game> gameSingleContainer) {
+                                                        GamesAdapter.this.items.set(pos, gameSingleContainer);
+                                                        GamesAdapter.this.notifyItemChanged(pos);
+                                                    }
+                                                }, new RetrofitActivity.ErrorHandler(404, new Sendable<HttpException>() {
+                                                    @Override
+                                                    public void Send(HttpException e) {
+                                                        GamesAdapter.this.items.remove(pos);
+                                                        GamesAdapter.this.notifyItemRemoved(pos);
+                                                        GamesAdapter.this.expandedItems.remove(pos);
+                                                    }
+                                                }), ctx.getResources().getString(R.string.updating));
                                     }
                                 }, ctx.getResources().getString(R.string.leaving_game));
                     }
@@ -194,6 +196,25 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             } else if (hasJoin) {
                 button.setVisibility(View.VISIBLE);
                 button.setImageDrawable(ctx.getResources().getDrawable(android.R.drawable.ic_input_add, null));
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        retrofitActivity.handleReq(retrofitActivity.memberService.MemberCreate(new Member(), game.Properties.ID),
+                                new Sendable<SingleContainer<Member>>() {
+                                    @Override
+                                    public void Send(SingleContainer<Member> memberSingleContainer) {
+                                        retrofitActivity.handleReq(retrofitActivity.gameService.GameLoad(game.Properties.ID),
+                                                new Sendable<SingleContainer<Game>>() {
+                                                    @Override
+                                                    public void Send(SingleContainer<Game> gameSingleContainer) {
+                                                        GamesAdapter.this.items.set(pos, gameSingleContainer);
+                                                        GamesAdapter.this.notifyItemChanged(pos);
+                                                    }
+                                                }, ctx.getResources().getString(R.string.updating));
+                                    }
+                                }, ctx.getResources().getString(R.string.joining_game));
+                    }
+                });
             } else {
                 button.setVisibility(View.GONE);
             }

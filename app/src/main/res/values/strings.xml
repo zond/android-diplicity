@@ -42,4 +42,7 @@
     <string name="update_your_state">Something has changed on the server, reload your state.</string>
     <string name="client_misbehaved">The client misbehaved, please file a bug.</string>
     <string name="server_error">Server error, please file a bug.</string>
+    <string name="joining_game">Joining game</string>
+    <string name="updating">Updating</string>
+    <string name="unknown_error">Unknown error</string>
 </resources>

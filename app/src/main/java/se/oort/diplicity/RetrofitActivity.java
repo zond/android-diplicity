@@ -143,7 +143,20 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         }
     }
 
+    public static class ErrorHandler {
+        public int code;
+        public Sendable<HttpException> handler;
+        public ErrorHandler(int code, Sendable<HttpException> handler) {
+            this.code = code;
+            this.handler = handler;
+        }
+    }
+
     public <T> void handleReq(Observable<T> req, final Sendable<T> handler, final String progressMessage) {
+        handleReq(req, handler, null, progressMessage);
+    }
+
+    public <T> void handleReq(Observable<T> req, final Sendable<T> handler, final ErrorHandler onError, final String progressMessage) {
         final ProgressDialog progress = new ProgressDialog(this);
         if (progressMessage != null) {
             progress.setTitle(progressMessage);
@@ -166,15 +179,21 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                         Log.e("Diplicity", "Error loading " + progressMessage + ": " + e);
                         if (e instanceof HttpException) {
                             HttpException he = (HttpException) e;
-                            if (he.code() == 412) {
-                                Toast.makeText(RetrofitActivity.this, R.string.update_your_state, Toast.LENGTH_LONG).show();
-                            } else if (he.code() > 399 && he.code() < 500) {
-                                Toast.makeText(RetrofitActivity.this, R.string.client_misbehaved, Toast.LENGTH_SHORT).show();
-                            } else if (he.code() > 499) {
-                                Toast.makeText(RetrofitActivity.this, R.string.server_error, Toast.LENGTH_SHORT).show();
+                            if (onError != null && onError.code == he.code()) {
+                                onError.handler.Send(he);
                             } else {
-                                Toast.makeText(RetrofitActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+                                if (he.code() == 412) {
+                                    Toast.makeText(RetrofitActivity.this, R.string.update_your_state, Toast.LENGTH_LONG).show();
+                                } else if (he.code() > 399 && he.code() < 500) {
+                                    Toast.makeText(RetrofitActivity.this, R.string.client_misbehaved, Toast.LENGTH_SHORT).show();
+                                } else if (he.code() > 499) {
+                                    Toast.makeText(RetrofitActivity.this, R.string.server_error, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(RetrofitActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+                                }
                             }
+                        } else {
+                            Toast.makeText(RetrofitActivity.this, R.string.unknown_error, Toast.LENGTH_SHORT).show();
                         }
                         if (progressMessage != null) {
                             progress.dismiss();
