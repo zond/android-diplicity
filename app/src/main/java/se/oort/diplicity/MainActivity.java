@@ -179,7 +179,7 @@ public class MainActivity extends RetrofitActivity {
         });
     }
 
-    private void navigateTo(int root, int child) {
+    private void navigateTo(final int root, final int child) {
         switch (root) {
         case 0: // Games
             switch (child) {
@@ -187,7 +187,7 @@ public class MainActivity extends RetrofitActivity {
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
                     public void Send(String s) {
-                        appendItems(gameService.MyStartedGames(null, null, null, null, null, null, null, null, s), null, null, gamesAdapter);
+                        appendItems(gameService.MyStartedGames(null, null, null, null, null, null, null, null, s), getResources().getString(R.string.more), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                     }
                 });
                 displayItems(gameService.MyStartedGames(null, null, null, null, null, null, null, null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
@@ -196,7 +196,7 @@ public class MainActivity extends RetrofitActivity {
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
                     public void Send(String s) {
-                        appendItems(gameService.MyStagingGames(null, null, null, null, null, null, null, null, s), null, null, gamesAdapter);
+                        appendItems(gameService.MyStagingGames(null, null, null, null, null, null, null, null, s), getResources().getString(R.string.more), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                     }
                 });
                 displayItems(gameService.MyStagingGames(null, null, null, null, null, null, null, null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
@@ -205,7 +205,7 @@ public class MainActivity extends RetrofitActivity {
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
                     public void Send(String s) {
-                        appendItems(gameService.MyFinishedGames(null, null, null, null, null, null, null, null, s), null, null, gamesAdapter);
+                        appendItems(gameService.MyFinishedGames(null, null, null, null, null, null, null, null, s), getResources().getString(R.string.more), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                     }
                 });
                 displayItems(gameService.MyFinishedGames(null, null, null, null, null, null, null, null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
@@ -214,7 +214,7 @@ public class MainActivity extends RetrofitActivity {
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
                     public void Send(String s) {
-                        appendItems(gameService.OpenGames(null, null, null, null, null, null, null, null, s), null, null, gamesAdapter);
+                        appendItems(gameService.OpenGames(null, null, null, null, null, null, null, null, s), getResources().getString(R.string.more), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                     }
                 });
                 displayItems(gameService.OpenGames(null, null, null, null, null, null, null, null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
@@ -223,7 +223,7 @@ public class MainActivity extends RetrofitActivity {
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
                     public void Send(String s) {
-                        appendItems(gameService.StartedGames(null, null, null, null, null, null, null, null, s), null, null, gamesAdapter);
+                        appendItems(gameService.StartedGames(null, null, null, null, null, null, null, null, s), getResources().getString(R.string.more), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                     }
                 });
                 displayItems(gameService.StartedGames(null, null, null, null, null, null, null, null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
@@ -232,7 +232,7 @@ public class MainActivity extends RetrofitActivity {
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
                     public void Send(String s) {
-                        appendItems(gameService.FinishedGames(null, null, null, null, null, null, null, null, s), null, null, gamesAdapter);
+                        appendItems(gameService.FinishedGames(null, null, null, null, null, null, null, null, s), getResources().getString(R.string.more), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                     }
                 });
                 displayItems(gameService.FinishedGames(null, null, null, null, null, null, null, null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
@@ -245,7 +245,7 @@ public class MainActivity extends RetrofitActivity {
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
                     public void Send(String s) {
-                        appendItems(userStatsService.ListTopRatedPlayers(null, s), null, null, userStatsAdapter);
+                        appendItems(userStatsService.ListTopRatedPlayers(null, s), getResources().getString(R.string.more), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
                     }
                 });
                 displayItems(userStatsService.ListTopRatedPlayers(null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
@@ -254,7 +254,7 @@ public class MainActivity extends RetrofitActivity {
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
                     public void Send(String s) {
-                        appendItems(userStatsService.ListTopReliablePlayers(null, s), null, null, userStatsAdapter);
+                        appendItems(userStatsService.ListTopReliablePlayers(null, s), getResources().getString(R.string.more), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
                     }
                 });
                 displayItems(userStatsService.ListTopReliablePlayers(null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
@@ -263,7 +263,7 @@ public class MainActivity extends RetrofitActivity {
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
                     public void Send(String s) {
-                        appendItems(userStatsService.ListTopQuickPlayers(null, s), null, null, userStatsAdapter);
+                        appendItems(userStatsService.ListTopQuickPlayers(null, s), getResources().getString(R.string.more), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
                     }
                 });
                 displayItems(userStatsService.ListTopQuickPlayers(null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
@@ -272,7 +272,7 @@ public class MainActivity extends RetrofitActivity {
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
                     public void Send(String s) {
-                        appendItems(userStatsService.ListTopHatedPlayers(null, s), null, null, userStatsAdapter);
+                        appendItems(userStatsService.ListTopHatedPlayers(null, s), getResources().getString(R.string.more), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
                     }
                 });
                 displayItems(userStatsService.ListTopHatedPlayers(null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
@@ -281,7 +281,7 @@ public class MainActivity extends RetrofitActivity {
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
                     public void Send(String s) {
-                        appendItems(userStatsService.ListTopHaterPlayers(null, s), null, null, userStatsAdapter);
+                        appendItems(userStatsService.ListTopHaterPlayers(null, s), getResources().getString(R.string.more), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
                     }
                 });
                 displayItems(userStatsService.ListTopHaterPlayers(null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);

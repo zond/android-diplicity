@@ -160,18 +160,17 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         final ProgressDialog progress = new ProgressDialog(this);
         if (progressMessage != null) {
             progress.setTitle(progressMessage);
-            progress.setCancelable(true);
-            progress.show();
         }
+        progress.setCancelable(true);
+        progress.show();
+
 
         req.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<T>() {
                     @Override
                     public void onCompleted() {
-                        if (progressMessage != null) {
-                            progress.dismiss();
-                        }
+                        progress.dismiss();
                     }
 
                     @Override
@@ -195,9 +194,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                         } else {
                             Toast.makeText(RetrofitActivity.this, R.string.unknown_error, Toast.LENGTH_SHORT).show();
                         }
-                        if (progressMessage != null) {
-                            progress.dismiss();
-                        }
+                        progress.dismiss();
                     }
 
                     @Override
