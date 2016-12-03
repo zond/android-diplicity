@@ -169,28 +169,10 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        final ProgressDialog progress = new ProgressDialog(retrofitActivity);
-                        progress.setTitle(ctx.getResources().getString(R.string.leaving_game));
-                        progress.setCancelable(true);
-                        progress.show();
-
-                        retrofitActivity.memberService
-                                .MemberDelete(game.Properties.ID, App.loggedInUser.Id)
-                                .subscribe(new Subscriber<SingleContainer<Member>>() {
+                        retrofitActivity.handleReq(retrofitActivity.memberService.MemberDelete(game.Properties.ID, App.loggedInUser.Id),
+                                new Sendable<SingleContainer<Member>>() {
                                     @Override
-                                    public void onCompleted() {
-                                        progress.dismiss();
-                                    }
-
-                                    @Override
-                                    public void onError(Throwable e) {
-                                        Log.e("Diplicity", "Error leaving game: " + e);
-                                        Toast.makeText(retrofitActivity, R.string.network_error, Toast.LENGTH_SHORT).show();
-                                        progress.dismiss();
-                                    }
-
-                                    @Override
-                                    public void onNext(SingleContainer<Member> memberSingleContainer) {
+                                    public void Send(SingleContainer<Member> memberSingleContainer) {
                                         for (int i = 0; i < game.Properties.Members.size(); i++) {
                                             if (game.Properties.Members.get(i).User.Id.equals(memberSingleContainer.Properties.User.Id)) {
                                                 game.Properties.Members.remove(i);
@@ -205,9 +187,8 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                                         } else {
                                             GamesAdapter.this.notifyItemChanged(pos);
                                         }
-                                        progress.dismiss();
                                     }
-                                });
+                                }, ctx.getResources().getString(R.string.leaving_game));
                     }
                 });
             } else if (hasJoin) {

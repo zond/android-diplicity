@@ -3,10 +3,13 @@ package se.oort.diplicity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
@@ -37,6 +40,7 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import se.oort.diplicity.apigen.GameService;
+import se.oort.diplicity.apigen.Link;
 import se.oort.diplicity.apigen.MemberService;
 import se.oort.diplicity.apigen.MultiContainer;
 import se.oort.diplicity.apigen.User;
@@ -121,42 +125,68 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == LOGIN_REQUEST) {
             if (resultCode == RESULT_OK) {
-                final ProgressDialog progress = new ProgressDialog(this);
-                progress.setTitle(getResources().getString(R.string.logging_in));
-                progress.setCancelable(true);
-                progress.show();
-
-                rootService.GetRoot()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Subscriber<RootService.Root>() {
-                            @Override
-                            public void onCompleted() {
-                                progress.dismiss();
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                Log.e("Diplicity", "Error loading user: " + e);
-                                Toast.makeText(RetrofitActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
-                                progress.dismiss();
-                            }
-
-                            @Override
-                            public void onNext(RootService.Root root) {
-                                App.loggedInUser = root.Properties.User;
-                                List<LoginSubscriber<?>> subscribersCopy;
-                                synchronized (loginSubscribers) {
-                                    subscribersCopy = new ArrayList<LoginSubscriber<?>>(loginSubscribers);
-                                    loginSubscribers.clear();
-                                }
-                                for (LoginSubscriber<?> subscriber : subscribersCopy) {
-                                    subscriber.retry();
-                                }
-                            }
-                        });
+                handleReq(rootService.GetRoot(), new Sendable<RootService.Root>() {
+                    @Override
+                    public void Send(RootService.Root root) {
+                        App.loggedInUser = root.Properties.User;
+                        List<LoginSubscriber<?>> subscribersCopy;
+                        synchronized (loginSubscribers) {
+                            subscribersCopy = new ArrayList<LoginSubscriber<?>>(loginSubscribers);
+                            loginSubscribers.clear();
+                        }
+                        for (LoginSubscriber<?> subscriber : subscribersCopy) {
+                            subscriber.retry();
+                        }
+                    }
+                }, getResources().getString(R.string.logging_in));
             }
         }
+    }
+
+    public <T> void handleReq(Observable<T> req, final Sendable<T> handler, final String progressMessage) {
+        final ProgressDialog progress = new ProgressDialog(this);
+        if (progressMessage != null) {
+            progress.setTitle(progressMessage);
+            progress.setCancelable(true);
+            progress.show();
+        }
+
+        req.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<T>() {
+                    @Override
+                    public void onCompleted() {
+                        if (progressMessage != null) {
+                            progress.dismiss();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("Diplicity", "Error loading " + progressMessage + ": " + e);
+                        if (e instanceof HttpException) {
+                            HttpException he = (HttpException) e;
+                            if (he.code() == 412) {
+                                Toast.makeText(RetrofitActivity.this, R.string.update_your_state, Toast.LENGTH_LONG).show();
+                            } else if (he.code() > 399 && he.code() < 500) {
+                                Toast.makeText(RetrofitActivity.this, R.string.client_misbehaved, Toast.LENGTH_SHORT).show();
+                            } else if (he.code() > 499) {
+                                Toast.makeText(RetrofitActivity.this, R.string.server_error, Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(RetrofitActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        if (progressMessage != null) {
+                            progress.dismiss();
+                        }
+                    }
+
+                    @Override
+                    public void onNext(T res) {
+                        handler.Send(res);
+                    }
+                });
+
     }
 
     protected void setBaseURL(String baseURL) {

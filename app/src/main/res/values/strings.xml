@@ -39,4 +39,7 @@
     <string name="logging_in">Logging in</string>
     <string name="x_to_y">%1$s - %2$s</string>
     <string name="leaving_game">Leaving game</string>
+    <string name="update_your_state">Something has changed on the server, reload your state.</string>
+    <string name="client_misbehaved">The client misbehaved, please file a bug.</string>
+    <string name="server_error">Server error, please file a bug.</string>
 </resources>

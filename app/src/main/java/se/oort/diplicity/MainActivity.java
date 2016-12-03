@@ -295,55 +295,36 @@ public class MainActivity extends RetrofitActivity {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
 
-        final ProgressDialog progress = new ProgressDialog(this);
+        String msg = null;
         if (what != null) {
-            progress.setTitle(getResources().getString(R.string.loading_x_y, what, typ));
+            msg = getResources().getString(R.string.loading_x_y, what, typ);
         }
-        progress.setCancelable(true);
-        progress.show();
 
-        call
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<MultiContainer<T>>() {
-                    @Override
-                    public void onCompleted() {
-                        progress.dismiss();
+        handleReq(call, new Sendable<MultiContainer<T>>() {
+            @Override
+            public void Send(MultiContainer<T> container) {
+                nextCursorContainer.set(0, "");
+                for (Link link : container.Links) {
+                    if (link.Rel.equals("next")) {
+                        Uri uri = Uri.parse(link.URL);
+                        nextCursorContainer.set(0, uri.getQueryParameter("cursor"));
                     }
+                }
+                adapter.addAll(container.Properties);
 
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e("Diplicity", "Error loading " + what + " " + typ + ": " + e);
-                        Toast.makeText(MainActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
-                        progress.dismiss();
-                    }
-
-                    @Override
-                    public void onNext(MultiContainer<T> container) {
-                        nextCursorContainer.set(0, "");
-                        for (Link link : container.Links) {
-                            if (link.Rel.equals("next")) {
-                                Uri uri = Uri.parse(link.URL);
-                                nextCursorContainer.set(0, uri.getQueryParameter("cursor"));
-                            }
-                        }
-                        adapter.addAll(container.Properties);
-
-                        if (what != null) {
-                            ((TextView) findViewById(R.id.content_title)).setText(getResources().getString(R.string.x_y, what, typ));
-                        }
-                        ((TextView) findViewById(R.id.content_title)).setVisibility(View.VISIBLE);
-                        if (container.Properties.isEmpty()) {
-                            findViewById(R.id.empty_view).setVisibility(View.VISIBLE);
-                            contentList.setVisibility(View.GONE);
-                        } else {
-                            findViewById(R.id.empty_view).setVisibility(View.GONE);
-                            contentList.setVisibility(View.VISIBLE);
-                        }
-                    }
-                });
-
-
+                if (what != null) {
+                    ((TextView) findViewById(R.id.content_title)).setText(getResources().getString(R.string.x_y, what, typ));
+                }
+                ((TextView) findViewById(R.id.content_title)).setVisibility(View.VISIBLE);
+                if (container.Properties.isEmpty()) {
+                    findViewById(R.id.empty_view).setVisibility(View.VISIBLE);
+                    contentList.setVisibility(View.GONE);
+                } else {
+                    findViewById(R.id.empty_view).setVisibility(View.GONE);
+                    contentList.setVisibility(View.VISIBLE);
+                }
+            }
+        }, msg);
     }
 
     private <T> void displayItems(Observable<MultiContainer<T>> call, String what, String typ, RecycleAdapter<SingleContainer<T>,?> adapter) {
