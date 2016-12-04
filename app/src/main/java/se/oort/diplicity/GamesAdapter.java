@@ -60,7 +60,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             minQuicknessLabel = (TextView) view.findViewById(R.id.min_quickness_label);
             maxHatedLabel = (TextView) view.findViewById(R.id.max_hated_label);
             maxHaterLabel = (TextView) view.findViewById(R.id.max_hater_label);
-            button = (FloatingActionButton) view.findViewById(R.id.button);
+            button = (FloatingActionButton) view.findViewById(R.id.join_leave_button);
         }
         @Override
         public void bind(final SingleContainer<Game> game, final int pos) {

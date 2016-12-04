@@ -4,9 +4,11 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -60,6 +62,7 @@ public class MainActivity extends RetrofitActivity {
 
     private List<List<Map<String, String>>> navigationChildGroups;
     private List<Map<String, String>> navigationRootGroups;
+    private FloatingActionButton button;
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -75,6 +78,15 @@ public class MainActivity extends RetrofitActivity {
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+
+        button = (FloatingActionButton) findViewById(R.id.add_game_button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.create_game_dialog).create();
+                dialog.show();
+            }
+        });
 
         setupNavigation();
 
@@ -180,6 +192,11 @@ public class MainActivity extends RetrofitActivity {
     }
 
     private void navigateTo(final int root, final int child) {
+        if (root == 0 && child == 1) {
+            button.setVisibility(View.VISIBLE);
+        } else {
+            button.setVisibility(View.GONE);
+        }
         switch (root) {
         case 0: // Games
             switch (child) {

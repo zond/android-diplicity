@@ -30,6 +30,8 @@
     <string name="season_year_type">%1$s %2$s, %3$s</string>
     <string name="x_players">%s players</string>
     <string name="rating">Rating</string>
+    <string name="min_rating">Min rating</string>
+    <string name="max_rating">Max rating</string>
     <string name="reliability">Reliability</string>
     <string name="quickness">Quickness</string>
     <string name="min_reliability">Min reliability</string>

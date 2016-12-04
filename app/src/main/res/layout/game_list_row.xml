@@ -151,12 +151,13 @@
             android:layout_height="wrap_content"/>
 
         <android.support.design.widget.FloatingActionButton
-            app:elevation="@dimen/elevation_high"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            app:elevation="6dp"
             app:fabSize="mini"
             app:rippleColor="@color/colorPrimary"
             app:useCompatPadding="true"
             android:tint="@android:color/white"
-            android:id="@+id/button"
+            android:id="@+id/join_leave_button"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
