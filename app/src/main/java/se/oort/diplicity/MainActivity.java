@@ -16,8 +16,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -75,8 +77,15 @@ public class MainActivity extends RetrofitActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.create_game_dialog).create();
-                dialog.show();
+                AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.create_game_dialog).show();
+                Spinner variants = ((Spinner) dialog.findViewById(R.id.variants));
+                List<String> variantNames = new ArrayList<String>();
+                for (SingleContainer<VariantService.Variant> variantContainer : App.variants.Properties) {
+                    variantNames.add(variantContainer.Properties.Name);
+                }
+                ArrayAdapter<String> variantAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, variantNames);
+                variants.setAdapter(variantAdapter);
+                variantAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             }
         });
 

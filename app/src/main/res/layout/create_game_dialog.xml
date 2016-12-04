@@ -9,8 +9,39 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:columnCount="2"
-        android:rowCount="6"
+        android:rowCount="8"
         android:useDefaultMargins="true">
+
+        <TextView
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            app:layout_columnWeight="0"
+            android:id="@+id/variant_label"
+            android:text="@string/variant"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <Spinner
+            app:layout_columnWeight="1"
+            android:id="@+id/variants"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"/>
+
+        <TextView
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            app:layout_columnWeight="0"
+            android:id="@+id/phase_length_label"
+            android:text="@string/phase_length_in_minutes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            app:layout_columnWeight="1"
+            android:inputType="number"
+            android:id="@+id/phase_length"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
         <TextView
             android:layout_marginStart="5dp"
