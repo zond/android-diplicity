@@ -1,6 +1,5 @@
 package se.oort.diplicity;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,17 +13,13 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,9 +28,6 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Link;
 import se.oort.diplicity.apigen.MultiContainer;
@@ -98,7 +90,7 @@ public class MainActivity extends RetrofitActivity {
             @Override
             public void onLoadMore(String cursor, int totalItemsCount, RecyclerView view) {
                 if (cursor.length() > 0) {
-                    loadMoreProcContainer.get(0).Send(cursor);
+                    loadMoreProcContainer.get(0).send(cursor);
                 }
             }
         };
@@ -203,7 +195,7 @@ public class MainActivity extends RetrofitActivity {
             case 0: // My started
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
-                    public void Send(String s) {
+                    public void send(String s) {
                         appendItems(gameService.MyStartedGames(null, null, null, null, null, null, null, null, s), getResources().getString(R.string.more), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                     }
                 });
@@ -212,7 +204,7 @@ public class MainActivity extends RetrofitActivity {
             case 1: // My staging
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
-                    public void Send(String s) {
+                    public void send(String s) {
                         appendItems(gameService.MyStagingGames(null, null, null, null, null, null, null, null, s), getResources().getString(R.string.more), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                     }
                 });
@@ -221,7 +213,7 @@ public class MainActivity extends RetrofitActivity {
             case 2: // My finished
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
-                    public void Send(String s) {
+                    public void send(String s) {
                         appendItems(gameService.MyFinishedGames(null, null, null, null, null, null, null, null, s), getResources().getString(R.string.more), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                     }
                 });
@@ -230,7 +222,7 @@ public class MainActivity extends RetrofitActivity {
             case 3: // Open
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
-                    public void Send(String s) {
+                    public void send(String s) {
                         appendItems(gameService.OpenGames(null, null, null, null, null, null, null, null, s), getResources().getString(R.string.more), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                     }
                 });
@@ -239,7 +231,7 @@ public class MainActivity extends RetrofitActivity {
             case 4: // Started
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
-                    public void Send(String s) {
+                    public void send(String s) {
                         appendItems(gameService.StartedGames(null, null, null, null, null, null, null, null, s), getResources().getString(R.string.more), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                     }
                 });
@@ -248,7 +240,7 @@ public class MainActivity extends RetrofitActivity {
             case 5: // Finished
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
-                    public void Send(String s) {
+                    public void send(String s) {
                         appendItems(gameService.FinishedGames(null, null, null, null, null, null, null, null, s), getResources().getString(R.string.more), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                     }
                 });
@@ -261,7 +253,7 @@ public class MainActivity extends RetrofitActivity {
             case 0: // Top rated
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
-                    public void Send(String s) {
+                    public void send(String s) {
                         appendItems(userStatsService.ListTopRatedPlayers(null, s), getResources().getString(R.string.more), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
                     }
                 });
@@ -270,7 +262,7 @@ public class MainActivity extends RetrofitActivity {
             case 1: // Top reliable
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
-                    public void Send(String s) {
+                    public void send(String s) {
                         appendItems(userStatsService.ListTopReliablePlayers(null, s), getResources().getString(R.string.more), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
                     }
                 });
@@ -279,7 +271,7 @@ public class MainActivity extends RetrofitActivity {
             case 2: // Top quick
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
-                    public void Send(String s) {
+                    public void send(String s) {
                         appendItems(userStatsService.ListTopQuickPlayers(null, s), getResources().getString(R.string.more), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
                     }
                 });
@@ -288,7 +280,7 @@ public class MainActivity extends RetrofitActivity {
             case 3: // Top hated
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
-                    public void Send(String s) {
+                    public void send(String s) {
                         appendItems(userStatsService.ListTopHatedPlayers(null, s), getResources().getString(R.string.more), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
                     }
                 });
@@ -297,7 +289,7 @@ public class MainActivity extends RetrofitActivity {
             case 4: // Top hater
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
-                    public void Send(String s) {
+                    public void send(String s) {
                         appendItems(userStatsService.ListTopHaterPlayers(null, s), getResources().getString(R.string.more), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
                     }
                 });
@@ -319,7 +311,7 @@ public class MainActivity extends RetrofitActivity {
 
         handleReq(call, new Sendable<MultiContainer<T>>() {
             @Override
-            public void Send(MultiContainer<T> container) {
+            public void send(MultiContainer<T> container) {
                 nextCursorContainer.set(0, "");
                 for (Link link : container.Links) {
                     if (link.Rel.equals("next")) {

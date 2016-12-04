@@ -3,13 +3,11 @@ package se.oort.diplicity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
@@ -38,15 +36,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func2;
+import rx.observables.JoinObservable;
 import rx.schedulers.Schedulers;
 import se.oort.diplicity.apigen.GameService;
-import se.oort.diplicity.apigen.Link;
 import se.oort.diplicity.apigen.MemberService;
 import se.oort.diplicity.apigen.MultiContainer;
 import se.oort.diplicity.apigen.User;
 import se.oort.diplicity.apigen.UserStatsService;
-
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 public abstract class RetrofitActivity extends AppCompatActivity {
 
@@ -55,6 +52,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     static final String DEFAULT_URL = "https://diplicity-engine.appspot.com";
     static final String LOGGED_IN_USER_KEY = "logged_in_user";
     static final String AUTH_TOKEN_KEY = "auth_token";
+    static final String VARIANTS_KEY = "variants";
 
     AuthenticatingCallAdapterFactory adapterFactory;
     Retrofit retrofit;
@@ -63,6 +61,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     public UserStatsService userStatsService;
     public MemberService memberService;
     public RootService rootService;
+    public VariantService variantService;
 
     private SharedPreferences prefs;
     private SharedPreferences.OnSharedPreferenceChangeListener prefsListener;
@@ -78,7 +77,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
             this.onSubscribe.call(this.subscriber);
         }
     }
-    private static List<LoginSubscriber<?>> loginSubscribers = Collections.synchronizedList(new ArrayList<LoginSubscriber<?>>());
+    private final static List<LoginSubscriber<?>> loginSubscribers = Collections.synchronizedList(new ArrayList<LoginSubscriber<?>>());
 
     public static Serializable unserialize(byte[] b) {
         ByteArrayInputStream bis = null;
@@ -121,14 +120,78 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         return bout.toByteArray();
     }
 
+    public Sendable<Throwable> newProgressAndToastHandler(final ErrorHandler onError, final String progressMessage) {
+        final ProgressDialog progress = new ProgressDialog(this);
+        if (progressMessage != null) {
+            progress.setTitle(progressMessage);
+        }
+        progress.setCancelable(true);
+        progress.show();
+
+        return new Sendable<Throwable>() {
+            @Override
+            public void send(Throwable e) {
+                if (e != null) {
+                    Log.e("Diplicity", "Error loading " + progressMessage + ": " + e);
+                    if (e instanceof HttpException) {
+                        HttpException he = (HttpException) e;
+                        if (onError != null && onError.code == he.code()) {
+                            onError.handler.send(he);
+                        } else {
+                            if (he.code() == 412) {
+                                Toast.makeText(RetrofitActivity.this, R.string.update_your_state, Toast.LENGTH_LONG).show();
+                            } else if (he.code() > 399 && he.code() < 500) {
+                                Toast.makeText(RetrofitActivity.this, R.string.client_misbehaved, Toast.LENGTH_SHORT).show();
+                            } else if (he.code() > 499) {
+                                Toast.makeText(RetrofitActivity.this, R.string.server_error, Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(RetrofitActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    } else {
+                        Toast.makeText(RetrofitActivity.this, R.string.unknown_error, Toast.LENGTH_SHORT).show();
+                    }
+                }
+                progress.dismiss();
+            }
+        };
+    }
+
+    public <T> void observe(Observable<T> observable, @Nullable final Sendable<T> onResult, @Nullable final Sendable<Throwable> onDone) {
+        observable
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Subscriber<T>() {
+                    @Override
+                    public void onCompleted() {
+                        if (onDone != null) {
+                            onDone.send(null);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if (onDone != null)
+                            onDone.send(e);
+                    }
+
+                    @Override
+                    public void onNext(T t) {
+                        if (onResult != null)
+                            onResult.send(t);
+                    }
+                });
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == LOGIN_REQUEST) {
             if (resultCode == RESULT_OK) {
-                handleReq(rootService.GetRoot(), new Sendable<RootService.Root>() {
+                observe(JoinObservable.when(JoinObservable.from(rootService.GetRoot()).and(variantService.GetVariants()).then(new Func2<RootService.Root, MultiContainer<VariantService.Variant>, Object>() {
                     @Override
-                    public void Send(RootService.Root root) {
+                    public Object call(RootService.Root root, MultiContainer<VariantService.Variant> variants) {
                         App.loggedInUser = root.Properties.User;
+                        App.variants = variants;
                         List<LoginSubscriber<?>> subscribersCopy;
                         synchronized (loginSubscribers) {
                             subscribersCopy = new ArrayList<LoginSubscriber<?>>(loginSubscribers);
@@ -137,8 +200,9 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                         for (LoginSubscriber<?> subscriber : subscribersCopy) {
                             subscriber.retry();
                         }
+                        return null;
                     }
-                }, getResources().getString(R.string.logging_in));
+                })).toObservable(), null, newProgressAndToastHandler(null, getResources().getString(R.string.logging_in)));
             }
         }
     }
@@ -153,56 +217,11 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     }
 
     public <T> void handleReq(Observable<T> req, final Sendable<T> handler, final String progressMessage) {
-        handleReq(req, handler, null, progressMessage);
+        observe(req, handler, newProgressAndToastHandler(null, progressMessage));
     }
 
     public <T> void handleReq(Observable<T> req, final Sendable<T> handler, final ErrorHandler onError, final String progressMessage) {
-        final ProgressDialog progress = new ProgressDialog(this);
-        if (progressMessage != null) {
-            progress.setTitle(progressMessage);
-        }
-        progress.setCancelable(true);
-        progress.show();
-
-
-        req.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<T>() {
-                    @Override
-                    public void onCompleted() {
-                        progress.dismiss();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e("Diplicity", "Error loading " + progressMessage + ": " + e);
-                        if (e instanceof HttpException) {
-                            HttpException he = (HttpException) e;
-                            if (onError != null && onError.code == he.code()) {
-                                onError.handler.Send(he);
-                            } else {
-                                if (he.code() == 412) {
-                                    Toast.makeText(RetrofitActivity.this, R.string.update_your_state, Toast.LENGTH_LONG).show();
-                                } else if (he.code() > 399 && he.code() < 500) {
-                                    Toast.makeText(RetrofitActivity.this, R.string.client_misbehaved, Toast.LENGTH_SHORT).show();
-                                } else if (he.code() > 499) {
-                                    Toast.makeText(RetrofitActivity.this, R.string.server_error, Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Toast.makeText(RetrofitActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        } else {
-                            Toast.makeText(RetrofitActivity.this, R.string.unknown_error, Toast.LENGTH_SHORT).show();
-                        }
-                        progress.dismiss();
-                    }
-
-                    @Override
-                    public void onNext(T res) {
-                        handler.Send(res);
-                    }
-                });
-
+        observe(req, handler, newProgressAndToastHandler(onError, progressMessage));
     }
 
     protected void setBaseURL(String baseURL) {
@@ -234,14 +253,17 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         userStatsService = retrofit.create(UserStatsService.class);
         memberService = retrofit.create(MemberService.class);
         rootService = retrofit.create(RootService.class);
+        variantService = retrofit.create(VariantService.class);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putByteArray(LOGGED_IN_USER_KEY, serialize(App.loggedInUser));
+        outState.putByteArray(VARIANTS_KEY, serialize(App.variants));
         outState.putString(AUTH_TOKEN_KEY, App.authToken);
     }
 
+    @SuppressWarnings("unchecked")
     private void loadSavedInstance(Bundle savedInstanceState) {
         String s = savedInstanceState.getString(AUTH_TOKEN_KEY);
         if (s != null) {
@@ -250,6 +272,10 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         byte[] b = savedInstanceState.getByteArray(LOGGED_IN_USER_KEY);
         if (b != null) {
             App.loggedInUser = (User) unserialize(b);
+        }
+        b = savedInstanceState.getByteArray(VARIANTS_KEY);
+        if (b != null) {
+            App.variants = (MultiContainer<VariantService.Variant>) unserialize(b);
         }
     }
 

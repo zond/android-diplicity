@@ -1,9 +1,5 @@
 package se.oort.diplicity;
 
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Loader;
-import android.graphics.Color;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -21,11 +16,9 @@ import java.util.List;
 import java.util.Set;
 
 import retrofit2.adapter.rxjava.HttpException;
-import rx.Subscriber;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Link;
 import se.oort.diplicity.apigen.Member;
-import se.oort.diplicity.apigen.Phase;
 import se.oort.diplicity.apigen.PhaseMeta;
 import se.oort.diplicity.apigen.SingleContainer;
 
@@ -173,17 +166,17 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                         retrofitActivity.handleReq(retrofitActivity.memberService.MemberDelete(game.Properties.ID, App.loggedInUser.Id),
                                 new Sendable<SingleContainer<Member>>() {
                                     @Override
-                                    public void Send(SingleContainer<Member> memberSingleContainer) {
+                                    public void send(SingleContainer<Member> memberSingleContainer) {
                                         retrofitActivity.handleReq(retrofitActivity.gameService.GameLoad(game.Properties.ID),
                                                 new Sendable<SingleContainer<Game>>() {
                                                     @Override
-                                                    public void Send(SingleContainer<Game> gameSingleContainer) {
+                                                    public void send(SingleContainer<Game> gameSingleContainer) {
                                                         GamesAdapter.this.items.set(pos, gameSingleContainer);
                                                         GamesAdapter.this.notifyItemChanged(pos);
                                                     }
                                                 }, new RetrofitActivity.ErrorHandler(404, new Sendable<HttpException>() {
                                                     @Override
-                                                    public void Send(HttpException e) {
+                                                    public void send(HttpException e) {
                                                         GamesAdapter.this.items.remove(pos);
                                                         GamesAdapter.this.notifyItemRemoved(pos);
                                                         GamesAdapter.this.expandedItems.remove(pos);
@@ -202,11 +195,11 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                         retrofitActivity.handleReq(retrofitActivity.memberService.MemberCreate(new Member(), game.Properties.ID),
                                 new Sendable<SingleContainer<Member>>() {
                                     @Override
-                                    public void Send(SingleContainer<Member> memberSingleContainer) {
+                                    public void send(SingleContainer<Member> memberSingleContainer) {
                                         retrofitActivity.handleReq(retrofitActivity.gameService.GameLoad(game.Properties.ID),
                                                 new Sendable<SingleContainer<Game>>() {
                                                     @Override
-                                                    public void Send(SingleContainer<Game> gameSingleContainer) {
+                                                    public void send(SingleContainer<Game> gameSingleContainer) {
                                                         GamesAdapter.this.items.set(pos, gameSingleContainer);
                                                         GamesAdapter.this.notifyItemChanged(pos);
                                                     }

@@ -1,6 +1,6 @@
 package se.oort.diplicity.apigen;
 		
-public class SingleContainer<T> {
+public class SingleContainer<T> implements java.io.Serializable {
   public SingleContainer() {
   }
   public T Properties;
