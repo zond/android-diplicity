@@ -231,7 +231,6 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
         View.OnClickListener clickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("Diplicity", "*** " + view + " got click");
                 if (expandedItems.contains(vh.getAdapterPosition())) {
                     expandedItems.remove(vh.getAdapterPosition());
                 } else {
