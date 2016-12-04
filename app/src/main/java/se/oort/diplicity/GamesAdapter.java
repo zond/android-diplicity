@@ -180,6 +180,12 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                                                         GamesAdapter.this.items.remove(pos);
                                                         GamesAdapter.this.notifyItemRemoved(pos);
                                                         GamesAdapter.this.expandedItems.remove(pos);
+                                                        for (int i : GamesAdapter.this.expandedItems) {
+                                                            if (i > pos) {
+                                                                GamesAdapter.this.expandedItems.remove(i);
+                                                                GamesAdapter.this.expandedItems.add(i+1);
+                                                            }
+                                                        }
                                                     }
                                                 }), ctx.getResources().getString(R.string.updating));
                                     }
