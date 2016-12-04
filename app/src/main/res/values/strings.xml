@@ -30,14 +30,14 @@
     <string name="season_year_type">%1$s %2$s, %3$s</string>
     <string name="x_players">%s players</string>
     <string name="rating">Rating</string>
-    <string name="min_rating">Min rating</string>
-    <string name="max_rating">Max rating</string>
+    <string name="min_rating">Minimum rating</string>
+    <string name="max_rating">Maximum rating</string>
     <string name="reliability">Reliability</string>
     <string name="quickness">Quickness</string>
-    <string name="min_reliability">Min reliability</string>
-    <string name="min_quickness">Min quickness</string>
-    <string name="max_hated">Max hated</string>
-    <string name="max_hater">Max hater</string>
+    <string name="min_reliability">Minimum reliability</string>
+    <string name="min_quickness">Minimum quickness</string>
+    <string name="max_hated">Maximum hated</string>
+    <string name="max_hater">Maximum hater</string>
     <string name="logging_in">Logging in</string>
     <string name="x_to_y">%1$s - %2$s</string>
     <string name="leaving_game">Leaving game</string>
@@ -50,4 +50,7 @@
     <string name="more">more</string>
     <string name="phase_length_in_minutes">Phase length in minutes</string>
     <string name="variant">Variant</string>
+    <string name="description">Description</string>
+    <string name="create_game">Create game</string>
+    <string name="creating_game">Creating game</string>
 </resources>

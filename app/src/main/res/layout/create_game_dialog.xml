@@ -6,11 +6,34 @@
     android:layout_height="wrap_content">
 
     <GridLayout
+        android:id="@+id/grid"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:columnCount="2"
-        android:rowCount="8"
+        android:rowCount="9"
         android:useDefaultMargins="true">
+
+        <TextView
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            app:layout_columnWeight="0"
+            android:id="@+id/desc_label"
+            android:text="@string/description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            app:layout_columnWeight="1"
+            android:inputType="text"
+            android:id="@+id/desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
         <TextView
             android:layout_marginStart="5dp"
@@ -22,6 +45,8 @@
             android:layout_height="wrap_content" />
 
         <Spinner
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
             app:layout_columnWeight="1"
             android:id="@+id/variants"
             android:layout_height="wrap_content"
@@ -37,6 +62,9 @@
             android:layout_height="wrap_content" />
 
         <EditText
+            android:layout_marginRight="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
             app:layout_columnWeight="1"
             android:inputType="number"
             android:id="@+id/phase_length"
@@ -54,8 +82,11 @@
 
         <EditText
             app:layout_columnWeight="1"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
             android:inputType="numberDecimal"
             android:id="@+id/min_rating"
+            android:layout_marginRight="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
@@ -71,7 +102,10 @@
         <EditText
             app:layout_columnWeight="1"
             android:inputType="numberDecimal"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
             android:id="@+id/max_rating"
+            android:layout_marginRight="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
@@ -87,6 +121,9 @@
         <EditText
             android:inputType="numberDecimal"
             app:layout_columnWeight="1"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:id="@+id/min_reliability"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
@@ -102,6 +139,9 @@
 
         <EditText
             android:inputType="numberDecimal"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             app:layout_columnWeight="1"
             android:id="@+id/min_quickness"
             android:layout_width="match_parent"
@@ -118,7 +158,10 @@
 
         <EditText
             android:inputType="numberDecimal"
+            android:layout_marginRight="5dp"
             app:layout_columnWeight="1"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
             android:id="@+id/max_hated"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
@@ -134,11 +177,30 @@
 
         <EditText
             app:layout_columnWeight="1"
+            android:layout_marginStart="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
             android:inputType="numberDecimal"
             android:id="@+id/max_hater"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-
     </GridLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:elevation="6dp"
+        app:borderWidth="0dp"
+        app:fabSize="mini"
+        app:rippleColor="@color/colorPrimary"
+        app:useCompatPadding="true"
+        android:tint="@android:color/white"
+        android:id="@+id/add_game_button"
+        android:src="@android:drawable/ic_menu_save"
+        android:layout_alignBottom="@id/grid"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
 </RelativeLayout>

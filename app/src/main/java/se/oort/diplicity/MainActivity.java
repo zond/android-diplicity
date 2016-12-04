@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.Spinner;
@@ -77,8 +78,47 @@ public class MainActivity extends RetrofitActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.create_game_dialog).show();
-                Spinner variants = ((Spinner) dialog.findViewById(R.id.variants));
+                final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.create_game_dialog).show();
+                final Spinner variants = ((Spinner) dialog.findViewById(R.id.variants));
+                ((FloatingActionButton) dialog.findViewById(R.id.add_game_button)).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Game game = new Game();
+                        game.Desc = ((EditText) dialog.findViewById(R.id.desc)).getText().toString();
+                        game.Variant = variants.getSelectedItem().toString();
+                        try {
+                            game.PhaseLengthMinutes = Long.parseLong(((EditText) dialog.findViewById(R.id.phase_length)).getText().toString());
+                        } catch (NumberFormatException e) {}
+                        try {
+                            game.MinRating = Double.parseDouble(((EditText) dialog.findViewById(R.id.min_rating)).getText().toString());
+                        } catch (NumberFormatException e) {}
+                        try {
+                          game.MaxRating = Double.parseDouble(((EditText) dialog.findViewById(R.id.max_rating)).getText().toString());
+                        } catch (NumberFormatException e) {}
+                        try {
+                         game.MinReliability = Double.parseDouble(((EditText) dialog.findViewById(R.id.min_reliability)).getText().toString());
+                        } catch (NumberFormatException e) {}
+                        try {
+                            game.MinQuickness = Double.parseDouble(((EditText) dialog.findViewById(R.id.min_quickness)).getText().toString());
+                        } catch (NumberFormatException e) {}
+                        try {
+                            game.MaxHated = Double.parseDouble(((EditText) dialog.findViewById(R.id.max_hated)).getText().toString());
+                        } catch (NumberFormatException e) {}
+                        try {
+                            game.MaxHater = Double.parseDouble(((EditText) dialog.findViewById(R.id.max_hater)).getText().toString());
+                        } catch (NumberFormatException e) {}
+                        handleReq(gameService.GameCreate(game), new Sendable<SingleContainer<Game>>() {
+                            @Override
+                            public void send(SingleContainer<Game> gameSingleContainer) {
+                                if (nextCursorContainer.get(0).length() == 0) {
+                                    gamesAdapter.items.add(gameSingleContainer);
+                                    gamesAdapter.notifyItemInserted(gamesAdapter.items.size());
+                                }
+                                dialog.dismiss();
+                            }
+                        }, getResources().getString(R.string.creating_game));
+                    }
+                });
                 List<String> variantNames = new ArrayList<String>();
                 for (SingleContainer<VariantService.Variant> variantContainer : App.variants.Properties) {
                     variantNames.add(variantContainer.Properties.Name);
