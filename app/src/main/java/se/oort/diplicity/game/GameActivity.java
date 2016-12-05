@@ -3,6 +3,7 @@ package se.oort.diplicity.game;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Base64;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -12,6 +13,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.WebView;
+
+import java.io.StringWriter;
 
 import se.oort.diplicity.R;
 import se.oort.diplicity.RetrofitActivity;
@@ -51,6 +55,8 @@ public class GameActivity extends RetrofitActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        showMap();
     }
 
     @Override
@@ -85,14 +91,36 @@ public class GameActivity extends RetrofitActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
+    public void hideAllExcept(int toShow) {
+        for (int viewID : new int[]{R.id.map_web}) {
+            if (viewID == toShow) {
+                findViewById(viewID).setVisibility(View.VISIBLE);
+            } else {
+                findViewById(viewID).setVisibility(View.GONE);
+            }
+        }
+    }
+
+    static String convertStreamToString(java.io.InputStream is) {
+        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
+    }
+
+    public void showMap() {
+        hideAllExcept(R.id.map_web);
+        ((WebView) findViewById(R.id.map_web)).loadData(
+                convertStreamToString(getResources().openRawResource(R.raw.standard)),
+                "text/html; charset=utf-8",
+                null);
+    }
+
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (id == R.id.nav_map) {
-            // Handle the camera action
+            showMap();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

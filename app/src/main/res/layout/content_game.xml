@@ -5,12 +5,22 @@
     android:id="@+id/content_game"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="se.oort.diplicity.game.GameActivity"
     tools:showIn="@layout/app_bar_game">
+
+    <FrameLayout
+        android:id="@+id/game_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <WebView
+            android:id="@+id/map_web"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </WebView>
+
+    </FrameLayout>
 
 </RelativeLayout>
