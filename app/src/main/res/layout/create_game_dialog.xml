@@ -195,7 +195,7 @@
         app:rippleColor="@color/colorPrimary"
         app:useCompatPadding="true"
         android:tint="@android:color/white"
-        android:id="@+id/add_game_button"
+        android:id="@+id/create_game_button"
         android:src="@android:drawable/ic_menu_save"
         android:layout_alignBottom="@id/grid"
         android:layout_alignParentRight="true"

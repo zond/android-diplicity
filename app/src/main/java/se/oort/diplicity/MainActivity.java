@@ -22,14 +22,17 @@ import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import retrofit2.adapter.rxjava.HttpException;
 import rx.Observable;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Link;
@@ -78,54 +81,122 @@ public class MainActivity extends RetrofitActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.create_game_dialog).show();
-                final Spinner variants = ((Spinner) dialog.findViewById(R.id.variants));
-                ((FloatingActionButton) dialog.findViewById(R.id.add_game_button)).setOnClickListener(new View.OnClickListener() {
+                handleReq(userStatsService.UserStatsLoad(App.loggedInUser.Id), new Sendable<SingleContainer<UserStats>>() {
                     @Override
-                    public void onClick(View view) {
-                        Game game = new Game();
-                        game.Desc = ((EditText) dialog.findViewById(R.id.desc)).getText().toString();
-                        game.Variant = variants.getSelectedItem().toString();
-                        try {
-                            game.PhaseLengthMinutes = Long.parseLong(((EditText) dialog.findViewById(R.id.phase_length)).getText().toString());
-                        } catch (NumberFormatException e) {}
-                        try {
-                            game.MinRating = Double.parseDouble(((EditText) dialog.findViewById(R.id.min_rating)).getText().toString());
-                        } catch (NumberFormatException e) {}
-                        try {
-                          game.MaxRating = Double.parseDouble(((EditText) dialog.findViewById(R.id.max_rating)).getText().toString());
-                        } catch (NumberFormatException e) {}
-                        try {
-                         game.MinReliability = Double.parseDouble(((EditText) dialog.findViewById(R.id.min_reliability)).getText().toString());
-                        } catch (NumberFormatException e) {}
-                        try {
-                            game.MinQuickness = Double.parseDouble(((EditText) dialog.findViewById(R.id.min_quickness)).getText().toString());
-                        } catch (NumberFormatException e) {}
-                        try {
-                            game.MaxHated = Double.parseDouble(((EditText) dialog.findViewById(R.id.max_hated)).getText().toString());
-                        } catch (NumberFormatException e) {}
-                        try {
-                            game.MaxHater = Double.parseDouble(((EditText) dialog.findViewById(R.id.max_hater)).getText().toString());
-                        } catch (NumberFormatException e) {}
-                        handleReq(gameService.GameCreate(game), new Sendable<SingleContainer<Game>>() {
+                    public void send(SingleContainer<UserStats> userStatsSingleContainer) {
+                        final List<UserStats> statsContainer = new ArrayList<>();
+                        statsContainer.add(userStatsSingleContainer.Properties);
+
+                        final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.create_game_dialog).show();
+                        final Returner<Game, Boolean> validateGame = new Returner<Game, Boolean>() {
                             @Override
-                            public void send(SingleContainer<Game> gameSingleContainer) {
-                                if (nextCursorContainer.get(0).length() == 0) {
-                                    gamesAdapter.items.add(gameSingleContainer);
-                                    gamesAdapter.notifyItemInserted(gamesAdapter.items.size());
+                            public Boolean Return(Game g) {
+                                UserStats us = statsContainer.get(0);
+                                if (g.MinRating > us.Glicko.PracticalRating) {
+                                    Toast.makeText(MainActivity.this, getResources().getString(R.string.minimum_rating_must_be_below_your_rating_x, us.Glicko.PracticalRating), Toast.LENGTH_LONG).show();
+                                    return false;
                                 }
-                                dialog.dismiss();
+                                if (g.MaxRating < us.Glicko.PracticalRating) {
+                                    Toast.makeText(MainActivity.this, getResources().getString(R.string.maximum_rating_must_be_above_your_rating_x, us.Glicko.PracticalRating), Toast.LENGTH_LONG).show();
+                                    return false;
+                                }
+                                if (g.MinReliability > us.Reliability) {
+                                    Toast.makeText(MainActivity.this, getResources().getString(R.string.minimum_reliability_must_be_below_your_reliability_x, us.Reliability), Toast.LENGTH_LONG).show();
+                                    return false;
+                                }
+                                if (g.MinQuickness > us.Quickness) {
+                                    Toast.makeText(MainActivity.this, getResources().getString(R.string.minimum_quickness_must_be_below_your_quickness_x, us.Quickness), Toast.LENGTH_LONG).show();
+                                    return false;
+                                }
+                                if (g.MaxHated < us.Hated) {
+                                    Toast.makeText(MainActivity.this, getResources().getString(R.string.maximum_hated_must_be_above_your_hated_x, us.Hated), Toast.LENGTH_LONG).show();
+                                    return false;
+                                }
+                                if (g.MaxHater < us.Hater) {
+                                    Toast.makeText(MainActivity.this, getResources().getString(R.string.maximum_hater_must_be_above_your_hater_x, us.Hater), Toast.LENGTH_LONG).show();
+                                    return false;
+                                }
+                                return true;
                             }
-                        }, getResources().getString(R.string.creating_game));
+                        };
+                        final Spinner variants = ((Spinner) dialog.findViewById(R.id.variants));
+                        List<String> variantNames = new ArrayList<String>();
+                        for (SingleContainer<VariantService.Variant> variantContainer : App.variants.Properties) {
+                            variantNames.add(variantContainer.Properties.Name);
+                        }
+                        int classical = 0;
+                        Collections.sort(variantNames);
+                        for (int i = 0; i < variantNames.size(); i++) {
+                            if (variantNames.get(i).equals("Classical")) {
+                                classical = i;
+                            }
+                        }
+                        ArrayAdapter<String> variantAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, variantNames);
+                        variants.setAdapter(variantAdapter);
+                        variantAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        variants.setSelection(classical);
+
+                        ((FloatingActionButton) dialog.findViewById(R.id.create_game_button)).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                final Game game = new Game();
+                                game.Desc = ((EditText) dialog.findViewById(R.id.desc)).getText().toString();
+                                game.Variant = variants.getSelectedItem().toString();
+                                try {
+                                    game.PhaseLengthMinutes = Long.parseLong(((EditText) dialog.findViewById(R.id.phase_length)).getText().toString());
+                                } catch (NumberFormatException e) {
+                                }
+                                try {
+                                    game.MinRating = Double.parseDouble(((EditText) dialog.findViewById(R.id.min_rating)).getText().toString());
+                                } catch (NumberFormatException e) {
+                                }
+                                try {
+                                    game.MaxRating = Double.parseDouble(((EditText) dialog.findViewById(R.id.max_rating)).getText().toString());
+                                } catch (NumberFormatException e) {
+                                }
+                                try {
+                                    game.MinReliability = Double.parseDouble(((EditText) dialog.findViewById(R.id.min_reliability)).getText().toString());
+                                } catch (NumberFormatException e) {
+                                }
+                                try {
+                                    game.MinQuickness = Double.parseDouble(((EditText) dialog.findViewById(R.id.min_quickness)).getText().toString());
+                                } catch (NumberFormatException e) {
+                                }
+                                try {
+                                    game.MaxHated = Double.parseDouble(((EditText) dialog.findViewById(R.id.max_hated)).getText().toString());
+                                } catch (NumberFormatException e) {
+                                }
+                                try {
+                                    game.MaxHater = Double.parseDouble(((EditText) dialog.findViewById(R.id.max_hater)).getText().toString());
+                                } catch (NumberFormatException e) {
+                                }
+                                if (validateGame.Return(game)) {
+                                    handleReq(gameService.GameCreate(game), new Sendable<SingleContainer<Game>>() {
+                                        @Override
+                                        public void send(SingleContainer<Game> gameSingleContainer) {
+                                            if (nextCursorContainer.get(0).length() == 0) {
+                                                gamesAdapter.items.add(gameSingleContainer);
+                                                gamesAdapter.notifyItemInserted(gamesAdapter.items.size());
+                                            }
+                                            dialog.dismiss();
+                                        }
+                                    }, new ErrorHandler(412, new Sendable<HttpException>() {
+                                        @Override
+                                        public void send(HttpException e) {
+                                            handleReq(userStatsService.UserStatsLoad(App.loggedInUser.Id), new Sendable<SingleContainer<UserStats>>() {
+                                                @Override
+                                                public void send(SingleContainer<UserStats> userStatsSingleContainer) {
+                                                    statsContainer.set(0, userStatsSingleContainer.Properties);
+                                                    validateGame.Return(game);
+                                                }
+                                            }, getResources().getString(R.string.creating_game));
+                                        }
+                                    }), getResources().getString(R.string.creating_game));
+                                }
+                            }
+                        });
                     }
-                });
-                List<String> variantNames = new ArrayList<String>();
-                for (SingleContainer<VariantService.Variant> variantContainer : App.variants.Properties) {
-                    variantNames.add(variantContainer.Properties.Name);
-                }
-                ArrayAdapter<String> variantAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, variantNames);
-                variants.setAdapter(variantAdapter);
-                variantAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                }, getResources().getString(R.string.loading_user_stats));
             }
         });
 

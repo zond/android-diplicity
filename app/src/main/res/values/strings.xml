@@ -53,4 +53,12 @@
     <string name="description">Description</string>
     <string name="create_game">Create game</string>
     <string name="creating_game">Creating game</string>
+    <string name="loading_user_stats">Loading user stats</string>
+    <string name="must_be_below_your_rating_x">Must be below your rating (%s)</string>
+    <string name="minimum_rating_must_be_below_your_rating_x">Minimum rating must be below your rating (%s)</string>
+    <string name="maximum_rating_must_be_above_your_rating_x">Maximum rating must be above your rating (%s)</string>
+    <string name="minimum_reliability_must_be_below_your_reliability_x">Minimum reliability must be below your reliability (%s)</string>
+    <string name="minimum_quickness_must_be_below_your_quickness_x">Minimum quickness must be below your quickness (%s)</string>
+    <string name="maximum_hated_must_be_above_your_hated_x">Maximum hated must be above your hated (%s)</string>
+    <string name="maximum_hater_must_be_above_your_hater_x">Maximum hater must be above your hater (%s)</string>
 </resources>
