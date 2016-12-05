@@ -159,7 +159,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             }
             if (hasLeave) {
                 button.setVisibility(View.VISIBLE);
-                button.setImageDrawable(ctx.getResources().getDrawable(android.R.drawable.ic_input_delete, null));
+                button.setImageDrawable(ctx.getResources().getDrawable(R.drawable.ic_clear_black_24dp, null));
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
