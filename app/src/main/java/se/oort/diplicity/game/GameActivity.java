@@ -14,15 +14,31 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import se.oort.diplicity.R;
+import se.oort.diplicity.RetrofitActivity;
+import se.oort.diplicity.apigen.Game;
+import se.oort.diplicity.apigen.PhaseMeta;
 
-public class GameActivity extends AppCompatActivity
+public class GameActivity extends RetrofitActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String SERIALIZED_GAME_KEY = "serialized_game";
 
+    public Game game;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        byte[] serializedGame = getIntent().getByteArrayExtra(SERIALIZED_GAME_KEY);
+        game = (Game) unserialize(serializedGame);
+
+        if (game.NewestPhaseMeta != null && game.NewestPhaseMeta.size() > 0) {
+            PhaseMeta pm = game.NewestPhaseMeta.get(0);
+            setTitle(getResources().getString(R.string.desc_season_year_type, game.Desc, pm.Season, pm.Year, pm.Type));
+        } else {
+            setTitle(game.Desc);
+        }
+
         setContentView(R.layout.activity_game);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

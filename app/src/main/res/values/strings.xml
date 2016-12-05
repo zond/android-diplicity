@@ -63,4 +63,5 @@
     <string name="maximum_hater_must_be_above_your_hater_x">Maximum hater must be above your hater (%s)</string>
     <string name="title_activity_game">GameActivity</string>
     <string name="map">Map</string>
+    <string name="desc_season_year_type">%1$s: %2$s %3$s, %4$s</string>
 </resources>
