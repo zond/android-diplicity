@@ -31,7 +31,6 @@ public class UserView extends FrameLayout {
         addView(inflater.inflate(R.layout.user_view, null));
     }
     public void setUser(final User user) {
-        Log.d("Diplicity", "setting user to " + user.Name);
         ((TextView) findViewById(R.id.name)).setText(user.Name);
         final ImageView avatar = (ImageView) findViewById(R.id.avatar);
         Observable.create(new Observable.OnSubscribe<Bitmap>() {
