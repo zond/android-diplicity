@@ -25,10 +25,27 @@
         </activity>
         <activity
             android:name=".LoginActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="se.oort.diplicity.MainActivity" />
+        </activity>
         <activity
             android:name=".PreferenceActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="se.oort.diplicity.MainActivity" />
+        </activity>
+        <activity
+            android:name=".game.GameActivity"
+            android:label="@string/title_activity_game"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="se.oort.diplicity.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

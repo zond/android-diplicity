@@ -61,4 +61,5 @@
     <string name="minimum_quickness_must_be_below_your_quickness_x">Minimum quickness must be below your quickness (%s)</string>
     <string name="maximum_hated_must_be_above_your_hated_x">Maximum hated must be above your hated (%s)</string>
     <string name="maximum_hater_must_be_above_your_hater_x">Maximum hater must be above your hater (%s)</string>
+    <string name="title_activity_game">GameActivity</string>
 </resources>

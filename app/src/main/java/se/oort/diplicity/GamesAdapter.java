@@ -1,5 +1,6 @@
 package se.oort.diplicity;
 
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +22,7 @@ import se.oort.diplicity.apigen.Link;
 import se.oort.diplicity.apigen.Member;
 import se.oort.diplicity.apigen.PhaseMeta;
 import se.oort.diplicity.apigen.SingleContainer;
+import se.oort.diplicity.game.GameActivity;
 
 public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAdapter.ViewHolder> {
     private RetrofitActivity retrofitActivity;
@@ -217,6 +219,15 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             } else {
                 button.setVisibility(View.GONE);
             }
+
+            ((FloatingActionButton) itemView.findViewById(R.id.open_button)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(retrofitActivity, GameActivity.class);
+                    intent.putExtra(GameActivity.SERIALIZED_GAME_KEY, RetrofitActivity.serialize(game.Properties));
+                    retrofitActivity.startActivity(intent);
+                }
+            });
         }
     }
     public GamesAdapter(RetrofitActivity activity, List<SingleContainer<Game>> games) {
