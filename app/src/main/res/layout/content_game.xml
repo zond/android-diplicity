@@ -14,12 +14,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <WebView
-            android:id="@+id/map_web"
+        <se.oort.diplicity.game.MapView
+            android:id="@+id/map_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-        </WebView>
+        </se.oort.diplicity.game.MapView>
 
     </FrameLayout>
 

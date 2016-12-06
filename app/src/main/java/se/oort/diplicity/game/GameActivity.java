@@ -92,7 +92,7 @@ public class GameActivity extends RetrofitActivity
     }
 
     public void hideAllExcept(int toShow) {
-        for (int viewID : new int[]{R.id.map_web}) {
+        for (int viewID : new int[]{R.id.map_view}) {
             if (viewID == toShow) {
                 findViewById(viewID).setVisibility(View.VISIBLE);
             } else {
@@ -101,17 +101,9 @@ public class GameActivity extends RetrofitActivity
         }
     }
 
-    static String convertStreamToString(java.io.InputStream is) {
-        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
-    }
-
     public void showMap() {
-        hideAllExcept(R.id.map_web);
-        ((WebView) findViewById(R.id.map_web)).loadData(
-                convertStreamToString(getResources().openRawResource(R.raw.standard)),
-                "text/html; charset=utf-8",
-                null);
+        hideAllExcept(R.id.map_view);
+        ((MapView) findViewById(R.id.map_view)).load();
     }
 
     @Override
