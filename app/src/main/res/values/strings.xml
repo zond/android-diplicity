@@ -64,4 +64,5 @@
     <string name="title_activity_game">GameActivity</string>
     <string name="map">Map</string>
     <string name="desc_season_year_type">%1$s: %2$s %3$s, %4$s</string>
+    <string name="loading_start_state">Loading start state</string>
 </resources>

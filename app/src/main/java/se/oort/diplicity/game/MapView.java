@@ -3,11 +3,14 @@ package se.oort.diplicity.game;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 
+import se.oort.diplicity.App;
 import se.oort.diplicity.R;
+import se.oort.diplicity.apigen.Game;
 
 public class MapView extends FrameLayout {
 
@@ -22,16 +25,15 @@ public class MapView extends FrameLayout {
         return s.hasNext() ? s.next() : "";
     }
 
-    public void load() {
+    public void load(String url) {
         WebView webView = (WebView) findViewById(R.id.web_view);
         webView.getSettings().setLoadWithOverviewMode(true);
         webView.getSettings().setUseWideViewPort(true);
         webView.setBackgroundColor(Color.TRANSPARENT);
         webView.getSettings().setBuiltInZoomControls(true);
+        webView.getSettings().setJavaScriptEnabled(true);
 
-        webView.loadData(
-                convertStreamToString(getResources().openRawResource(R.raw.standard)),
-                "text/html; charset=utf-8",
-                null);
+        Log.d("Diplicity", "Loading game view " + url);
+        webView.loadUrl(url);
     }
 }

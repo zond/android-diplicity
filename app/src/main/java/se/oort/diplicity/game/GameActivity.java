@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,13 +15,19 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
+import android.widget.Toast;
 
 import java.io.StringWriter;
 
+import se.oort.diplicity.App;
 import se.oort.diplicity.R;
 import se.oort.diplicity.RetrofitActivity;
+import se.oort.diplicity.Sendable;
+import se.oort.diplicity.VariantService;
 import se.oort.diplicity.apigen.Game;
+import se.oort.diplicity.apigen.Link;
 import se.oort.diplicity.apigen.PhaseMeta;
+import se.oort.diplicity.apigen.SingleContainer;
 
 public class GameActivity extends RetrofitActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -30,8 +37,8 @@ public class GameActivity extends RetrofitActivity
     public Game game;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
 
         byte[] serializedGame = getIntent().getByteArrayExtra(SERIALIZED_GAME_KEY);
         game = (Game) unserialize(serializedGame);
@@ -103,7 +110,36 @@ public class GameActivity extends RetrofitActivity
 
     public void showMap() {
         hideAllExcept(R.id.map_view);
-        ((MapView) findViewById(R.id.map_view)).load();
+
+        final Sendable<String> renderer = new Sendable<String>() {
+            @Override
+            public void send(String url) {
+                Log.d("Diplicity", "Loading game map " + url);
+                ((MapView) findViewById(R.id.map_view)).load(url);
+            }
+        };
+
+        if (!game.Started) {
+            handleReq(variantService.GetStartPhase(game.Variant), new Sendable<SingleContainer<VariantService.Phase>>() {
+                @Override
+                public void send(SingleContainer<VariantService.Phase> phaseSingleContainer) {
+                    String url = null;
+                    for (Link link : phaseSingleContainer.Links) {
+                        if (link.Rel.equals("map")) {
+                            url = link.URL;
+                            break;
+                        }
+                    }
+                    if (url != null) {
+                        renderer.send(url);
+                    } else {
+                        Toast.makeText(getBaseContext(), R.string.unknown_error, Toast.LENGTH_SHORT);
+                    }
+                }
+            }, getResources().getString(R.string.loading_start_state));
+        } else {
+            renderer.send(App.baseURL + "/Game/" + game.ID + " + /Phase/" + game.NewestPhaseMeta.get(0).PhaseOrdinal + "/Map");
+        }
     }
 
     @Override
