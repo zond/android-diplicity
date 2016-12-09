@@ -1,0 +1,4 @@
+dependencies:
+  pre:
+    - echo y | android update sdk --no-ui --all --filter "Android SDK Platform 25"
+    - echo y | android update sdk --no-ui --all --filter "Android SDK Build-Tools 24.0.3"
