@@ -188,6 +188,10 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                                                                 GamesAdapter.this.expandedItems.add(i+1);
                                                             }
                                                         }
+                                                        if (GamesAdapter.this.items.size() == 0) {
+                                                            retrofitActivity.findViewById(R.id.empty_view).setVisibility(View.VISIBLE);
+                                                            retrofitActivity.findViewById(R.id.content_list).setVisibility(View.GONE);
+                                                        }
                                                     }
                                                 }), ctx.getResources().getString(R.string.updating));
                                     }

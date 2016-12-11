@@ -49,7 +49,7 @@ public class GameActivity extends RetrofitActivity
     public Game game;
     public Member member;
     public Map<String, OptionsService.Option> options = new HashMap<>();
-    public Map<String, Order> orders = new HashMap<String, Order>();
+    public Map<String, Order> orders = Collections.synchronizedMap(new HashMap<String, Order>());
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -129,9 +129,23 @@ public class GameActivity extends RetrofitActivity
         }
     }
 
-    private void setOrder(List<String> parts) {
+    private void setOrder(String province, List<String> parts) {
+        Sendable<SingleContainer<Order>> handler = new Sendable<SingleContainer<Order>>() {
+            @Override
+            public void send(SingleContainer<Order> orderSingleContainer) {
+                MapView mv = (MapView) findViewById(R.id.map_view);
+                mv.evaluateJS("window.map.removeOrders()");
+                for (Map.Entry<String, Order> entry : orders.entrySet()) {
+                    mv.evaluateJS("window.map.addOrder(" + new Gson().toJson(entry.getValue().Parts) + ", col" + entry.getValue().Nation + ");");
+                }
+
+            }
+        };
         if (parts == null || parts.size() == 0) {
-            orders.remove(parts.get(0));
+            orders.remove(province);
+            handleReq(
+                    orderService.OrderDelete(game.ID, game.NewestPhaseMeta.get(0).PhaseOrdinal.toString(), province),
+                    handler, getResources().getString(R.string.removing_order));
         } else {
             Order order = new Order();
             order.GameID = game.ID;
@@ -139,15 +153,13 @@ public class GameActivity extends RetrofitActivity
             order.PhaseOrdinal = game.NewestPhaseMeta.get(0).PhaseOrdinal;
             order.Parts = parts;
             orders.put(parts.get(0), order);
-        }
-        MapView mv = (MapView) findViewById(R.id.map_view);
-        mv.evaluateJS("window.map.removeOrders()");
-        for (Map.Entry<String, Order> entry : orders.entrySet()) {
-            mv.evaluateJS("window.map.addOrder(" + new Gson().toJson(entry.getValue().Parts) + ", col" + entry.getValue().Nation + ");");
+            handleReq(
+                    orderService.OrderCreate(order, game.ID, game.NewestPhaseMeta.get(0).PhaseOrdinal.toString()),
+                    handler, getResources().getString(R.string.saving_order));
         }
     }
 
-    private void completeOrder(final List<String> prefix, final Map<String, OptionsService.Option> opts) {
+    private void completeOrder(final List<String> prefix, final Map<String, OptionsService.Option> opts, final String srcProvince) {
         Set<String> optionTypes = new HashSet<>();
         Set<String> optionValues = new HashSet<>();
         for (Map.Entry<String, OptionsService.Option> opt : opts.entrySet()) {
@@ -174,10 +186,14 @@ public class GameActivity extends RetrofitActivity
                                     prefix.add(s);
                                     Map<String, OptionsService.Option> next = opts.get(s).Next;
                                     if (next == null || next.isEmpty()) {
-                                        setOrder(prefix);
+                                        setOrder(srcProvince, prefix);
                                         acceptOrders();
                                     } else {
-                                        completeOrder(prefix, next);
+                                        String newSrcProvince = srcProvince;
+                                        if (newSrcProvince == null) {
+                                            newSrcProvince = s;
+                                        }
+                                        completeOrder(prefix, next, newSrcProvince);
                                     }
                                 }
                             });
@@ -193,16 +209,17 @@ public class GameActivity extends RetrofitActivity
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     if (orderTypes.get(i).equals(getResources().getString(R.string.cancel))) {
+                        setOrder(srcProvince, null);
                         acceptOrders();
                         return;
                     }
                     prefix.add(orderTypes.get(i));
                     Map<String, OptionsService.Option> next = opts.get(orderTypes.get(i)).Next;
                     if (next == null || next.isEmpty()) {
-                        setOrder(prefix);
+                        setOrder(srcProvince, prefix);
                         acceptOrders();
                     } else {
-                        completeOrder(prefix, next);
+                        completeOrder(prefix, next, srcProvince);
                     }
                 }
             }).setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -214,17 +231,17 @@ public class GameActivity extends RetrofitActivity
         } else if (optionType.equals("SrcProvince")) {
             Map<String, OptionsService.Option> next = opts.get(optionValues.iterator().next()).Next;
             if (next == null || next.isEmpty()) {
-                setOrder(prefix);
+                setOrder(srcProvince, prefix);
                 acceptOrders();
             } else {
-                completeOrder(prefix, next);
+                completeOrder(prefix, next, srcProvince);
             }
         }
 
     }
 
     public void acceptOrders() {
-        completeOrder(new ArrayList<String>(), options);
+        completeOrder(new ArrayList<String>(), options, null);
     }
 
     public void showMap() {

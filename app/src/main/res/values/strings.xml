@@ -68,4 +68,6 @@
     <string name="loading_options">Loading options</string>
     <string name="cancel">Cancel</string>
     <string name="loading_state">Loading state</string>
+    <string name="removing_order">Removing order</string>
+    <string name="saving_order">Saving order</string>
 </resources>

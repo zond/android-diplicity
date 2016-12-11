@@ -13,6 +13,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -92,26 +93,38 @@ public class MainActivity extends RetrofitActivity {
                             @Override
                             public Boolean Return(Game g) {
                                 UserStats us = statsContainer.get(0);
+                                if (g.MinRating == null)
+                                    g.MinRating = 0.0;
                                 if (g.MinRating > us.Glicko.PracticalRating) {
                                     Toast.makeText(MainActivity.this, getResources().getString(R.string.minimum_rating_must_be_below_your_rating_x, us.Glicko.PracticalRating), Toast.LENGTH_LONG).show();
                                     return false;
                                 }
+                                if (g.MaxRating == null)
+                                    g.MaxRating = 0.0;
                                 if (g.MaxRating < us.Glicko.PracticalRating) {
                                     Toast.makeText(MainActivity.this, getResources().getString(R.string.maximum_rating_must_be_above_your_rating_x, us.Glicko.PracticalRating), Toast.LENGTH_LONG).show();
                                     return false;
                                 }
+                                if (g.MinReliability == null)
+                                    g.MinReliability = 0.0;
                                 if (g.MinReliability > us.Reliability) {
                                     Toast.makeText(MainActivity.this, getResources().getString(R.string.minimum_reliability_must_be_below_your_reliability_x, us.Reliability), Toast.LENGTH_LONG).show();
                                     return false;
                                 }
+                                if (g.MinQuickness == null)
+                                    g.MinQuickness = 0.0;
                                 if (g.MinQuickness > us.Quickness) {
                                     Toast.makeText(MainActivity.this, getResources().getString(R.string.minimum_quickness_must_be_below_your_quickness_x, us.Quickness), Toast.LENGTH_LONG).show();
                                     return false;
                                 }
+                                if (g.MaxHated == null)
+                                    g.MaxHated = 0.0;
                                 if (g.MaxHated < us.Hated) {
                                     Toast.makeText(MainActivity.this, getResources().getString(R.string.maximum_hated_must_be_above_your_hated_x, us.Hated), Toast.LENGTH_LONG).show();
                                     return false;
                                 }
+                                if (g.MaxHater == null)
+                                    g.MaxHater = 0.0;
                                 if (g.MaxHater < us.Hater) {
                                     Toast.makeText(MainActivity.this, getResources().getString(R.string.maximum_hater_must_be_above_your_hater_x, us.Hater), Toast.LENGTH_LONG).show();
                                     return false;
@@ -175,8 +188,10 @@ public class MainActivity extends RetrofitActivity {
                                         @Override
                                         public void send(SingleContainer<Game> gameSingleContainer) {
                                             if (nextCursorContainer.get(0).length() == 0) {
+                                                findViewById(R.id.empty_view).setVisibility(View.GONE);
+                                                contentList.setVisibility(View.VISIBLE);
                                                 gamesAdapter.items.add(gameSingleContainer);
-                                                gamesAdapter.notifyItemInserted(gamesAdapter.items.size());
+                                                gamesAdapter.notifyItemInserted(gamesAdapter.items.size() - 1);
                                             }
                                             dialog.dismiss();
                                         }
