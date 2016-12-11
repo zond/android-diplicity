@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -42,6 +43,7 @@ import rx.schedulers.Schedulers;
 import se.oort.diplicity.apigen.GameService;
 import se.oort.diplicity.apigen.MemberService;
 import se.oort.diplicity.apigen.MultiContainer;
+import se.oort.diplicity.apigen.OrderService;
 import se.oort.diplicity.apigen.User;
 import se.oort.diplicity.apigen.UserStatsService;
 
@@ -49,7 +51,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
 
     static final int LOGIN_REQUEST = 1;
     static final String API_URL_KEY = "api_url";
-    static final String DEFAULT_URL = "https://diplicity-engine.appspot.com";
+    static final String DEFAULT_URL = "https://diplicity-engine.appspot.com/";
     static final String LOGGED_IN_USER_KEY = "logged_in_user";
     static final String AUTH_TOKEN_KEY = "auth_token";
     static final String VARIANTS_KEY = "variants";
@@ -62,9 +64,13 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     public MemberService memberService;
     public RootService rootService;
     public VariantService variantService;
+    public OptionsService optionsService;
+    public OrderService orderService;
 
     private SharedPreferences prefs;
     private SharedPreferences.OnSharedPreferenceChangeListener prefsListener;
+
+    public Handler handler = new Handler();
 
     private class LoginSubscriber<R> {
         private Subscriber<? super R> subscriber;
@@ -187,7 +193,10 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == LOGIN_REQUEST) {
             if (resultCode == RESULT_OK) {
-                observe(JoinObservable.when(JoinObservable.from(rootService.GetRoot()).and(variantService.GetVariants()).then(new Func2<RootService.Root, MultiContainer<VariantService.Variant>, Object>() {
+                observe(JoinObservable.when(JoinObservable
+                        .from(rootService.GetRoot())
+                        .and(variantService.GetVariants())
+                        .then(new Func2<RootService.Root, MultiContainer<VariantService.Variant>, Object>() {
                     @Override
                     public Object call(RootService.Root root, MultiContainer<VariantService.Variant> variants) {
                         App.loggedInUser = root.Properties.User;
@@ -254,6 +263,8 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         memberService = retrofit.create(MemberService.class);
         rootService = retrofit.create(RootService.class);
         variantService = retrofit.create(VariantService.class);
+        optionsService = retrofit.create(OptionsService.class);
+        orderService = retrofit.create(OrderService.class);
     }
 
     @Override
