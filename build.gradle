@@ -17,7 +17,7 @@ buildscript {
 ext {
     git = org.ajoberstar.grgit.Grgit.open()
     gitVersionCode = "${git.log().size()}"
-    gitVersionName = "${git.describe()}"
+    gitVersionName = "${git.head().abbreviatedId}"
 }
 
 allprojects {
