@@ -1,10 +1,11 @@
 dependencies:
   pre:
-    - ./circle/maybe_download_keystore.sh
+    - ./circle/download_keystore.sh
     - if [ ! -d "/usr/local/android-sdk-linux/platforms/android-25" ]; then echo y | android update sdk --no-ui --all --filter "android-25"; fi
     - if [ ! -d "/usr/local/android-sdk-linux/build-tools/25.0.1" ]; then echo y | android update sdk --no-ui --all --filter "build-tools-25.0.1"; fi
     # Android Support Repository, revision 35 / Local Maven repository for Support Libraries
     - if [ ! -d "/usr/local/android-sdk-linux/extras/android/m2repository/com/android/support/design/25.0.1" ]; then echo y | android update sdk --no-ui --all --filter "extra-android-m2repository"; fi
+    - go get github.com/prasmussen/gdrive
 
 test:
   override:
@@ -16,3 +17,8 @@ machine:
     KEYSTORE: ${HOME}/${CIRCLE_PROJECT_REPONAME}/signing.keystore
     KEY_ALIAS: release
 
+deployment:
+  production:
+    branch: master
+    commands:
+      - ./circle/upload_to_drive.sh
