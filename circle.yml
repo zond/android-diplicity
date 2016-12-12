@@ -9,7 +9,7 @@ dependencies:
 test:
   override:
     - ./gradlew assembleRelease
-    - cp -r project-name/build/outputs $CIRCLE_ARTIFACTS
+    - cp -r app/build/outputs $CIRCLE_ARTIFACTS
 
 machine:
   environment:
