@@ -1,5 +1,5 @@
-#!/usr/bin/env 
+#!/usr/bin/env bash
 
 APK_NAME="build-${CIRCLE_BUILD_NUM}-`git rev-parse --short HEAD`.apk"
 
-gdrive --refresh-token ${GDRIVE_REFRESH_TOKEN} upload -p ${GDRIVE_PARENT_FOLDER} app/build/outputs/apk/app-release.apk
+$HOME/.go_workspace/bin/gdrive --refresh-token ${GDRIVE_REFRESH_TOKEN} upload -p ${GDRIVE_PARENT_FOLDER} --name ${APK_NAME} app/build/outputs/apk/app-release.apk
