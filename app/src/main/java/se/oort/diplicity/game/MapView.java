@@ -61,6 +61,8 @@ public class MapView extends FrameLayout {
         webView.setBackgroundColor(Color.TRANSPARENT);
         webView.getSettings().setBuiltInZoomControls(true);
         webView.getSettings().setJavaScriptEnabled(true);
+        webView.setBackgroundColor(Color.parseColor("#212121"));
+
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
