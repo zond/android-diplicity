@@ -21,7 +21,7 @@ public class PreferenceActivity extends AppCompatActivity {
         getFragmentManager().beginTransaction().replace(android.R.id.content, new Fragment()).commit();
     }
 
-    public class Fragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+    public static class Fragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
         @Override
         public void onResume() {

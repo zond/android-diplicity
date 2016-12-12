@@ -70,4 +70,7 @@
     <string name="loading_state">Loading state</string>
     <string name="removing_order">Removing order</string>
     <string name="saving_order">Saving order</string>
+    <string name="orders">Orders</string>
+    <string name="loading_orders">Loading orders</string>
+    <string name="nation_order">%1$s: %2$s</string>
 </resources>

@@ -16,10 +16,19 @@
 
         <se.oort.diplicity.game.MapView
             android:id="@+id/map_view"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
         </se.oort.diplicity.game.MapView>
+
+        <ListView
+            android:id="@+id/orders_view"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </ListView>
 
     </FrameLayout>
 

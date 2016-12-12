@@ -8,10 +8,13 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -120,7 +123,7 @@ public class GameActivity extends RetrofitActivity
     }
 
     public void hideAllExcept(int toShow) {
-        for (int viewID : new int[]{R.id.map_view}) {
+        for (int viewID : new int[]{R.id.map_view, R.id.orders_view}) {
             if (viewID == toShow) {
                 findViewById(viewID).setVisibility(View.VISIBLE);
             } else {
@@ -244,6 +247,25 @@ public class GameActivity extends RetrofitActivity
         completeOrder(new ArrayList<String>(), options, null);
     }
 
+    public void showOrders() {
+        hideAllExcept(R.id.orders_view);
+        handleReq(
+                orderService.ListOrders(game.ID, game.NewestPhaseMeta.get(0).PhaseOrdinal.toString()),
+                new Sendable<MultiContainer<Order>>() {
+                    @Override
+                    public void send(MultiContainer<Order> orderMultiContainer) {
+                        List<String> orders = new ArrayList<String>();
+                        for (SingleContainer<Order> orderContainer : orderMultiContainer.Properties) {
+                            orders.add(getResources().getString(R.string.nation_order, orderContainer.Properties.Nation, TextUtils.join(" ", orderContainer.Properties.Parts)));
+                        }
+                        Collections.sort(orders);
+                        ListView ordersView = (ListView) findViewById(R.id.orders_view);
+                        ordersView.setOnClickListener(null);
+                        ordersView.setAdapter(new ArrayAdapter<String>(GameActivity.this, android.R.layout.simple_list_item_1, orders));
+                    }
+                }, getResources().getString(R.string.loading_orders));
+    }
+
     public void showMap() {
         hideAllExcept(R.id.map_view);
 
@@ -303,6 +325,8 @@ public class GameActivity extends RetrofitActivity
 
         if (id == R.id.nav_map) {
             showMap();
+        } else if (id == R.id.nav_orders) {
+            showOrders();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
