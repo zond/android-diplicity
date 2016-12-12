@@ -2,4 +2,4 @@
 
 # android-diplicity
 
-[Builds signed APKs](https://circleci.com/gh/zond/android-diplicity)
+[Builds and signed APKs](https://circleci.com/gh/zond/android-diplicity)
