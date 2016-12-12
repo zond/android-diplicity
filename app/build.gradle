@@ -7,23 +7,28 @@ android {
         applicationId "se.oort.diplicity"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        versionCode gitVersionCode.toInteger()
+        versionName gitVersionName
+
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-		signingConfigs {
-			release {
-				storeFile file(System.getenv("KEYSTORE"))
-					storePassword System.getenv("KEYSTORE_PASSWORD")
-					keyAlias System.getenv("KEY_ALIAS")
-					keyPassword System.getenv("KEY_PASSWORD")
+		if (System.getenv("KEYSTORE") != null) {
+			signingConfigs {
+				release {
+					storeFile file(System.getenv("KEYSTORE"))
+						storePassword System.getenv("KEYSTORE_PASSWORD")
+						keyAlias System.getenv("KEY_ALIAS")
+						keyPassword System.getenv("KEY_PASSWORD")
+				}
 			}
 		}
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-						signingConfig signingConfigs.release
+						if (System.getenv("KEYSTORE") != null) {
+							signingConfig signingConfigs.release
+						}
         }
     }
 }
