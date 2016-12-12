@@ -5,3 +5,7 @@ dependencies:
     # Android Support Repository, revision 35 / Local Maven repository for Support Libraries
     - if [ ! -d "/usr/local/android-sdk-linux/extras/android/m2repository/com/android/support/design/25.0.1" ]; then echo y | android update sdk --no-ui --all --filter "extra-android-m2repository"; fi
 
+test:
+  override:
+    - ./gradlew assembleRelease
+    - cp -r project-name/build/outputs $CIRCLE_ARTIFACTS
