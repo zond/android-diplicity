@@ -2,4 +2,4 @@
 
 # android-diplicity
 
-[Automatic builds](goo.gl/6GuDD9)
+[Automatic builds](http://goo.gl/6GuDD9)
