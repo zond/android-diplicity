@@ -34,6 +34,7 @@ android {
 }
 
 dependencies {
+    compile 'com.google.firebase:firebase-crash:10.0.1'
     compile 'com.google.code.gson:gson:2.6.2'
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
@@ -47,3 +48,5 @@ dependencies {
     compile "com.android.support:gridlayout-v7:25.0.1"
     compile 'com.android.support:recyclerview-v7:25.0.1'
 }
+
+apply plugin: 'com.google.gms.google-services'
