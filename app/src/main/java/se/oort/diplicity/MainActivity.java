@@ -95,37 +95,37 @@ public class MainActivity extends RetrofitActivity {
                                 UserStats us = statsContainer.get(0);
                                 if (g.MinRating == null)
                                     g.MinRating = 0.0;
-                                if (g.MinRating > us.Glicko.PracticalRating) {
+                                if (g.MinRating != 0.0 && g.MinRating > us.Glicko.PracticalRating) {
                                     Toast.makeText(MainActivity.this, getResources().getString(R.string.minimum_rating_must_be_below_your_rating_x, us.Glicko.PracticalRating), Toast.LENGTH_LONG).show();
                                     return false;
                                 }
                                 if (g.MaxRating == null)
                                     g.MaxRating = 0.0;
-                                if (g.MaxRating < us.Glicko.PracticalRating) {
+                                if (g.MaxRating != 0.0 && g.MaxRating < us.Glicko.PracticalRating) {
                                     Toast.makeText(MainActivity.this, getResources().getString(R.string.maximum_rating_must_be_above_your_rating_x, us.Glicko.PracticalRating), Toast.LENGTH_LONG).show();
                                     return false;
                                 }
                                 if (g.MinReliability == null)
                                     g.MinReliability = 0.0;
-                                if (g.MinReliability > us.Reliability) {
+                                if (g.MinReliability != 0.0 && g.MinReliability > us.Reliability) {
                                     Toast.makeText(MainActivity.this, getResources().getString(R.string.minimum_reliability_must_be_below_your_reliability_x, us.Reliability), Toast.LENGTH_LONG).show();
                                     return false;
                                 }
                                 if (g.MinQuickness == null)
                                     g.MinQuickness = 0.0;
-                                if (g.MinQuickness > us.Quickness) {
+                                if (g.MinQuickness != 0.0 && g.MinQuickness > us.Quickness) {
                                     Toast.makeText(MainActivity.this, getResources().getString(R.string.minimum_quickness_must_be_below_your_quickness_x, us.Quickness), Toast.LENGTH_LONG).show();
                                     return false;
                                 }
                                 if (g.MaxHated == null)
                                     g.MaxHated = 0.0;
-                                if (g.MaxHated < us.Hated) {
+                                if (g.MaxHated != 0.0 && g.MaxHated < us.Hated) {
                                     Toast.makeText(MainActivity.this, getResources().getString(R.string.maximum_hated_must_be_above_your_hated_x, us.Hated), Toast.LENGTH_LONG).show();
                                     return false;
                                 }
                                 if (g.MaxHater == null)
                                     g.MaxHater = 0.0;
-                                if (g.MaxHater < us.Hater) {
+                                if (g.MaxHater != 0.0 && g.MaxHater < us.Hater) {
                                     Toast.makeText(MainActivity.this, getResources().getString(R.string.maximum_hater_must_be_above_your_hater_x, us.Hater), Toast.LENGTH_LONG).show();
                                     return false;
                                 }
