@@ -55,6 +55,12 @@ public class MapView extends FrameLayout {
     }
 
     public void load(String url) {
+        synchronized (this) {
+            if (onFinished == null) {
+                onFinished = new ArrayList<>();
+            }
+        }
+
         WebView webView = (WebView) findViewById(R.id.web_view);
         webView.getSettings().setLoadWithOverviewMode(true);
         webView.getSettings().setUseWideViewPort(true);
