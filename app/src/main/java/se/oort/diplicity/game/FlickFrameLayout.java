@@ -58,7 +58,6 @@ public class FlickFrameLayout extends FrameLayout {
 
     @Override
     public boolean	onInterceptTouchEvent(MotionEvent ev) {
-        Log.d("Diplicity", "onInterceptTouchEvent(" + ev + ")");
         gestureDetectorCompat.onTouchEvent(ev);
         return super.onInterceptTouchEvent(ev);
     }

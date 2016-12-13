@@ -44,6 +44,7 @@ import se.oort.diplicity.apigen.MultiContainer;
 import se.oort.diplicity.apigen.Order;
 import se.oort.diplicity.apigen.Phase;
 import se.oort.diplicity.apigen.PhaseMeta;
+import se.oort.diplicity.apigen.Resolution;
 import se.oort.diplicity.apigen.SingleContainer;
 
 public class GameActivity extends RetrofitActivity
@@ -357,26 +358,42 @@ public class GameActivity extends RetrofitActivity
     public void showOrders() {
         hideAllExcept(R.id.orders_view);
         handleReq(
-                orderService.ListOrders(game.ID, phaseMeta.PhaseOrdinal.toString()),
-                new Sendable<MultiContainer<Order>>() {
-                    @Override
-                    public void send(MultiContainer<Order> orderMultiContainer) {
-                        List<String> orders = new ArrayList<String>();
-                        for (SingleContainer<Order> orderContainer : orderMultiContainer.Properties) {
-                            orders.add(getResources().getString(R.string.nation_order, orderContainer.Properties.Nation, TextUtils.join(" ", orderContainer.Properties.Parts)));
-                        }
-                        Collections.sort(orders);
-                        ListView ordersView = (ListView) findViewById(R.id.orders_view);
-                        ordersView.setOnTouchListener(new View.OnTouchListener() {
+                JoinObservable.when(JoinObservable
+                        .from(orderService.ListOrders(game.ID, phaseMeta.PhaseOrdinal.toString()))
+                        .and(phaseService.PhaseLoad(game.ID, phaseMeta.PhaseOrdinal.toString()))
+                        .then(new Func2<MultiContainer<Order>, SingleContainer<Phase>, Object>() {
                             @Override
-                            public boolean onTouch(View view, MotionEvent motionEvent) {
-                                flickFrameLayout.onTouchEvent(motionEvent);
-                                return true;
+                            public Object call(MultiContainer<Order> orderMultiContainer, SingleContainer<Phase> phaseSingleContainer) {
+                                Map<String, String> resultMap = new HashMap<String, String>();
+                                if (phaseSingleContainer.Properties.Resolutions != null) {
+                                    for (Resolution resolution : phaseSingleContainer.Properties.Resolutions) {
+                                        resultMap.put(resolution.Province, resolution.Resolution);
+                                    }
+                                }
+                                List<String> orders = new ArrayList<String>();
+                                for (SingleContainer<Order> orderContainer : orderMultiContainer.Properties) {
+                                    String resolution = resultMap.get(orderContainer.Properties.Parts.get(0));
+                                    if (resolution == null) {
+                                        orders.add(getResources().getString(R.string.nation_order, orderContainer.Properties.Nation, TextUtils.join(" ", orderContainer.Properties.Parts)));
+                                    } else {
+                                        orders.add(getResources().getString(R.string.nation_order_result, orderContainer.Properties.Nation, TextUtils.join(" ", orderContainer.Properties.Parts), resolution));
+                                    }
+                                }
+                                Collections.sort(orders);
+                                ListView ordersView = (ListView) findViewById(R.id.orders_view);
+                                ordersView.setOnTouchListener(new View.OnTouchListener() {
+                                    @Override
+                                    public boolean onTouch(View view, MotionEvent motionEvent) {
+                                        flickFrameLayout.onTouchEvent(motionEvent);
+                                        return true;
+                                    }
+                                });
+                                ordersView.setAdapter(new ArrayAdapter<String>(GameActivity.this, android.R.layout.simple_list_item_1, orders));
+                                return null;
                             }
-                        });
-                        ordersView.setAdapter(new ArrayAdapter<String>(GameActivity.this, android.R.layout.simple_list_item_1, orders));
-                    }
-                }, getResources().getString(R.string.loading_orders));
+                        })).toObservable(),
+                null,
+                getResources().getString(R.string.loading_orders));
     }
 
     public void showMap() {
