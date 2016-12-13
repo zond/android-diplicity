@@ -12,13 +12,13 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,6 +41,7 @@ import se.oort.diplicity.apigen.Link;
 import se.oort.diplicity.apigen.Member;
 import se.oort.diplicity.apigen.MultiContainer;
 import se.oort.diplicity.apigen.Order;
+import se.oort.diplicity.apigen.Phase;
 import se.oort.diplicity.apigen.PhaseMeta;
 import se.oort.diplicity.apigen.SingleContainer;
 
@@ -48,11 +49,16 @@ public class GameActivity extends RetrofitActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String SERIALIZED_GAME_KEY = "serialized_game";
+    public static final String SERIALIZED_PHASE_META_KEY = "serialized_phase_meta";
 
     public Game game;
+    public PhaseMeta phaseMeta;
     public Member member;
     public Map<String, OptionsService.Option> options = new HashMap<>();
     public Map<String, Order> orders = Collections.synchronizedMap(new HashMap<String, Order>());
+
+    private FlickFrameLayout flickFrameLayout;
+    private int currentView;
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -60,6 +66,50 @@ public class GameActivity extends RetrofitActivity
 
         byte[] serializedGame = getIntent().getByteArrayExtra(SERIALIZED_GAME_KEY);
         game = (Game) unserialize(serializedGame);
+        byte[] serializedPhaseMeta = getIntent().getByteArrayExtra(SERIALIZED_PHASE_META_KEY);
+        if (serializedPhaseMeta != null) {
+            phaseMeta = (PhaseMeta) unserialize(serializedPhaseMeta);
+        }
+
+        draw();
+    }
+
+    public void nextPhase() {
+        if (phaseMeta != null && phaseMeta.PhaseOrdinal < game.NewestPhaseMeta.get(0).PhaseOrdinal) {
+            handleReq(
+                    phaseService.PhaseLoad(game.ID, "" + (phaseMeta.PhaseOrdinal + 1)),
+                    new Sendable<SingleContainer<Phase>>() {
+                        @Override
+                        public void send(SingleContainer<Phase> phaseSingleContainer) {
+                            Gson gson = new Gson();
+                            phaseMeta = gson.fromJson(gson.toJson(phaseSingleContainer.Properties), PhaseMeta.class);
+                            draw();
+                        }
+                    }, getResources().getString(R.string.loading_state));
+        }
+    }
+
+    public void prevPhase() {
+        if (phaseMeta != null && phaseMeta.PhaseOrdinal > 1) {
+            handleReq(
+                    phaseService.PhaseLoad(game.ID, "" + (phaseMeta.PhaseOrdinal - 1)),
+                    new Sendable<SingleContainer<Phase>>() {
+                        @Override
+                        public void send(SingleContainer<Phase> phaseSingleContainer) {
+                            Gson gson = new Gson();
+                            phaseMeta = gson.fromJson(gson.toJson(phaseSingleContainer.Properties), PhaseMeta.class);
+                            draw();
+                        }
+                    }, getResources().getString(R.string.loading_state));
+        }
+    }
+
+    public void draw() {
+        if (phaseMeta != null) {
+            setTitle(getResources().getString(R.string.desc_season_year_type, game.Desc, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type));
+        } else {
+            setTitle(game.Desc);
+        }
 
         for (Member m : game.Members) {
             if (m.User.Id.equals(App.loggedInUser.Id)) {
@@ -67,14 +117,11 @@ public class GameActivity extends RetrofitActivity
             }
         }
 
-        if (game.NewestPhaseMeta != null && game.NewestPhaseMeta.size() > 0) {
-            PhaseMeta pm = game.NewestPhaseMeta.get(0);
-            setTitle(getResources().getString(R.string.desc_season_year_type, game.Desc, pm.Season, pm.Year, pm.Type));
-        } else {
-            setTitle(game.Desc);
-        }
-
         setContentView(R.layout.activity_game);
+
+        flickFrameLayout = (FlickFrameLayout) findViewById(R.id.game_content);
+        flickFrameLayout.gameActivity = this;
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -93,7 +140,10 @@ public class GameActivity extends RetrofitActivity
             nav_Menu.findItem(R.id.nav_orders).setVisible(false);
         }
 
-        showMap();
+        if (currentView == 0) {
+            currentView = R.id.nav_map;
+        }
+        navigateTo(currentView);
     }
 
     @Override
@@ -151,19 +201,21 @@ public class GameActivity extends RetrofitActivity
             }
         };
         if (parts == null || parts.size() == 0) {
-            orders.remove(province);
-            handleReq(
-                    orderService.OrderDelete(game.ID, game.NewestPhaseMeta.get(0).PhaseOrdinal.toString(), province),
-                    handler, getResources().getString(R.string.removing_order));
+            if (orders.containsKey(province)) {
+                orders.remove(province);
+                handleReq(
+                        orderService.OrderDelete(game.ID, phaseMeta.PhaseOrdinal.toString(), province),
+                        handler, getResources().getString(R.string.removing_order));
+            }
         } else {
             Order order = new Order();
             order.GameID = game.ID;
             order.Nation = member.Nation;
-            order.PhaseOrdinal = game.NewestPhaseMeta.get(0).PhaseOrdinal;
+            order.PhaseOrdinal = phaseMeta.PhaseOrdinal;
             order.Parts = parts;
             orders.put(parts.get(0), order);
             handleReq(
-                    orderService.OrderCreate(order, game.ID, game.NewestPhaseMeta.get(0).PhaseOrdinal.toString()),
+                    orderService.OrderCreate(order, game.ID, phaseMeta.PhaseOrdinal.toString()),
                     handler, getResources().getString(R.string.saving_order));
         }
     }
@@ -211,20 +263,20 @@ public class GameActivity extends RetrofitActivity
                     });
                 }
             });
-        } else if (optionType.equals("OrderType")) {
-            final List<String> orderTypes = new ArrayList<>(optionValues);
-            orderTypes.add(getResources().getString(R.string.cancel));
-            Collections.sort(orderTypes);
-            new AlertDialog.Builder(this).setItems(orderTypes.toArray(new CharSequence[orderTypes.size()]), new DialogInterface.OnClickListener() {
+        } else if (optionType.equals("OrderType") || optionType.equals("UnitType")) {
+            final List<String> optionVals = new ArrayList<>(optionValues);
+            Collections.sort(optionVals);
+            optionVals.add(getResources().getString(R.string.cancel));
+            new AlertDialog.Builder(this).setItems(optionVals.toArray(new CharSequence[optionVals.size()]), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    if (orderTypes.get(i).equals(getResources().getString(R.string.cancel))) {
+                    if (optionVals.get(i).equals(getResources().getString(R.string.cancel))) {
                         setOrder(srcProvince, null);
                         acceptOrders();
                         return;
                     }
-                    prefix.add(orderTypes.get(i));
-                    Map<String, OptionsService.Option> next = opts.get(orderTypes.get(i)).Next;
+                    prefix.add(optionVals.get(i));
+                    Map<String, OptionsService.Option> next = opts.get(optionVals.get(i)).Next;
                     if (next == null || next.isEmpty()) {
                         setOrder(srcProvince, prefix);
                         acceptOrders();
@@ -257,7 +309,7 @@ public class GameActivity extends RetrofitActivity
     public void showOrders() {
         hideAllExcept(R.id.orders_view);
         handleReq(
-                orderService.ListOrders(game.ID, game.NewestPhaseMeta.get(0).PhaseOrdinal.toString()),
+                orderService.ListOrders(game.ID, phaseMeta.PhaseOrdinal.toString()),
                 new Sendable<MultiContainer<Order>>() {
                     @Override
                     public void send(MultiContainer<Order> orderMultiContainer) {
@@ -267,7 +319,13 @@ public class GameActivity extends RetrofitActivity
                         }
                         Collections.sort(orders);
                         ListView ordersView = (ListView) findViewById(R.id.orders_view);
-                        ordersView.setEnabled(false);
+                        ordersView.setOnTouchListener(new View.OnTouchListener() {
+                            @Override
+                            public boolean onTouch(View view, MotionEvent motionEvent) {
+                                flickFrameLayout.onTouchEvent(motionEvent);
+                                return true;
+                            }
+                        });
                         ordersView.setAdapter(new ArrayAdapter<String>(GameActivity.this, android.R.layout.simple_list_item_1, orders));
                     }
                 }, getResources().getString(R.string.loading_orders));
@@ -284,12 +342,11 @@ public class GameActivity extends RetrofitActivity
         };
 
         if (game.Started) {
-            PhaseMeta newestPhase = game.NewestPhaseMeta.get(0);
-            renderer.send(App.baseURL + "Game/" + game.ID + "/Phase/" + newestPhase.PhaseOrdinal + "/Map");
-            if (member != null) {
+            renderer.send(App.baseURL + "Game/" + game.ID + "/Phase/" + phaseMeta.PhaseOrdinal + "/Map");
+            if (member != null && !phaseMeta.Resolved) {
                 handleReq(JoinObservable.when(JoinObservable
-                        .from(optionsService.GetOptions(game.ID, newestPhase.PhaseOrdinal.toString()))
-                        .and(orderService.ListOrders(game.ID, newestPhase.PhaseOrdinal.toString()))
+                        .from(optionsService.GetOptions(game.ID, phaseMeta.PhaseOrdinal.toString()))
+                        .and(orderService.ListOrders(game.ID, phaseMeta.PhaseOrdinal.toString()))
                         .then(new Func2<SingleContainer<Map<String, OptionsService.Option>>, MultiContainer<Order>, Object>() {
                             @Override
                             public Object call(SingleContainer<Map<String, OptionsService.Option>> opts, MultiContainer<Order> ords) {
@@ -330,8 +387,12 @@ public class GameActivity extends RetrofitActivity
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        int id = item.getItemId();
+        navigateTo(item.getItemId());
+        return true;
+    }
 
+    private void navigateTo(int id) {
+        currentView = id;
         if (id == R.id.nav_map) {
             showMap();
         } else if (id == R.id.nav_orders) {
@@ -340,6 +401,5 @@ public class GameActivity extends RetrofitActivity
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 }

@@ -44,6 +44,8 @@ import se.oort.diplicity.apigen.GameService;
 import se.oort.diplicity.apigen.MemberService;
 import se.oort.diplicity.apigen.MultiContainer;
 import se.oort.diplicity.apigen.OrderService;
+import se.oort.diplicity.apigen.Phase;
+import se.oort.diplicity.apigen.PhaseService;
 import se.oort.diplicity.apigen.User;
 import se.oort.diplicity.apigen.UserStatsService;
 
@@ -66,6 +68,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     public VariantService variantService;
     public OptionsService optionsService;
     public OrderService orderService;
+    public PhaseService phaseService;
 
     private SharedPreferences prefs;
     private SharedPreferences.OnSharedPreferenceChangeListener prefsListener;
@@ -265,6 +268,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         variantService = retrofit.create(VariantService.class);
         optionsService = retrofit.create(OptionsService.class);
         orderService = retrofit.create(OrderService.class);
+        phaseService = retrofit.create(PhaseService.class);
     }
 
     @Override

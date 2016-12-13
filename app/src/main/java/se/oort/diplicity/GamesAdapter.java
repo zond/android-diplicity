@@ -229,6 +229,9 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                 public void onClick(View view) {
                     Intent intent = new Intent(retrofitActivity, GameActivity.class);
                     intent.putExtra(GameActivity.SERIALIZED_GAME_KEY, RetrofitActivity.serialize(game.Properties));
+                    if (game.Properties.NewestPhaseMeta != null && game.Properties.NewestPhaseMeta.size() > 0) {
+                        intent.putExtra(GameActivity.SERIALIZED_PHASE_META_KEY, RetrofitActivity.serialize(game.Properties.NewestPhaseMeta.get(0)));
+                    }
                     retrofitActivity.startActivity(intent);
                 }
             });

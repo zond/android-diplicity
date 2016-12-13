@@ -25,10 +25,13 @@ public class UserView extends FrameLayout {
 
     private static LRUCache<String,Bitmap> pictureCache = new LRUCache<>(128);
 
+    private void inflate() {
+        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        addView(inflater.inflate(R.layout.user_view, null));
+    }
     public UserView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        addView(inflater.inflate(R.layout.user_view, null));
+        inflate();
     }
     public void setUser(final User user) {
         ((TextView) findViewById(R.id.name)).setText(user.Name);

@@ -9,7 +9,7 @@
     tools:context="se.oort.diplicity.game.GameActivity"
     tools:showIn="@layout/app_bar_game">
 
-    <FrameLayout
+    <se.oort.diplicity.game.FlickFrameLayout
         android:id="@+id/game_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -26,10 +26,10 @@
             android:id="@+id/orders_view"
             android:visibility="gone"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
         </ListView>
 
-    </FrameLayout>
+    </se.oort.diplicity.game.FlickFrameLayout>
 
 </RelativeLayout>

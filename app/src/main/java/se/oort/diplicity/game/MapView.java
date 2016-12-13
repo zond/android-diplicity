@@ -9,7 +9,6 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,10 +24,13 @@ public class MapView extends FrameLayout {
     private List<Runnable> onFinished = new ArrayList<>();
     private Sendable<String> onClickedProvince;
 
+    private void inflate() {
+        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        addView(inflater.inflate(R.layout.map_view, null));
+    }
     public MapView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        addView(inflater.inflate(R.layout.map_view, null));
+        inflate();
     }
 
     public void setOnClickedProvince(Sendable<String> l) {
@@ -61,7 +63,7 @@ public class MapView extends FrameLayout {
             }
         }
 
-        WebView webView = (WebView) findViewById(R.id.web_view);
+        final WebView webView = (WebView) findViewById(R.id.web_view);
         webView.getSettings().setLoadWithOverviewMode(true);
         webView.getSettings().setUseWideViewPort(true);
         webView.setBackgroundColor(Color.TRANSPARENT);
