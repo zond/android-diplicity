@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,7 +34,6 @@ import se.oort.diplicity.App;
 import se.oort.diplicity.OptionsService;
 import se.oort.diplicity.R;
 import se.oort.diplicity.RetrofitActivity;
-import se.oort.diplicity.RootService;
 import se.oort.diplicity.Sendable;
 import se.oort.diplicity.VariantService;
 import se.oort.diplicity.apigen.Game;
@@ -86,6 +86,12 @@ public class GameActivity extends RetrofitActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        if (!game.Started) {
+            navigationView = (NavigationView) findViewById(R.id.nav_view);
+            Menu nav_Menu = navigationView.getMenu();
+            nav_Menu.findItem(R.id.nav_orders).setVisible(false);
+        }
 
         showMap();
     }
@@ -177,33 +183,34 @@ public class GameActivity extends RetrofitActivity
         if (optionType.equals("Province")) {
             final MapView m = (MapView) findViewById(R.id.map_view);
             for (Map.Entry<String, OptionsService.Option> opt : opts.entrySet()) {
-                if (opt.getValue().Type.equals("Province")) {
-                    m.evaluateJS("window.map.addClickListener('" + opt.getKey() + "', function(prov) { Android.provinceClicked(prov); });");
-                    m.setOnClickedProvince(new Sendable<String>() {
+                m.evaluateJS("window.map.addClickListener('" + opt.getKey() + "', function(prov) { Android.provinceClicked(prov); });");
+            }
+            m.setOnClickedProvince(new Sendable<String>() {
+                @Override
+                public void send(final String s) {
+                    handler.post(new Runnable() {
                         @Override
-                        public void send(final String s) {
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    m.evaluateJS("window.map.clearClickListeners();");
-                                    prefix.add(s);
-                                    Map<String, OptionsService.Option> next = opts.get(s).Next;
-                                    if (next == null || next.isEmpty()) {
-                                        setOrder(srcProvince, prefix);
-                                        acceptOrders();
-                                    } else {
-                                        String newSrcProvince = srcProvince;
-                                        if (newSrcProvince == null) {
-                                            newSrcProvince = s;
-                                        }
-                                        completeOrder(prefix, next, newSrcProvince);
-                                    }
+                        public void run() {
+                            if (!opts.containsKey(s)) {
+                                return;
+                            }
+                            m.evaluateJS("window.map.clearClickListeners();");
+                            prefix.add(s);
+                            Map<String, OptionsService.Option> next = opts.get(s).Next;
+                            if (next == null || next.isEmpty()) {
+                                setOrder(srcProvince, prefix);
+                                acceptOrders();
+                            } else {
+                                String newSrcProvince = srcProvince;
+                                if (newSrcProvince == null) {
+                                    newSrcProvince = s;
                                 }
-                            });
+                                completeOrder(prefix, next, newSrcProvince);
+                            }
                         }
                     });
                 }
-            }
+            });
         } else if (optionType.equals("OrderType")) {
             final List<String> orderTypes = new ArrayList<>(optionValues);
             orderTypes.add(getResources().getString(R.string.cancel));
@@ -260,7 +267,7 @@ public class GameActivity extends RetrofitActivity
                         }
                         Collections.sort(orders);
                         ListView ordersView = (ListView) findViewById(R.id.orders_view);
-                        ordersView.setOnClickListener(null);
+                        ordersView.setEnabled(false);
                         ordersView.setAdapter(new ArrayAdapter<String>(GameActivity.this, android.R.layout.simple_list_item_1, orders));
                     }
                 }, getResources().getString(R.string.loading_orders));
@@ -279,25 +286,27 @@ public class GameActivity extends RetrofitActivity
         if (game.Started) {
             PhaseMeta newestPhase = game.NewestPhaseMeta.get(0);
             renderer.send(App.baseURL + "Game/" + game.ID + "/Phase/" + newestPhase.PhaseOrdinal + "/Map");
-            handleReq(JoinObservable.when(JoinObservable
-                    .from(optionsService.GetOptions(game.ID, newestPhase.PhaseOrdinal.toString()))
-                    .and(orderService.ListOrders(game.ID, newestPhase.PhaseOrdinal.toString()))
-                    .then(new Func2<SingleContainer<Map<String, OptionsService.Option>>, MultiContainer<Order>, Object>() {
-                        @Override
-                        public Object call(SingleContainer<Map<String, OptionsService.Option>> opts, MultiContainer<Order> ords) {
-                            options = opts.Properties;
-                            orders.clear();
-                            for (SingleContainer<Order> orderContainer : ords.Properties) {
-                                orders.put(orderContainer.Properties.Parts.get(0), orderContainer.Properties);
+            if (member != null) {
+                handleReq(JoinObservable.when(JoinObservable
+                        .from(optionsService.GetOptions(game.ID, newestPhase.PhaseOrdinal.toString()))
+                        .and(orderService.ListOrders(game.ID, newestPhase.PhaseOrdinal.toString()))
+                        .then(new Func2<SingleContainer<Map<String, OptionsService.Option>>, MultiContainer<Order>, Object>() {
+                            @Override
+                            public Object call(SingleContainer<Map<String, OptionsService.Option>> opts, MultiContainer<Order> ords) {
+                                options = opts.Properties;
+                                orders.clear();
+                                for (SingleContainer<Order> orderContainer : ords.Properties) {
+                                    orders.put(orderContainer.Properties.Parts.get(0), orderContainer.Properties);
+                                }
+                                return null;
                             }
-                            return null;
-                        }
-                })).toObservable(), new Sendable<Object>() {
-                   @Override
+                        })).toObservable(), new Sendable<Object>() {
+                    @Override
                     public void send(Object o) {
-                       acceptOrders();
+                        acceptOrders();
                     }
                 }, getResources().getString(R.string.loading_state));
+            }
         } else {
             handleReq(variantService.GetStartPhase(game.Variant), new Sendable<SingleContainer<VariantService.Phase>>() {
                 @Override
