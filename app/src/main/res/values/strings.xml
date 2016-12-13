@@ -73,4 +73,6 @@
     <string name="orders">Orders</string>
     <string name="loading_orders">Loading orders</string>
     <string name="nation_order">%1$s: %2$s</string>
+    <string name="phases">Phases</string>
+    <string name="loading_phases">Loading phases</string>
 </resources>

@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -59,6 +60,7 @@ public class GameActivity extends RetrofitActivity
 
     private FlickFrameLayout flickFrameLayout;
     private int currentView;
+    private MultiContainer<Phase> phases;
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -179,7 +181,7 @@ public class GameActivity extends RetrofitActivity
     }
 
     public void hideAllExcept(int toShow) {
-        for (int viewID : new int[]{R.id.map_view, R.id.orders_view}) {
+        for (int viewID : new int[]{R.id.map_view, R.id.orders_view, R.id.phases_view}) {
             if (viewID == toShow) {
                 findViewById(viewID).setVisibility(View.VISIBLE);
             } else {
@@ -306,6 +308,52 @@ public class GameActivity extends RetrofitActivity
         completeOrder(new ArrayList<String>(), options, null);
     }
 
+    private class PhaseElement {
+        public Phase phase;
+        public PhaseElement(Phase phase) {
+            this.phase = phase;
+        }
+        public String toString() {
+            return getResources().getString(R.string.season_year_type, phase.Season, phase.Year, phase.Type);
+        }
+    }
+
+    public void showPhases(boolean loadPhases) {
+        hideAllExcept(R.id.phases_view);
+        final Sendable<MultiContainer<Phase>> renderer = new Sendable<MultiContainer<Phase>>() {
+            @Override
+            public void send(MultiContainer<Phase> phaseMultiContainer) {
+                final List<PhaseElement> phases = new ArrayList<>();
+                for (SingleContainer<Phase> phaseSingleContainer : phaseMultiContainer.Properties) {
+                    phases.add(new PhaseElement(phaseSingleContainer.Properties));
+                }
+                ListView phasesView = (ListView) findViewById(R.id.phases_view);
+                phasesView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        Gson gson = new Gson();
+                        phaseMeta = gson.fromJson(gson.toJson(phases.get(i).phase), PhaseMeta.class);
+                        draw();
+                    }
+                });
+                phasesView.setAdapter(new ArrayAdapter<PhaseElement>(GameActivity.this, android.R.layout.simple_list_item_1, phases));
+            }
+        };
+        if (loadPhases || phases == null) {
+            handleReq(
+                    phaseService.ListPhases(game.ID),
+                    new Sendable<MultiContainer<Phase>>() {
+                        @Override
+                        public void send(MultiContainer<Phase> phaseMultiContainer) {
+                            phases = phaseMultiContainer;
+                            renderer.send(phaseMultiContainer);
+                        }
+                    }, getResources().getString(R.string.loading_phases));
+        } else {
+            renderer.send(phases);
+        }
+    }
+
     public void showOrders() {
         hideAllExcept(R.id.orders_view);
         handleReq(
@@ -392,11 +440,14 @@ public class GameActivity extends RetrofitActivity
     }
 
     private void navigateTo(int id) {
+        int oldView = currentView;
         currentView = id;
         if (id == R.id.nav_map) {
             showMap();
         } else if (id == R.id.nav_orders) {
             showOrders();
+        } else if (id == R.id.nav_phases) {
+            showPhases(oldView != currentView);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
