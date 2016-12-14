@@ -14,9 +14,9 @@ import java.net.URLEncoder;
 
 public class LoginActivity extends RetrofitActivity {
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onPostCreate(Bundle savedInstanceState) {
         try {
-            super.onCreate(savedInstanceState);
+            super.onPostCreate(savedInstanceState);
             setTitle(R.string.logging_in);
             WebView mWebView = new WebView(this);
             mWebView.setBackgroundColor(Color.parseColor("#212121"));

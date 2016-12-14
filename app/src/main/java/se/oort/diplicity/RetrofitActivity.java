@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
@@ -21,7 +22,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
@@ -42,9 +45,9 @@ import rx.observables.JoinObservable;
 import rx.schedulers.Schedulers;
 import se.oort.diplicity.apigen.GameService;
 import se.oort.diplicity.apigen.MemberService;
+import se.oort.diplicity.apigen.MessageService;
 import se.oort.diplicity.apigen.MultiContainer;
 import se.oort.diplicity.apigen.OrderService;
-import se.oort.diplicity.apigen.Phase;
 import se.oort.diplicity.apigen.PhaseService;
 import se.oort.diplicity.apigen.User;
 import se.oort.diplicity.apigen.UserStatsService;
@@ -70,11 +73,14 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     public OrderService orderService;
     public PhaseService phaseService;
     public ChannelService channelService;
+    public MessageService messageService;
 
     private SharedPreferences prefs;
     private SharedPreferences.OnSharedPreferenceChangeListener prefsListener;
 
     public Handler handler = new Handler();
+
+    private Set<ProgressDialog> progressDialogs = new HashSet<>();
 
     private class LoginSubscriber<R> {
         private Subscriber<? super R> subscriber;
@@ -137,6 +143,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         }
         progress.setCancelable(true);
         progress.show();
+        this.progressDialogs.add(progress);
 
         return new Sendable<Throwable>() {
             @Override
@@ -162,6 +169,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                         Toast.makeText(RetrofitActivity.this, R.string.unknown_error, Toast.LENGTH_SHORT).show();
                     }
                 }
+                RetrofitActivity.this.progressDialogs.remove(progress);
                 progress.dismiss();
             }
         };
@@ -271,6 +279,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         orderService = retrofit.create(OrderService.class);
         phaseService = retrofit.create(PhaseService.class);
         channelService = retrofit.create(ChannelService.class);
+        messageService = retrofit.create(MessageService.class);
     }
 
     @Override
@@ -331,6 +340,9 @@ public abstract class RetrofitActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
+        for (ProgressDialog dialog : progressDialogs) {
+            dialog.dismiss();
+        }
         prefs.unregisterOnSharedPreferenceChangeListener(prefsListener);
         super.onDestroy();
     }

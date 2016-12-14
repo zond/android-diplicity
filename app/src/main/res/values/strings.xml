@@ -81,4 +81,5 @@
     <string name="members_unread_total">%1$s (%2$s/%3$s)</string>
     <string name="title_activity_press">PressActivity</string>
     <string name="message">Message</string>
+    <string name="loading_messages">Loading messages</string>
 </resources>
