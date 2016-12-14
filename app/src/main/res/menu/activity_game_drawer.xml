@@ -14,6 +14,10 @@
             android:id="@+id/nav_phases"
             android:icon="@drawable/ic_format_list_numbered_black_24dp"
             android:title="@string/phases" />
+        <item
+            android:id="@+id/nav_press"
+            android:icon="@drawable/ic_contacts_black_24dp"
+            android:title="@string/press" />
     </group>
 
 </menu>

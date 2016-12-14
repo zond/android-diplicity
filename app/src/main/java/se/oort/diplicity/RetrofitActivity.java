@@ -69,6 +69,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     public OptionsService optionsService;
     public OrderService orderService;
     public PhaseService phaseService;
+    public ChannelService channelService;
 
     private SharedPreferences prefs;
     private SharedPreferences.OnSharedPreferenceChangeListener prefsListener;
@@ -269,6 +270,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         optionsService = retrofit.create(OptionsService.class);
         orderService = retrofit.create(OrderService.class);
         phaseService = retrofit.create(PhaseService.class);
+        channelService = retrofit.create(ChannelService.class);
     }
 
     @Override

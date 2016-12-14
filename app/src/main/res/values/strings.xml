@@ -76,4 +76,9 @@
     <string name="phases">Phases</string>
     <string name="loading_phases">Loading phases</string>
     <string name="nation_order_result">%1$s: %2$s: %3$s</string>
+    <string name="press">Press</string>
+    <string name="loading_channels">Loading channels</string>
+    <string name="members_unread_total">%1$s (%2$s/%3$s)</string>
+    <string name="title_activity_press">PressActivity</string>
+    <string name="message">Message</string>
 </resources>

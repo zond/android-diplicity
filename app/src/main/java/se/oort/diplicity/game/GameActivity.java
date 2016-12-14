@@ -1,6 +1,7 @@
 package se.oort.diplicity.game;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -32,6 +33,7 @@ import java.util.Set;
 import rx.functions.Func2;
 import rx.observables.JoinObservable;
 import se.oort.diplicity.App;
+import se.oort.diplicity.ChannelService;
 import se.oort.diplicity.OptionsService;
 import se.oort.diplicity.R;
 import se.oort.diplicity.RetrofitActivity;
@@ -53,14 +55,23 @@ public class GameActivity extends RetrofitActivity
     public static final String SERIALIZED_GAME_KEY = "serialized_game";
     public static final String SERIALIZED_PHASE_META_KEY = "serialized_phase_meta";
 
+    // Included in the intent bundle.
     public Game game;
+    // Included in the intent bundle.
     public PhaseMeta phaseMeta;
+    // Calculated from the intent bundle.
     public Member member;
+
+    // Used to receive orders from the user.
     public Map<String, OptionsService.Option> options = new HashMap<>();
+    // Used to update/render orders on the map.
     public Map<String, Order> orders = Collections.synchronizedMap(new HashMap<String, Order>());
 
+    // Used to swipe between phases.
     private FlickFrameLayout flickFrameLayout;
+    // Used to remember which view we are in (map, orders, phases etc).
     private int currentView;
+    // Used to display the phases view again after clicking it, without having to load all phases again.
     private MultiContainer<Phase> phases;
 
     @Override
@@ -141,6 +152,7 @@ public class GameActivity extends RetrofitActivity
             navigationView = (NavigationView) findViewById(R.id.nav_view);
             Menu nav_Menu = navigationView.getMenu();
             nav_Menu.findItem(R.id.nav_orders).setVisible(false);
+            nav_Menu.findItem(R.id.nav_phases).setVisible(false);
         }
 
         if (currentView == 0) {
@@ -182,7 +194,7 @@ public class GameActivity extends RetrofitActivity
     }
 
     public void hideAllExcept(int toShow) {
-        for (int viewID : new int[]{R.id.map_view, R.id.orders_view, R.id.phases_view}) {
+        for (int viewID : new int[]{R.id.map_view, R.id.orders_view, R.id.phases_view, R.id.press_view}) {
             if (viewID == toShow) {
                 findViewById(viewID).setVisibility(View.VISIBLE);
             } else {
@@ -317,6 +329,44 @@ public class GameActivity extends RetrofitActivity
         public String toString() {
             return getResources().getString(R.string.season_year_type, phase.Season, phase.Year, phase.Type);
         }
+    }
+
+    private class ChannelElement {
+        public ChannelService.Channel channel;
+        public ChannelElement(ChannelService.Channel channel) {
+            this.channel = channel;
+        }
+        public String toString() {
+            return getResources().getString(
+                    R.string.members_unread_total,
+                    TextUtils.join(", ", channel.Members),
+                    channel.NMessagesSince.NMessages, channel.NMessages);
+        }
+    }
+
+    public void showPress() {
+        hideAllExcept(R.id.press_view);
+        handleReq(
+                channelService.ListChannels(game.ID),
+                new Sendable<MultiContainer<ChannelService.Channel>>() {
+                    @Override
+                    public void send(MultiContainer<ChannelService.Channel> channelMultiContainer) {
+                        final List<ChannelElement> channels = new ArrayList<>();
+                        for (SingleContainer<ChannelService.Channel> channelSingleContainer : channelMultiContainer.Properties) {
+                            channels.add(new ChannelElement(channelSingleContainer.Properties));
+                        }
+                        ListView pressView = (ListView) findViewById(R.id.press_view);
+                        pressView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                                Intent intent = new Intent(GameActivity.this, PressActivity.class);
+                                intent.putExtra(PressActivity.SERIALIZED_CHANNEL_KEY, serialize(channels.get(i).channel));
+                                startActivity(intent);
+                            }
+                        });
+                        pressView.setAdapter(new ArrayAdapter<ChannelElement>(GameActivity.this, android.R.layout.simple_list_item_1, channels));
+                    }
+                }, getResources().getString(R.string.loading_channels));
     }
 
     public void showPhases(boolean loadPhases) {
@@ -465,6 +515,8 @@ public class GameActivity extends RetrofitActivity
             showOrders();
         } else if (id == R.id.nav_phases) {
             showPhases(oldView != currentView);
+        } else if (id == R.id.nav_press) {
+            showPress();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
