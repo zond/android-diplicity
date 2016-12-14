@@ -5,187 +5,150 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <GridLayout
+    <LinearLayout
         android:id="@+id/grid"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:columnCount="2"
-        android:rowCount="9"
-        android:useDefaultMargins="true">
+        android:orientation="vertical"
+        android:layout_height="wrap_content">
 
-        <TextView
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-            app:layout_columnWeight="0"
-            android:id="@+id/desc_label"
-            android:text="@string/description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <EditText
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            app:layout_columnWeight="1"
-            android:inputType="text"
-            android:id="@+id/desc"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/desc_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content">
 
-        <TextView
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-            app:layout_columnWeight="0"
-            android:id="@+id/variant_label"
-            android:text="@string/variant"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            <android.support.design.widget.TextInputEditText
+                android:hint="@string/description"
+                android:id="@+id/desc"
+                android:inputType="text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
-        <Spinner
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-            app:layout_columnWeight="1"
-            android:id="@+id/variants"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"/>
+        </android.support.design.widget.TextInputLayout>
 
-        <TextView
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-            app:layout_columnWeight="0"
-            android:id="@+id/phase_length_label"
-            android:text="@string/phase_length_in_minutes"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <EditText
-            android:layout_marginRight="5dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-            app:layout_columnWeight="1"
-            android:inputType="number"
-            android:id="@+id/phase_length"
+        <LinearLayout
+            android:layout_margin="5dp"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content">
 
-        <TextView
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-            app:layout_columnWeight="0"
+            <TextView
+                android:id="@+id/variant_label"
+                android:text="@string/variant"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Spinner
+                android:layout_marginStart="5dp"
+                android:layout_marginLeft="5dp"
+                app:layout_columnWeight="1"
+                android:id="@+id/variants"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"/>
+
+        </LinearLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/phase_length_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.design.widget.TextInputEditText
+                android:hint="@string/phase_length_in_minutes"
+                android:id="@+id/phase_length"
+                android:inputType="number"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
             android:id="@+id/min_rating_label"
-            android:text="@string/min_rating"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <EditText
-            app:layout_columnWeight="1"
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-            android:inputType="numberDecimal"
-            android:id="@+id/min_rating"
-            android:layout_marginRight="5dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content">
 
-        <TextView
-            app:layout_columnWeight="0"
+            <android.support.design.widget.TextInputEditText
+                android:hint="@string/min_rating"
+                android:id="@+id/min_rating"
+                android:inputType="numberDecimal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
             android:id="@+id/max_rating_label"
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-            android:text="@string/max_rating"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <EditText
-            app:layout_columnWeight="1"
-            android:inputType="numberDecimal"
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-            android:id="@+id/max_rating"
-            android:layout_marginRight="5dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content">
 
-        <TextView
-            app:layout_columnWeight="0"
+            <android.support.design.widget.TextInputEditText
+                android:hint="@string/max_rating"
+                android:id="@+id/max_rating"
+                android:inputType="numberDecimal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
             android:id="@+id/min_reliability_label"
-            android:text="@string/min_reliability"
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <EditText
-            android:inputType="numberDecimal"
-            app:layout_columnWeight="1"
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:id="@+id/min_reliability"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content">
 
-        <TextView
-            app:layout_columnWeight="0"
+            <android.support.design.widget.TextInputEditText
+                android:hint="@string/min_reliability"
+                android:id="@+id/min_reliability"
+                android:inputType="numberDecimal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
             android:id="@+id/min_quickness_label"
-            android:text="@string/min_quickness"
-            android:layout_width="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_height="wrap_content" />
-
-        <EditText
-            android:inputType="numberDecimal"
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            app:layout_columnWeight="1"
-            android:id="@+id/min_quickness"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content">
 
-        <TextView
-            app:layout_columnWeight="0"
+            <android.support.design.widget.TextInputEditText
+                android:hint="@string/min_quickness"
+                android:id="@+id/min_quickness"
+                android:inputType="numberDecimal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
             android:id="@+id/max_hated_label"
-            android:text="@string/max_hated"
-            android:layout_width="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_height="wrap_content" />
-
-        <EditText
-            android:inputType="numberDecimal"
-            android:layout_marginRight="5dp"
-            app:layout_columnWeight="1"
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-            android:id="@+id/max_hated"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content">
 
-        <TextView
-            app:layout_columnWeight="0"
+            <android.support.design.widget.TextInputEditText
+                android:hint="@string/max_hated"
+                android:id="@+id/max_hated"
+                android:inputType="numberDecimal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
             android:id="@+id/max_hater_label"
-            android:text="@string/max_hater"
-            android:layout_width="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_height="wrap_content" />
-
-        <EditText
-            app:layout_columnWeight="1"
-            android:layout_marginStart="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginLeft="5dp"
-            android:inputType="numberDecimal"
-            android:id="@+id/max_hater"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content">
 
-    </GridLayout>
+            <android.support.design.widget.TextInputEditText
+                android:hint="@string/max_hater"
+                android:id="@+id/max_hater"
+                android:inputType="numberDecimal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </android.support.design.widget.TextInputLayout>
+
+    </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
         xmlns:app="http://schemas.android.com/apk/res-auto"

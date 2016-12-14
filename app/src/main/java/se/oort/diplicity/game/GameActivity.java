@@ -153,6 +153,7 @@ public class GameActivity extends RetrofitActivity
             Menu nav_Menu = navigationView.getMenu();
             nav_Menu.findItem(R.id.nav_orders).setVisible(false);
             nav_Menu.findItem(R.id.nav_phases).setVisible(false);
+            nav_Menu.findItem(R.id.nav_press).setVisible(false);
         }
 
         if (currentView == 0) {
