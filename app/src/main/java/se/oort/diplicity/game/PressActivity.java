@@ -1,18 +1,21 @@
 package se.oort.diplicity.game;
 
 import android.app.Activity;
+import android.content.IntentSender;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -27,6 +30,7 @@ import se.oort.diplicity.ChannelService;
 import se.oort.diplicity.R;
 import se.oort.diplicity.RetrofitActivity;
 import se.oort.diplicity.Sendable;
+import se.oort.diplicity.apigen.Member;
 import se.oort.diplicity.apigen.Message;
 import se.oort.diplicity.apigen.MultiContainer;
 import se.oort.diplicity.apigen.Phase;
@@ -36,8 +40,58 @@ import se.oort.diplicity.apigen.SingleContainer;
 public class PressActivity extends RetrofitActivity {
 
     public static final String SERIALIZED_CHANNEL_KEY = "serialized_channel";
+    public static final String SERIALIZED_MEMBER_KEY = "serialized_member";
 
     public ChannelService.Channel channel;
+    public Member member;
+
+    private MessageListAdapter messages = new MessageListAdapter();
+
+    private class MessageListAdapter extends BaseAdapter {
+        private List<Message> messages = new ArrayList<>();
+
+        public void add(Message message) {
+            this.messages.add(message);
+            notifyDataSetChanged();
+        }
+
+        public void replace(List<Message> messages) {
+            this.messages = messages;
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public int getCount() {
+            Log.d("Diplicity", "adapter returning " + messages.size());
+            return messages.size();
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return messages.get(i);
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return i;
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            View row = view;
+            if (row == null) {
+                row = getLayoutInflater().inflate(R.layout.message_list_row, viewGroup, false);
+            }
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(new Date());
+            cal.add(Calendar.SECOND, (int) -(messages.get(i).Age / 1000000000));
+
+            ((TextView) row.findViewById(R.id.body)).setText(messages.get(i).Body);
+            ((TextView) row.findViewById(R.id.at)).setText(cal.getTime().toString());
+            ((TextView) row.findViewById(R.id.sender)).setText(getResources().getString(R.string.x_, messages.get(i).Sender));
+            return row;
+        }
+    }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -46,52 +100,56 @@ public class PressActivity extends RetrofitActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        byte[] serializedMember = getIntent().getByteArrayExtra(SERIALIZED_MEMBER_KEY);
+        if (serializedMember != null) {
+            member = (Member) unserialize(serializedMember);
+        }
+
         byte[] serializedChannel = getIntent().getByteArrayExtra(SERIALIZED_CHANNEL_KEY);
         channel = (ChannelService.Channel) unserialize(serializedChannel);
+
         setTitle(TextUtils.join(", ", channel.Members));
+
+        ((ListView) findViewById(R.id.press_messages)).setAdapter(messages);
+
+        if (member == null) {
+            findViewById(R.id.send_message_button).setVisibility(View.GONE);
+            findViewById(R.id.body).setVisibility(View.GONE);
+        } else {
+            ((FloatingActionButton) findViewById(R.id.send_message_button)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Message message = new Message();
+                    message.Body = ((EditText) findViewById(R.id.new_message_body)).getText().toString();
+                    message.ChannelMembers = channel.Members;
+                    message.CreatedAt = new Date();
+                    message.Age = (long) 0;
+                    message.GameID = channel.GameID;
+                    message.Sender = member.Nation;
+                    handleReq(
+                            messageService.MessageCreate(message, channel.GameID),
+                            new Sendable<SingleContainer<Message>>() {
+                                @Override
+                                public void send(SingleContainer<Message> messageSingleContainer) {
+                                    messages.add(messageSingleContainer.Properties);
+                                }
+                            },
+                            getResources().getString(R.string.sending_message));
+                }
+            });
+        }
 
         handleReq(
                 messageService.ListMessages(channel.GameID, TextUtils.join(",", channel.Members)),
                 new Sendable<MultiContainer<Message>>() {
                     @Override
                     public void send(final MultiContainer<Message> messageMultiContainer) {
-                        final List<Message> messages= new ArrayList<>();
+                        final List<Message> newMessages= new ArrayList<>();
                         for (SingleContainer<Message> messageSingleContainer: messageMultiContainer.Properties) {
-                            messages.add(messageSingleContainer.Properties);
+                            newMessages.add(messageSingleContainer.Properties);
+                            Log.d("Diplicity", "Got " + messageSingleContainer.Properties.Body);
                         }
-                        ListView messagesView = (ListView) findViewById(R.id.press_messages);
-                        messagesView.setAdapter(new BaseAdapter() {
-                            @Override
-                            public int getCount() {
-                                return messages.size();
-                            }
-
-                            @Override
-                            public Object getItem(int i) {
-                                return messages.get(i);
-                            }
-
-                            @Override
-                            public long getItemId(int i) {
-                                return i;
-                            }
-
-                            @Override
-                            public View getView(int i, View view, ViewGroup viewGroup) {
-                                View row = view;
-                                if (row == null) {
-                                    row = getLayoutInflater().inflate(R.layout.message_list_row, viewGroup, false);
-                                }
-                                Calendar cal = Calendar.getInstance();
-                                cal.setTime(new Date());
-                                cal.add(Calendar.SECOND, (int) -(messages.get(i).Age / 1000000000));
-
-                                ((TextView) row.findViewById(R.id.body)).setText(messages.get(i).Body);
-                                ((TextView) row.findViewById(R.id.at)).setText(cal.getTime().toString());
-                                ((TextView) row.findViewById(R.id.sender)).setText(messages.get(i).Sender);
-                                return row;
-                            }
-                        });
+                        messages.replace(newMessages);
                     }
                 }, getResources().getString(R.string.loading_messages));
     }

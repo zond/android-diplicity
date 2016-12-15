@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="se.oort.diplicity.game.PressActivity"
     tools:showIn="@layout/activity_press">
@@ -39,6 +40,7 @@
             android:layout_height="wrap_content">
 
             <android.support.design.widget.TextInputEditText
+                android:id="@+id/new_message_body"
                 android:hint="@string/message"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
@@ -48,6 +50,7 @@
         <ListView
             android:id="@+id/press_messages"
             android:layout_below="@id/message_layout"
+            android:layout_alignParentBottom="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 

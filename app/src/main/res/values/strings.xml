@@ -82,4 +82,6 @@
     <string name="title_activity_press">PressActivity</string>
     <string name="message">Message</string>
     <string name="loading_messages">Loading messages</string>
+    <string name="sending_message">Sending message</string>
+    <string name="x_">%s:</string>
 </resources>

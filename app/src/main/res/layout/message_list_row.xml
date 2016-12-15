@@ -41,7 +41,7 @@
         android:layout_alignParentLeft="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="6sp"
         android:textColor="?android:attr/textColorPrimary" />
 
 </RelativeLayout>
