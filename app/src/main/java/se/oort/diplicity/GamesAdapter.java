@@ -241,6 +241,11 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
         super(activity, games);
         retrofitActivity = activity;
     }
+
+    public void clearExpanded() {
+        expandedItems.clear();
+    }
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())

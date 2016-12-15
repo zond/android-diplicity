@@ -3,6 +3,7 @@ package se.oort.diplicity.game;
 import android.app.Activity;
 import android.content.IntentSender;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -131,7 +132,8 @@ public class PressActivity extends RetrofitActivity {
                             new Sendable<SingleContainer<Message>>() {
                                 @Override
                                 public void send(SingleContainer<Message> messageSingleContainer) {
-                                    messages.add(messageSingleContainer.Properties);
+                                    ((EditText) findViewById(R.id.new_message_body)).setText("");
+                                    loadMessages();
                                 }
                             },
                             getResources().getString(R.string.sending_message));
@@ -139,6 +141,10 @@ public class PressActivity extends RetrofitActivity {
             });
         }
 
+        loadMessages();
+    }
+
+    private void loadMessages() {
         handleReq(
                 messageService.ListMessages(channel.GameID, TextUtils.join(",", channel.Members)),
                 new Sendable<MultiContainer<Message>>() {

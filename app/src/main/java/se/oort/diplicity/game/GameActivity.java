@@ -3,6 +3,7 @@ package se.oort.diplicity.game;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -34,6 +35,7 @@ import rx.functions.Func2;
 import rx.observables.JoinObservable;
 import se.oort.diplicity.App;
 import se.oort.diplicity.ChannelService;
+import se.oort.diplicity.MainActivity;
 import se.oort.diplicity.OptionsService;
 import se.oort.diplicity.R;
 import se.oort.diplicity.RetrofitActivity;
@@ -84,7 +86,10 @@ public class GameActivity extends RetrofitActivity
         if (serializedPhaseMeta != null) {
             phaseMeta = (PhaseMeta) unserialize(serializedPhaseMeta);
         }
+    }
 
+    public void onResume() {
+        super.onResume();
         draw();
     }
 
@@ -201,6 +206,11 @@ public class GameActivity extends RetrofitActivity
             } else {
                 findViewById(viewID).setVisibility(View.GONE);
             }
+        }
+        if (toShow == R.id.press_view) {
+            findViewById(R.id.create_channel_button).setVisibility(View.VISIBLE);
+        } else {
+            findViewById(R.id.create_channel_button).setVisibility(View.GONE);
         }
     }
 
@@ -347,6 +357,50 @@ public class GameActivity extends RetrofitActivity
 
     public void showPress() {
         hideAllExcept(R.id.press_view);
+        if (member != null) {
+            ((FloatingActionButton) findViewById(R.id.create_channel_button)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    final List<String> nations = new ArrayList<String>();
+                    for (Member thisMember : game.Members) {
+                        if (!member.Nation.equals(thisMember.Nation)) {
+                            nations.add(thisMember.Nation);
+                        }
+                    }
+                    final boolean[] checked = new boolean[nations.size()];
+                    final AlertDialog dialog = new AlertDialog.Builder(GameActivity.this).setMultiChoiceItems(
+                            nations.toArray(new String[]{}),
+                            checked,
+                            new DialogInterface.OnMultiChoiceClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i, boolean b) {
+                                    checked[i] = b;
+                                }
+                            }).setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int j) {
+                            List<String> channelMembers = new ArrayList<String>();
+                            for (int i = 0; i < checked.length; i++) {
+                                if (checked[i]) {
+                                    channelMembers.add(nations.get(i));
+                                }
+                            }
+                            channelMembers.add(member.Nation);
+                            Collections.sort(channelMembers);
+                            ChannelService.Channel channel = new ChannelService.Channel();
+                            channel.GameID = game.ID;
+                            channel.Members = channelMembers;
+                            Intent intent = new Intent(GameActivity.this, PressActivity.class);
+                            intent.putExtra(PressActivity.SERIALIZED_CHANNEL_KEY, serialize(channel));
+                            intent.putExtra(PressActivity.SERIALIZED_MEMBER_KEY, serialize(member));
+                            startActivity(intent);
+                            dialogInterface.dismiss();
+                        }
+                    }).show();
+
+                }
+            });
+        }
         handleReq(
                 channelService.ListChannels(game.ID),
                 new Sendable<MultiContainer<ChannelService.Channel>>() {

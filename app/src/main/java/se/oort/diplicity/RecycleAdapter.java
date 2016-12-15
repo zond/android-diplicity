@@ -28,7 +28,7 @@ public abstract class RecycleAdapter<T,VH extends RecycleAdapter.ViewHolder> ext
 
     public void clear() {
         int before = this.items.size();
-        this.items.clear();
+        items.clear();
         notifyItemRangeRemoved(0, before);
     }
 

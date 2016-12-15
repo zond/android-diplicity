@@ -475,6 +475,7 @@ public class MainActivity extends RetrofitActivity {
 
     private <T> void displayItems(Observable<MultiContainer<T>> call, String what, String typ, RecycleAdapter<SingleContainer<T>,?> adapter) {
         adapter.clear();
+        gamesAdapter.clearExpanded();
         contentList.setAdapter(adapter);
         scrollListener.resetState();
         appendItems(call, what, typ, adapter);

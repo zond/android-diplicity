@@ -37,12 +37,36 @@
 
         </ListView>
 
-        <ListView
-            android:id="@+id/press_view"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-        </ListView>
+            <ListView
+                android:id="@+id/press_view"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentBottom="true"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </ListView>
+
+            <android.support.design.widget.FloatingActionButton
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                app:elevation="6dp"
+                app:borderWidth="0dp"
+                app:fabSize="mini"
+                app:rippleColor="@color/colorPrimary"
+                app:useCompatPadding="true"
+                android:tint="@android:color/white"
+                android:id="@+id/create_channel_button"
+                android:src="@android:drawable/ic_input_add"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </RelativeLayout>
 
     </se.oort.diplicity.game.FlickFrameLayout>
 
