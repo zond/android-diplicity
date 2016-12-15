@@ -20,6 +20,7 @@ import se.oort.diplicity.apigen.UserStats;
 
 public class MemberAdapter extends RecycleAdapter<Member, MemberAdapter.ViewHolder> {
     private View.OnClickListener delegateClickListener;
+    private RetrofitActivity retrofitActivity;
     public class ViewHolder extends RecycleAdapter<Member, UserStatsAdapter.ViewHolder>.ViewHolder {
         public UserView userView;
         public TextView nation;
@@ -30,17 +31,18 @@ public class MemberAdapter extends RecycleAdapter<Member, MemberAdapter.ViewHold
         }
         @Override
         public void bind(Member member, int pos) {
-            userView.setUser(member.User);
+            userView.setUser(retrofitActivity, member.User);
             if (!member.Nation.equals("")) {
-                nation.setText(member.Nation);
+                nation.setText(retrofitActivity.getResources().getString(R.string._nation_, member.Nation));
                 nation.setVisibility(View.VISIBLE);
             } else {
                 nation.setVisibility(View.GONE);
             }
         }
     }
-    public MemberAdapter(Context ctx, List<Member> members, View.OnClickListener delegateClickListener) {
-        super(ctx, members);
+    public MemberAdapter(RetrofitActivity retrofitActivity, List<Member> members, View.OnClickListener delegateClickListener) {
+        super(retrofitActivity, members);
+        this.retrofitActivity = retrofitActivity;
         this.delegateClickListener = delegateClickListener;
     }
     @Override

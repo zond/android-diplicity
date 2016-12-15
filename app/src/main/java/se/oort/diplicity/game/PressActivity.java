@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -31,6 +32,7 @@ import se.oort.diplicity.ChannelService;
 import se.oort.diplicity.R;
 import se.oort.diplicity.RetrofitActivity;
 import se.oort.diplicity.Sendable;
+import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Member;
 import se.oort.diplicity.apigen.Message;
 import se.oort.diplicity.apigen.MultiContainer;
@@ -42,9 +44,11 @@ public class PressActivity extends RetrofitActivity {
 
     public static final String SERIALIZED_CHANNEL_KEY = "serialized_channel";
     public static final String SERIALIZED_MEMBER_KEY = "serialized_member";
+    public static final String SERIALIZED_GAME_KEY = "serialized_game";
 
     public ChannelService.Channel channel;
     public Member member;
+    public Game game;
 
     private MessageListAdapter messages = new MessageListAdapter();
 
@@ -87,9 +91,19 @@ public class PressActivity extends RetrofitActivity {
             cal.setTime(new Date());
             cal.add(Calendar.SECOND, (int) -(messages.get(i).Age / 1000000000));
 
+            String url = null;
+            for (Member member : game.Members) {
+                if (member.Nation.equals(messages.get(i).Sender)) {
+                    url = member.User.Picture;
+                }
+            }
+
             ((TextView) row.findViewById(R.id.body)).setText(messages.get(i).Body);
             ((TextView) row.findViewById(R.id.at)).setText(cal.getTime().toString());
             ((TextView) row.findViewById(R.id.sender)).setText(getResources().getString(R.string.x_, messages.get(i).Sender));
+            if (url != null) {
+                PressActivity.this.populateImage((ImageView) row.findViewById(R.id.avatar), url);
+            }
             return row;
         }
     }
@@ -108,6 +122,9 @@ public class PressActivity extends RetrofitActivity {
 
         byte[] serializedChannel = getIntent().getByteArrayExtra(SERIALIZED_CHANNEL_KEY);
         channel = (ChannelService.Channel) unserialize(serializedChannel);
+
+        byte[] serializedGame = getIntent().getByteArrayExtra(SERIALIZED_GAME_KEY);
+        game = (Game) unserialize(serializedGame);
 
         setTitle(TextUtils.join(", ", channel.Members));
 

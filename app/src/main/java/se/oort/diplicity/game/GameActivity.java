@@ -393,6 +393,7 @@ public class GameActivity extends RetrofitActivity
                             Intent intent = new Intent(GameActivity.this, PressActivity.class);
                             intent.putExtra(PressActivity.SERIALIZED_CHANNEL_KEY, serialize(channel));
                             intent.putExtra(PressActivity.SERIALIZED_MEMBER_KEY, serialize(member));
+                            intent.putExtra(PressActivity.SERIALIZED_GAME_KEY, serialize(game));
                             startActivity(intent);
                             dialogInterface.dismiss();
                         }
@@ -416,6 +417,7 @@ public class GameActivity extends RetrofitActivity
                             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                                 Intent intent = new Intent(GameActivity.this, PressActivity.class);
                                 intent.putExtra(PressActivity.SERIALIZED_CHANNEL_KEY, serialize(channels.get(i).channel));
+                                intent.putExtra(PressActivity.SERIALIZED_GAME_KEY, serialize(game));
                                 if (member != null) {
                                     intent.putExtra(PressActivity.SERIALIZED_MEMBER_KEY, serialize(member));
                                 }

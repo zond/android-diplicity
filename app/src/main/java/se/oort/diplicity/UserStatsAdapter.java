@@ -12,7 +12,7 @@ import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.apigen.UserStats;
 
 public class UserStatsAdapter extends RecycleAdapter<SingleContainer<UserStats>, UserStatsAdapter.ViewHolder> {
-
+    private RetrofitActivity retrofitActivity;
     public class ViewHolder extends RecycleAdapter<SingleContainer<UserStats>, UserStatsAdapter.ViewHolder>.ViewHolder {
         public UserView userView;
         public ViewHolder(View view) {
@@ -21,11 +21,12 @@ public class UserStatsAdapter extends RecycleAdapter<SingleContainer<UserStats>,
         }
         @Override
         public void bind(SingleContainer<UserStats> user, int pos) {
-            userView.setUser(user.Properties.User);
+            userView.setUser(retrofitActivity, user.Properties.User);
         }
     }
-    public UserStatsAdapter(Context ctx, List<SingleContainer<UserStats>> users) {
-        super(ctx, users);
+    public UserStatsAdapter(RetrofitActivity retrofitActivity, List<SingleContainer<UserStats>> users) {
+        super(retrofitActivity, users);
+        this.retrofitActivity = retrofitActivity;
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

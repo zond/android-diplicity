@@ -145,7 +145,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             LinearLayoutManager membersLayoutManager = new LinearLayoutManager(ctx);
             membersLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
             members.setLayoutManager(membersLayoutManager);
-            members.setAdapter(new MemberAdapter(ctx, game.Properties.Members, delegateClickListener));
+            members.setAdapter(new MemberAdapter(retrofitActivity, game.Properties.Members, delegateClickListener));
 
             boolean hasLeave = false;
             boolean hasJoin = false;

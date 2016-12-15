@@ -3,6 +3,9 @@ package se.oort.diplicity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -10,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
@@ -20,6 +24,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -81,6 +86,8 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     public Handler handler = new Handler();
 
     private Set<ProgressDialog> progressDialogs = new HashSet<>();
+
+    private static LRUCache<String,Bitmap> pictureCache = new LRUCache<>(128);
 
     private class LoginSubscriber<R> {
         private Subscriber<? super R> subscriber;
@@ -345,6 +352,47 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         }
         prefs.unregisterOnSharedPreferenceChangeListener(prefsListener);
         super.onDestroy();
+    }
+
+    public void populateImage(final ImageView view, final String u) {
+        Observable.create(new Observable.OnSubscribe<Bitmap>() {
+            @Override
+            public void call(final Subscriber<? super Bitmap> subscriber) {
+                Bitmap bmp = pictureCache.get(u);
+                if (bmp == null) {
+                    try {
+                        URL url = new URL(u);
+                        bmp = ThumbnailUtils.extractThumbnail(
+                                BitmapFactory.decodeStream(url.openConnection().getInputStream()),
+                                view.getWidth(), view.getHeight());
+                        pictureCache.put(u, bmp);
+                    } catch(IOException e) {
+                        subscriber.onError(e);
+                        return;
+                    }
+                }
+                subscriber.onNext(bmp);
+                subscriber.onCompleted();
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Bitmap>() {
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d("Diplicity", "Error loading " + u + ": "  + e);
+                        view.setImageDrawable(getResources().getDrawable(R.drawable.broken_image));
+                    }
+
+                    @Override
+                    public void onNext(Bitmap bitmap) {
+                        view.setImageBitmap(bitmap);
+                    }
+                });
+
     }
 
     private class AuthenticatingCallAdapterFactory extends CallAdapter.Factory {
