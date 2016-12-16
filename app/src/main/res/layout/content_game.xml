@@ -77,6 +77,79 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/game_results_view"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/solo_winner_label"
+                android:padding="5dp"
+                android:text="@string/solo_winner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?android:attr/textColorPrimary" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/solo_winner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/dias_members_label"
+                android:padding="5dp"
+                android:text="@string/dias"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?android:attr/textColorPrimary" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/dias_members"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/nmr_game_members_label"
+                android:padding="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/nmr"
+                android:textColor="?android:attr/textColorPrimary" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/nmr_game_members"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/eliminated_members_label"
+                android:padding="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/eliminated"
+                android:textColor="?android:attr/textColorPrimary" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/eliminated_members"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/scored_members_label"
+                android:padding="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/scores"
+                android:textColor="?android:attr/textColorPrimary" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/scored_members"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
         <ListView
             android:id="@+id/phases_view"
             android:layout_width="match_parent"

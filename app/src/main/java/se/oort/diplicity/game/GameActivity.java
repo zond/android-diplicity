@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import retrofit2.adapter.rxjava.HttpException;
 import rx.functions.Func2;
 import rx.observables.JoinObservable;
 import se.oort.diplicity.App;
@@ -47,6 +49,7 @@ import se.oort.diplicity.RetrofitActivity;
 import se.oort.diplicity.Sendable;
 import se.oort.diplicity.VariantService;
 import se.oort.diplicity.apigen.Game;
+import se.oort.diplicity.apigen.GameResult;
 import se.oort.diplicity.apigen.Link;
 import se.oort.diplicity.apigen.Member;
 import se.oort.diplicity.apigen.MultiContainer;
@@ -166,7 +169,7 @@ public class GameActivity extends RetrofitActivity
             nav_Menu.findItem(R.id.nav_phases).setVisible(false);
             nav_Menu.findItem(R.id.nav_press).setVisible(false);
         }
-        if (!phaseMeta.Resolved) {
+        if (phaseMeta == null || !phaseMeta.Resolved) {
             nav_Menu.findItem(R.id.nav_phase_result).setVisible(false);
         }
         if (!game.Finished) {
@@ -211,8 +214,20 @@ public class GameActivity extends RetrofitActivity
         return super.onOptionsItemSelected(item);
     }
 
+    public void setVisibility(int visibility, int... views) {
+        for (int i = 0; i < views.length; i++)
+            findViewById(views[i]).setVisibility(visibility);
+    }
+
     public void hideAllExcept(int toShow) {
-        for (int viewID : new int[]{R.id.map_view, R.id.orders_view, R.id.phases_view, R.id.press_view, R.id.phase_results_view}) {
+        for (int viewID : new int[]{
+                R.id.map_view,
+                R.id.orders_view,
+                R.id.phases_view,
+                R.id.press_view,
+                R.id.phase_results_view,
+                R.id.game_results_view
+        }) {
             if (viewID == toShow) {
                 findViewById(viewID).setVisibility(View.VISIBLE);
             } else {
@@ -477,13 +492,94 @@ public class GameActivity extends RetrofitActivity
         }
     }
 
+    public void showGameResults() {
+        setVisibility(View.GONE,
+                        R.id.solo_winner_label,
+                        R.id.solo_winner,
+                        R.id.dias_members_label,
+                        R.id.dias_members,
+                        R.id.nmr_game_members_label,
+                        R.id.nmr_game_members,
+                        R.id.eliminated_members_label,
+                        R.id.eliminated_members);
+        hideAllExcept(R.id.game_results_view);
+
+        ((LinearLayout) findViewById(R.id.game_results_view)).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                flickFrameLayout.onTouchEvent(motionEvent);
+                return true;
+            }
+        });
+        if (game.Finished) {
+            handleReq(
+                    gameResultService.GameResultLoad(game.ID),
+                    new Sendable<SingleContainer<GameResult>>() {
+                        @Override
+                        public void send(SingleContainer<GameResult> gameResultSingleContainer) {
+                            MemberListPopulater populater = new MemberListPopulater();
+                            if (gameResultSingleContainer.Properties.SoloWinnerUser != null &&
+                                !gameResultSingleContainer.Properties.SoloWinnerUser.equals("")) {
+                                populater.populate((RecyclerView) findViewById(R.id.solo_winner),
+                                        Arrays.asList(gameResultSingleContainer.Properties.SoloWinnerUser));
+                                setVisibility(View.VISIBLE, R.id.solo_winner, R.id.solo_winner_label);
+                            }
+                            if (gameResultSingleContainer.Properties.DIASUsers != null) {
+                                populater.populate((RecyclerView) findViewById(R.id.dias_members),
+                                        gameResultSingleContainer.Properties.DIASUsers);
+                                setVisibility(View.VISIBLE, R.id.dias_members, R.id.dias_members_label);
+                            }
+                            if (gameResultSingleContainer.Properties.EliminatedUsers != null) {
+                                populater.populate((RecyclerView) findViewById(R.id.eliminated_members),
+                                        gameResultSingleContainer.Properties.EliminatedUsers);
+                                setVisibility(View.VISIBLE, R.id.eliminated_members, R.id.eliminated_members_label);
+                            }
+                            if (gameResultSingleContainer.Properties.NMRUsers != null) {
+                                populater.populate((RecyclerView) findViewById(R.id.nmr_game_members),
+                                        gameResultSingleContainer.Properties.NMRUsers);
+                                setVisibility(View.VISIBLE, R.id.nmr_game_members, R.id.nmr_game_members_label);
+                            }
+                            if (gameResultSingleContainer.Properties.Scores != null) {
+                                populater.populate((RecyclerView) findViewById(R.id.scored_members),
+                                        gameResultSingleContainer.Properties.AllUsers);
+                                ((MemberAdapter) ((RecyclerView) findViewById(R.id.scored_members)).getAdapter())
+                                        .setScores(gameResultSingleContainer.Properties.Scores);
+                                setVisibility(View.VISIBLE, R.id.scored_members, R.id.scored_members_label);
+                            }
+                        }
+                    }, getResources().getString(R.string.loading_game_result));
+        }
+    }
+
+    private class MemberListPopulater {
+        public void populate(RecyclerView view, List<String> uids) {
+            List<Member> members = new ArrayList<Member>();
+            for (Member member : game.Members) {
+                if (uids.contains(member.User.Id)) {
+                    members.add(member);
+                }
+            }
+            LinearLayoutManager membersLayoutManager = new LinearLayoutManager(GameActivity.this);
+            membersLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+            view.setLayoutManager(membersLayoutManager);
+            view.setAdapter(new MemberAdapter(GameActivity.this, members, null, new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    flickFrameLayout.onTouchEvent(motionEvent);
+                    return true;
+                }
+            }));
+        }
+    }
+
     public void showPhaseResults() {
-        findViewById(R.id.nmr_members).setVisibility(View.GONE);
-        findViewById(R.id.nmr_members_label).setVisibility(View.GONE);
-        findViewById(R.id.active_members).setVisibility(View.GONE);
-        findViewById(R.id.active_members_label).setVisibility(View.GONE);
-        findViewById(R.id.ready_members).setVisibility(View.GONE);
-        findViewById(R.id.ready_members_label).setVisibility(View.GONE);
+        setVisibility(View.GONE,
+                    R.id.nmr_members,
+                    R.id.nmr_members_label,
+                    R.id.active_members,
+                    R.id.active_members_label,
+                    R.id.ready_members,
+                    R.id.ready_members_label);
 
         hideAllExcept(R.id.phase_results_view);
         ((LinearLayout) findViewById(R.id.phase_results_view)).setOnTouchListener(new View.OnTouchListener() {
@@ -497,44 +593,28 @@ public class GameActivity extends RetrofitActivity
             handleReq(
                     phaseResultService.PhaseResultLoad(game.ID, phaseMeta.PhaseOrdinal.toString()),
                     new Sendable<SingleContainer<PhaseResult>>() {
-                        private void populate(RecyclerView view, List<String> uids) {
-                            List<Member> members = new ArrayList<Member>();
-                            for (Member member : game.Members) {
-                                if (uids.contains(member.User.Id)) {
-                                    members.add(member);
-                                }
-                            }
-                            LinearLayoutManager membersLayoutManager = new LinearLayoutManager(GameActivity.this);
-                            membersLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-                            view.setLayoutManager(membersLayoutManager);
-                            view.setAdapter(new MemberAdapter(GameActivity.this, members, null, new View.OnTouchListener() {
-                                @Override
-                                public boolean onTouch(View view, MotionEvent motionEvent) {
-                                    flickFrameLayout.onTouchEvent(motionEvent);
-                                    return true;
-                                }
-                            }));
-                        }
-
                         @Override
                         public void send(SingleContainer<PhaseResult> phaseResultSingleContainer) {
+                            MemberListPopulater populater = new MemberListPopulater();
                             if (phaseResultSingleContainer.Properties.NMRUsers != null) {
-                                populate((RecyclerView) findViewById(R.id.nmr_members), phaseResultSingleContainer.Properties.NMRUsers);
-                                findViewById(R.id.nmr_members).setVisibility(View.VISIBLE);
-                                findViewById(R.id.nmr_members_label).setVisibility(View.VISIBLE);
+                                populater.populate((RecyclerView) findViewById(R.id.nmr_members), phaseResultSingleContainer.Properties.NMRUsers);
+                                setVisibility(View.VISIBLE, R.id.nmr_members, R.id.nmr_members_label);
                             }
                             if (phaseResultSingleContainer.Properties.ActiveUsers != null) {
-                                populate((RecyclerView) findViewById(R.id.active_members), phaseResultSingleContainer.Properties.ActiveUsers);
-                                findViewById(R.id.active_members).setVisibility(View.VISIBLE);
-                                findViewById(R.id.active_members_label).setVisibility(View.VISIBLE);
+                                populater.populate((RecyclerView) findViewById(R.id.active_members), phaseResultSingleContainer.Properties.ActiveUsers);
+                                setVisibility(View.VISIBLE, R.id.active_members, R.id.active_members_label);
                             }
                             if (phaseResultSingleContainer.Properties.ReadyUsers != null) {
-                                populate((RecyclerView) findViewById(R.id.ready_members), phaseResultSingleContainer.Properties.ReadyUsers);
-                                findViewById(R.id.ready_members).setVisibility(View.VISIBLE);
-                                findViewById(R.id.ready_members_label).setVisibility(View.VISIBLE);
+                                populater.populate((RecyclerView) findViewById(R.id.ready_members), phaseResultSingleContainer.Properties.ReadyUsers);
+                                setVisibility(View.VISIBLE, R.id.ready_members, R.id.ready_members_label);
                             }
                         }
-                    }, getResources().getString(R.string.loading_phase_result));
+                    }, new ErrorHandler(404, new Sendable<HttpException>() {
+                        @Override
+                        public void send(HttpException e) {
+
+                        }
+                    }), getResources().getString(R.string.loading_phase_result));
         }
     }
 
@@ -653,6 +733,7 @@ public class GameActivity extends RetrofitActivity
         } else if (id == R.id.nav_phase_result) {
             showPhaseResults();
         } else if (id == R.id.nav_game_result) {
+            showGameResults();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

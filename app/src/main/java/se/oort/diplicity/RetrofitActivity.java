@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ImageView;
@@ -21,7 +20,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URL;
@@ -48,6 +49,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func2;
 import rx.observables.JoinObservable;
 import rx.schedulers.Schedulers;
+import se.oort.diplicity.apigen.GameResultService;
 import se.oort.diplicity.apigen.GameService;
 import se.oort.diplicity.apigen.MemberService;
 import se.oort.diplicity.apigen.MessageService;
@@ -81,6 +83,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     public ChannelService channelService;
     public MessageService messageService;
     public PhaseResultService phaseResultService;
+    public GameResultService gameResultService;
 
     private SharedPreferences prefs;
     private SharedPreferences.OnSharedPreferenceChangeListener prefsListener;
@@ -158,12 +161,12 @@ public abstract class RetrofitActivity extends AppCompatActivity {
             @Override
             public void send(Throwable e) {
                 if (e != null) {
-                    Log.e("Diplicity", "Error loading " + progressMessage + ": " + e);
                     if (e instanceof HttpException) {
                         HttpException he = (HttpException) e;
                         if (onError != null && onError.code == he.code()) {
                             onError.handler.send(he);
                         } else {
+                            Log.e("Diplicity", "Error loading " + progressMessage + ": " + e);
                             if (he.code() == 412) {
                                 Toast.makeText(RetrofitActivity.this, R.string.update_your_state, Toast.LENGTH_LONG).show();
                             } else if (he.code() > 399 && he.code() < 500) {
@@ -290,6 +293,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         channelService = retrofit.create(ChannelService.class);
         messageService = retrofit.create(MessageService.class);
         phaseResultService = retrofit.create(PhaseResultService.class);
+        gameResultService = retrofit.create(GameResultService.class);
     }
 
     @Override

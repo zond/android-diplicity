@@ -13,6 +13,7 @@ import org.w3c.dom.Text;
 import java.util.List;
 
 import se.oort.diplicity.apigen.Game;
+import se.oort.diplicity.apigen.GameScore;
 import se.oort.diplicity.apigen.Member;
 import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.apigen.User;
@@ -22,13 +23,16 @@ public class MemberAdapter extends RecycleAdapter<Member, MemberAdapter.ViewHold
     private View.OnClickListener delegateClickListener;
     private View.OnTouchListener delegateTouchListener;
     private RetrofitActivity retrofitActivity;
+    private List<GameScore> scores;
     public class ViewHolder extends RecycleAdapter<Member, UserStatsAdapter.ViewHolder>.ViewHolder {
         public UserView userView;
         public TextView nation;
+        public TextView score;
         public ViewHolder(View view) {
             super(view);
             userView = (UserView) view.findViewById(R.id.user);
             nation = (TextView) view.findViewById(R.id.nation);
+            score = (TextView) view.findViewById(R.id.score);
         }
         @Override
         public void bind(Member member, int pos) {
@@ -38,6 +42,20 @@ public class MemberAdapter extends RecycleAdapter<Member, MemberAdapter.ViewHold
                 nation.setVisibility(View.VISIBLE);
             } else {
                 nation.setVisibility(View.GONE);
+            }
+            boolean foundScore = false;
+            if (scores != null) {
+                for (GameScore gameScore : scores) {
+                    if (gameScore.UserId.equals(member.User.Id)) {
+                        foundScore = true;
+                        score.setText(retrofitActivity.getResources().getString(R.string.scs_score, gameScore.SCs, gameScore.Score.intValue()));
+                    }
+                }
+            }
+            if (foundScore) {
+                score.setVisibility(View.VISIBLE);
+            } else {
+                score.setVisibility(View.GONE);
             }
         }
     }
@@ -49,6 +67,9 @@ public class MemberAdapter extends RecycleAdapter<Member, MemberAdapter.ViewHold
         this.retrofitActivity = retrofitActivity;
         this.delegateClickListener = delegateClickListener;
         this.delegateTouchListener = delegateTouchListener;
+    }
+    public void setScores(List<GameScore> scores) {
+        this.scores = scores;
     }
     @Override
     public MemberAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

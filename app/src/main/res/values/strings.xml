@@ -93,4 +93,11 @@
     <string name="nmr">NMR</string>
     <string name="active">Active</string>
     <string name="ready">Ready</string>
+    <string name="solo_winner">Solo winner</string>
+    <string name="dias_members">DIAS</string>
+    <string name="dias">DIAS</string>
+    <string name="scores">Scores</string>
+    <string name="scs_score">%1$s SCs, %2$s points</string>
+    <string name="eliminated">Eliminated</string>
+    <string name="loading_game_result">Loading game result</string>
 </resources>
