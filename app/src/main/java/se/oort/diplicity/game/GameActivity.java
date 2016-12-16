@@ -9,6 +9,8 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -18,7 +20,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -36,6 +40,7 @@ import rx.observables.JoinObservable;
 import se.oort.diplicity.App;
 import se.oort.diplicity.ChannelService;
 import se.oort.diplicity.MainActivity;
+import se.oort.diplicity.MemberAdapter;
 import se.oort.diplicity.OptionsService;
 import se.oort.diplicity.R;
 import se.oort.diplicity.RetrofitActivity;
@@ -48,6 +53,7 @@ import se.oort.diplicity.apigen.MultiContainer;
 import se.oort.diplicity.apigen.Order;
 import se.oort.diplicity.apigen.Phase;
 import se.oort.diplicity.apigen.PhaseMeta;
+import se.oort.diplicity.apigen.PhaseResult;
 import se.oort.diplicity.apigen.Resolution;
 import se.oort.diplicity.apigen.SingleContainer;
 
@@ -153,12 +159,18 @@ public class GameActivity extends RetrofitActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        Menu nav_Menu = navigationView.getMenu();
         if (!game.Started) {
-            navigationView = (NavigationView) findViewById(R.id.nav_view);
-            Menu nav_Menu = navigationView.getMenu();
             nav_Menu.findItem(R.id.nav_orders).setVisible(false);
             nav_Menu.findItem(R.id.nav_phases).setVisible(false);
             nav_Menu.findItem(R.id.nav_press).setVisible(false);
+        }
+        if (!phaseMeta.Resolved) {
+            nav_Menu.findItem(R.id.nav_phase_result).setVisible(false);
+        }
+        if (!game.Finished) {
+            nav_Menu.findItem(R.id.nav_game_result).setVisible(false);
         }
 
         if (currentView == 0) {
@@ -200,7 +212,7 @@ public class GameActivity extends RetrofitActivity
     }
 
     public void hideAllExcept(int toShow) {
-        for (int viewID : new int[]{R.id.map_view, R.id.orders_view, R.id.phases_view, R.id.press_view}) {
+        for (int viewID : new int[]{R.id.map_view, R.id.orders_view, R.id.phases_view, R.id.press_view, R.id.phase_results_view}) {
             if (viewID == toShow) {
                 findViewById(viewID).setVisibility(View.VISIBLE);
             } else {
@@ -465,6 +477,67 @@ public class GameActivity extends RetrofitActivity
         }
     }
 
+    public void showPhaseResults() {
+        findViewById(R.id.nmr_members).setVisibility(View.GONE);
+        findViewById(R.id.nmr_members_label).setVisibility(View.GONE);
+        findViewById(R.id.active_members).setVisibility(View.GONE);
+        findViewById(R.id.active_members_label).setVisibility(View.GONE);
+        findViewById(R.id.ready_members).setVisibility(View.GONE);
+        findViewById(R.id.ready_members_label).setVisibility(View.GONE);
+
+        hideAllExcept(R.id.phase_results_view);
+        ((LinearLayout) findViewById(R.id.phase_results_view)).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                flickFrameLayout.onTouchEvent(motionEvent);
+                return true;
+            }
+        });
+        if (phaseMeta.Resolved) {
+            handleReq(
+                    phaseResultService.PhaseResultLoad(game.ID, phaseMeta.PhaseOrdinal.toString()),
+                    new Sendable<SingleContainer<PhaseResult>>() {
+                        private void populate(RecyclerView view, List<String> uids) {
+                            List<Member> members = new ArrayList<Member>();
+                            for (Member member : game.Members) {
+                                if (uids.contains(member.User.Id)) {
+                                    members.add(member);
+                                }
+                            }
+                            LinearLayoutManager membersLayoutManager = new LinearLayoutManager(GameActivity.this);
+                            membersLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+                            view.setLayoutManager(membersLayoutManager);
+                            view.setAdapter(new MemberAdapter(GameActivity.this, members, null, new View.OnTouchListener() {
+                                @Override
+                                public boolean onTouch(View view, MotionEvent motionEvent) {
+                                    flickFrameLayout.onTouchEvent(motionEvent);
+                                    return true;
+                                }
+                            }));
+                        }
+
+                        @Override
+                        public void send(SingleContainer<PhaseResult> phaseResultSingleContainer) {
+                            if (phaseResultSingleContainer.Properties.NMRUsers != null) {
+                                populate((RecyclerView) findViewById(R.id.nmr_members), phaseResultSingleContainer.Properties.NMRUsers);
+                                findViewById(R.id.nmr_members).setVisibility(View.VISIBLE);
+                                findViewById(R.id.nmr_members_label).setVisibility(View.VISIBLE);
+                            }
+                            if (phaseResultSingleContainer.Properties.ActiveUsers != null) {
+                                populate((RecyclerView) findViewById(R.id.active_members), phaseResultSingleContainer.Properties.ActiveUsers);
+                                findViewById(R.id.active_members).setVisibility(View.VISIBLE);
+                                findViewById(R.id.active_members_label).setVisibility(View.VISIBLE);
+                            }
+                            if (phaseResultSingleContainer.Properties.ReadyUsers != null) {
+                                populate((RecyclerView) findViewById(R.id.ready_members), phaseResultSingleContainer.Properties.ReadyUsers);
+                                findViewById(R.id.ready_members).setVisibility(View.VISIBLE);
+                                findViewById(R.id.ready_members_label).setVisibility(View.VISIBLE);
+                            }
+                        }
+                    }, getResources().getString(R.string.loading_phase_result));
+        }
+    }
+
     public void showOrders() {
         hideAllExcept(R.id.orders_view);
         handleReq(
@@ -577,6 +650,9 @@ public class GameActivity extends RetrofitActivity
             showPhases(oldView != currentView);
         } else if (id == R.id.nav_press) {
             showPress();
+        } else if (id == R.id.nav_phase_result) {
+            showPhaseResults();
+        } else if (id == R.id.nav_game_result) {
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

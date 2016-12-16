@@ -86,4 +86,11 @@
     <string name="x_">%s:</string>
     <string name="create">Create</string>
     <string name="_nation_">(%s)</string>
+    <string name="phase_result">Phase result</string>
+    <string name="game_result">Game result</string>
+    <string name="loading_phase_result">Loading phase result</string>
+    <string name="nmr_members">NMR</string>
+    <string name="nmr">NMR</string>
+    <string name="active">Active</string>
+    <string name="ready">Ready</string>
 </resources>

@@ -20,6 +20,7 @@ import se.oort.diplicity.apigen.UserStats;
 
 public class MemberAdapter extends RecycleAdapter<Member, MemberAdapter.ViewHolder> {
     private View.OnClickListener delegateClickListener;
+    private View.OnTouchListener delegateTouchListener;
     private RetrofitActivity retrofitActivity;
     public class ViewHolder extends RecycleAdapter<Member, UserStatsAdapter.ViewHolder>.ViewHolder {
         public UserView userView;
@@ -40,10 +41,14 @@ public class MemberAdapter extends RecycleAdapter<Member, MemberAdapter.ViewHold
             }
         }
     }
-    public MemberAdapter(RetrofitActivity retrofitActivity, List<Member> members, View.OnClickListener delegateClickListener) {
+    public MemberAdapter(RetrofitActivity retrofitActivity,
+                         List<Member> members,
+                         View.OnClickListener delegateClickListener,
+                         View.OnTouchListener delegateTouchListener) {
         super(retrofitActivity, members);
         this.retrofitActivity = retrofitActivity;
         this.delegateClickListener = delegateClickListener;
+        this.delegateTouchListener = delegateTouchListener;
     }
     @Override
     public MemberAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -51,6 +56,9 @@ public class MemberAdapter extends RecycleAdapter<Member, MemberAdapter.ViewHold
                 .inflate(R.layout.member_list_row, parent, false);
         if (delegateClickListener != null) {
             itemView.setOnClickListener(delegateClickListener);
+        }
+        if (delegateTouchListener != null) {
+            itemView.setOnTouchListener(delegateTouchListener);
         }
         return new ViewHolder(itemView);
     }

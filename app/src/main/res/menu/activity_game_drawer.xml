@@ -18,6 +18,14 @@
             android:id="@+id/nav_press"
             android:icon="@drawable/ic_contacts_black_24dp"
             android:title="@string/press" />
+        <item
+            android:id="@+id/nav_phase_result"
+            android:icon="@drawable/ic_event_note_black_24dp"
+            android:title="@string/phase_result" />
+        <item
+            android:id="@+id/nav_game_result"
+            android:icon="@drawable/ic_event_available_black_24dp"
+            android:title="@string/game_result" />
     </group>
 
 </menu>

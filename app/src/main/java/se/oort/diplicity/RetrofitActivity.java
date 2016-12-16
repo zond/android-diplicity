@@ -53,6 +53,7 @@ import se.oort.diplicity.apigen.MemberService;
 import se.oort.diplicity.apigen.MessageService;
 import se.oort.diplicity.apigen.MultiContainer;
 import se.oort.diplicity.apigen.OrderService;
+import se.oort.diplicity.apigen.PhaseResultService;
 import se.oort.diplicity.apigen.PhaseService;
 import se.oort.diplicity.apigen.User;
 import se.oort.diplicity.apigen.UserStatsService;
@@ -79,6 +80,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     public PhaseService phaseService;
     public ChannelService channelService;
     public MessageService messageService;
+    public PhaseResultService phaseResultService;
 
     private SharedPreferences prefs;
     private SharedPreferences.OnSharedPreferenceChangeListener prefsListener;
@@ -287,6 +289,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         phaseService = retrofit.create(PhaseService.class);
         channelService = retrofit.create(ChannelService.class);
         messageService = retrofit.create(MessageService.class);
+        phaseResultService = retrofit.create(PhaseResultService.class);
     }
 
     @Override

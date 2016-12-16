@@ -75,8 +75,10 @@ public class MapView extends FrameLayout {
             @Override
             public void onPageFinished(WebView view, String url) {
                 synchronized (MapView.this) {
-                    for (Runnable r : onFinished) {
-                        r.run();
+                    if (onFinished != null) {
+                        for (Runnable r : onFinished) {
+                            r.run();
+                        }
                     }
                     onFinished = null;
                 }

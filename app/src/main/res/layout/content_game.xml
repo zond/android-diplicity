@@ -30,6 +30,53 @@
 
         </ListView>
 
+        <LinearLayout
+            android:id="@+id/phase_results_view"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/nmr_members_label"
+                android:padding="5dp"
+                android:text="@string/nmr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?android:attr/textColorPrimary" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/nmr_members"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/active_members_label"
+                android:padding="5dp"
+                android:text="@string/active"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?android:attr/textColorPrimary" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/active_members"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/ready_members_label"
+                android:padding="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ready"
+                android:textColor="?android:attr/textColorPrimary" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/ready_members"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
         <ListView
             android:id="@+id/phases_view"
             android:layout_width="match_parent"
