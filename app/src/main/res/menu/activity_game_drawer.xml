@@ -26,6 +26,14 @@
             android:id="@+id/nav_game_result"
             android:icon="@drawable/ic_event_available_black_24dp"
             android:title="@string/game_result" />
+        <item
+            android:id="@+id/nav_phase_settings"
+            android:icon="@drawable/ic_settings_applications_black_24dp"
+            android:title="@string/phase_settings" />
+        <item
+            android:id="@+id/nav_game_settings"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:title="@string/game_settings" />
     </group>
 
 </menu>

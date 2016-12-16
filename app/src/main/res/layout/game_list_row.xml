@@ -144,11 +144,10 @@
 
         </LinearLayout>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/member_list"
-            android:layout_below="@id/meta_labels"
+        <se.oort.diplicity.MemberTable
+            android:id="@+id/member_table"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
         <LinearLayout
             android:layout_width="wrap_content"

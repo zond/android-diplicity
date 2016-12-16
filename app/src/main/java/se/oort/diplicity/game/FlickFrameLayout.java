@@ -46,9 +46,9 @@ public class FlickFrameLayout extends FrameLayout {
 
             @Override
             public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float x, float y) {
-                if (x < -15000) {
+                if (x < -10000) {
                     gameActivity.nextPhase();
-                } else if (x > 15000) {
+                } else if (x > 10000) {
                     gameActivity.prevPhase();
                 }
                 return false;

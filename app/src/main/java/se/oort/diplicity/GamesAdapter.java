@@ -32,7 +32,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                 minReliability, minQuickness, maxHated, maxHater,
                 ratingLabel, minReliabilityLabel, minQuicknessLabel,
                 maxHatedLabel, maxHaterLabel;
-        RecyclerView members;
+        MemberTable members;
         RelativeLayout expanded;
         View.OnClickListener delegateClickListener;
         FloatingActionButton button;
@@ -48,7 +48,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             minQuickness = (TextView) view.findViewById(R.id.min_quickness);
             maxHated = (TextView) view.findViewById(R.id.max_hated);
             maxHater = (TextView) view.findViewById(R.id.max_hater);
-            members = (RecyclerView) view.findViewById(R.id.member_list);
+            members = (MemberTable) view.findViewById(R.id.member_table);
             expanded = (RelativeLayout) view.findViewById(R.id.expanded);
             ratingLabel = (TextView) view.findViewById(R.id.rating_label);
             minReliabilityLabel = (TextView) view.findViewById(R.id.min_reliability_label);
@@ -142,10 +142,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                 expanded.setVisibility(View.GONE);
             }
 
-            LinearLayoutManager membersLayoutManager = new LinearLayoutManager(ctx);
-            membersLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-            members.setLayoutManager(membersLayoutManager);
-            members.setAdapter(new MemberAdapter(retrofitActivity, game.Properties.Members, delegateClickListener, null));
+            members.setMembers(retrofitActivity, game.Properties.Members);
 
             boolean hasLeave = false;
             boolean hasJoin = false;

@@ -178,6 +178,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                             }
                         }
                     } else {
+                        Log.e("Diplicity", "Error loading " + progressMessage + ": " + e);
                         Toast.makeText(RetrofitActivity.this, R.string.unknown_error, Toast.LENGTH_SHORT).show();
                     }
                 }

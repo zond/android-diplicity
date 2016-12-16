@@ -22,6 +22,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +44,7 @@ import se.oort.diplicity.App;
 import se.oort.diplicity.ChannelService;
 import se.oort.diplicity.MainActivity;
 import se.oort.diplicity.MemberAdapter;
+import se.oort.diplicity.MemberTable;
 import se.oort.diplicity.OptionsService;
 import se.oort.diplicity.R;
 import se.oort.diplicity.RetrofitActivity;
@@ -504,10 +506,12 @@ public class GameActivity extends RetrofitActivity
                         R.id.eliminated_members);
         hideAllExcept(R.id.game_results_view);
 
-        ((LinearLayout) findViewById(R.id.game_results_view)).setOnTouchListener(new View.OnTouchListener() {
+        final ScrollView gameResultsView = (ScrollView) findViewById(R.id.game_results_view);
+        gameResultsView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 flickFrameLayout.onTouchEvent(motionEvent);
+                gameResultsView.onTouchEvent(motionEvent);
                 return true;
             }
         });
@@ -520,30 +524,29 @@ public class GameActivity extends RetrofitActivity
                             MemberListPopulater populater = new MemberListPopulater();
                             if (gameResultSingleContainer.Properties.SoloWinnerUser != null &&
                                 !gameResultSingleContainer.Properties.SoloWinnerUser.equals("")) {
-                                populater.populate((RecyclerView) findViewById(R.id.solo_winner),
+                                populater.populate(R.id.solo_winner,
                                         Arrays.asList(gameResultSingleContainer.Properties.SoloWinnerUser));
                                 setVisibility(View.VISIBLE, R.id.solo_winner, R.id.solo_winner_label);
                             }
                             if (gameResultSingleContainer.Properties.DIASUsers != null) {
-                                populater.populate((RecyclerView) findViewById(R.id.dias_members),
+                                populater.populate(R.id.dias_members,
                                         gameResultSingleContainer.Properties.DIASUsers);
                                 setVisibility(View.VISIBLE, R.id.dias_members, R.id.dias_members_label);
                             }
                             if (gameResultSingleContainer.Properties.EliminatedUsers != null) {
-                                populater.populate((RecyclerView) findViewById(R.id.eliminated_members),
+                                populater.populate(R.id.eliminated_members,
                                         gameResultSingleContainer.Properties.EliminatedUsers);
                                 setVisibility(View.VISIBLE, R.id.eliminated_members, R.id.eliminated_members_label);
                             }
                             if (gameResultSingleContainer.Properties.NMRUsers != null) {
-                                populater.populate((RecyclerView) findViewById(R.id.nmr_game_members),
+                                populater.populate(R.id.nmr_game_members,
                                         gameResultSingleContainer.Properties.NMRUsers);
                                 setVisibility(View.VISIBLE, R.id.nmr_game_members, R.id.nmr_game_members_label);
                             }
                             if (gameResultSingleContainer.Properties.Scores != null) {
-                                populater.populate((RecyclerView) findViewById(R.id.scored_members),
+                                ((MemberTable) findViewById(R.id.scored_members)).setScores(gameResultSingleContainer.Properties.Scores);
+                                populater.populate(R.id.scored_members,
                                         gameResultSingleContainer.Properties.AllUsers);
-                                ((MemberAdapter) ((RecyclerView) findViewById(R.id.scored_members)).getAdapter())
-                                        .setScores(gameResultSingleContainer.Properties.Scores);
                                 setVisibility(View.VISIBLE, R.id.scored_members, R.id.scored_members_label);
                             }
                         }
@@ -552,7 +555,7 @@ public class GameActivity extends RetrofitActivity
     }
 
     private class MemberListPopulater {
-        public void populate(RecyclerView view, List<String> uids) {
+        public void populate(int view, List<String> uids) {
             List<Member> members = new ArrayList<Member>();
             for (Member member : game.Members) {
                 if (uids.contains(member.User.Id)) {
@@ -561,14 +564,15 @@ public class GameActivity extends RetrofitActivity
             }
             LinearLayoutManager membersLayoutManager = new LinearLayoutManager(GameActivity.this);
             membersLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-            view.setLayoutManager(membersLayoutManager);
-            view.setAdapter(new MemberAdapter(GameActivity.this, members, null, new View.OnTouchListener() {
+            MemberTable table = (MemberTable) findViewById(view);
+            table.setMembers(GameActivity.this, members);
+            table.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent) {
                     flickFrameLayout.onTouchEvent(motionEvent);
                     return true;
                 }
-            }));
+            });
         }
     }
 
@@ -582,10 +586,13 @@ public class GameActivity extends RetrofitActivity
                     R.id.ready_members_label);
 
         hideAllExcept(R.id.phase_results_view);
-        ((LinearLayout) findViewById(R.id.phase_results_view)).setOnTouchListener(new View.OnTouchListener() {
+
+        final ScrollView phaseResultsView = (ScrollView) findViewById(R.id.phase_results_view);
+        phaseResultsView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 flickFrameLayout.onTouchEvent(motionEvent);
+                phaseResultsView.onTouchEvent(motionEvent);
                 return true;
             }
         });
@@ -597,15 +604,15 @@ public class GameActivity extends RetrofitActivity
                         public void send(SingleContainer<PhaseResult> phaseResultSingleContainer) {
                             MemberListPopulater populater = new MemberListPopulater();
                             if (phaseResultSingleContainer.Properties.NMRUsers != null) {
-                                populater.populate((RecyclerView) findViewById(R.id.nmr_members), phaseResultSingleContainer.Properties.NMRUsers);
+                                populater.populate(R.id.nmr_members, phaseResultSingleContainer.Properties.NMRUsers);
                                 setVisibility(View.VISIBLE, R.id.nmr_members, R.id.nmr_members_label);
                             }
                             if (phaseResultSingleContainer.Properties.ActiveUsers != null) {
-                                populater.populate((RecyclerView) findViewById(R.id.active_members), phaseResultSingleContainer.Properties.ActiveUsers);
+                                populater.populate(R.id.active_members, phaseResultSingleContainer.Properties.ActiveUsers);
                                 setVisibility(View.VISIBLE, R.id.active_members, R.id.active_members_label);
                             }
                             if (phaseResultSingleContainer.Properties.ReadyUsers != null) {
-                                populater.populate((RecyclerView) findViewById(R.id.ready_members), phaseResultSingleContainer.Properties.ReadyUsers);
+                                populater.populate(R.id.ready_members, phaseResultSingleContainer.Properties.ReadyUsers);
                                 setVisibility(View.VISIBLE, R.id.ready_members, R.id.ready_members_label);
                             }
                         }
