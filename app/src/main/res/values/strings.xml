@@ -109,4 +109,7 @@
     <string name="wants_dias">Wants DIAS</string>
     <string name="on_probation">On probation</string>
     <string name="updating_phase_state">Updating phase state</string>
+    <string name="DIAS">DIAS</string>
+    <string name="probation">Probation</string>
+    <string name="rdy">RDY</string>
 </resources>

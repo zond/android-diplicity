@@ -10,7 +10,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -24,20 +23,15 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -49,8 +43,6 @@ import rx.functions.Func2;
 import rx.observables.JoinObservable;
 import se.oort.diplicity.App;
 import se.oort.diplicity.ChannelService;
-import se.oort.diplicity.MainActivity;
-import se.oort.diplicity.MemberAdapter;
 import se.oort.diplicity.MemberTable;
 import se.oort.diplicity.OptionsService;
 import se.oort.diplicity.R;
@@ -471,91 +463,10 @@ public class GameActivity extends RetrofitActivity
                 }, getResources().getString(R.string.loading_channels));
     }
 
-    private class PhaseStateAdapter extends BaseAdapter {
-        private List<PhaseState> phaseStates;
-        @Override
-        public int getCount() {
-            return phaseStates.size();
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return phaseStates.get(i);
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return i;
-        }
-
-        private void setEnabled(View row, boolean enabled, int... ids) {
-            for (int i = 0; i < ids.length; i++) {
-                ((CheckBox) row.findViewById(ids[i])).setEnabled(enabled);
-            }
-        }
-
-        @Override
-        public View getView(final int i, View view, ViewGroup viewGroup) {
-            View row = view;
-            if (row == null) {
-                row = getLayoutInflater().inflate(R.layout.phase_state_row, viewGroup, false);
-            }
-            User user = null;
-            for (Member member : game.Members) {
-                if (member.Nation.equals(phaseStates.get(i).Nation)) {
-                    user = member.User;
-                    break;
-                }
-            }
-            if (user != null) {
-                ((UserView) row.findViewById(R.id.user)).setUser(GameActivity.this, user);
-            }
-            ((CheckBox) row.findViewById(R.id.ready_to_resolve)).setChecked(phaseStates.get(i).ReadyToResolve);
-            ((CheckBox) row.findViewById(R.id.wants_dias)).setChecked(phaseStates.get(i).WantsDIAS);
-            ((CheckBox) row.findViewById(R.id.on_probation)).setChecked(phaseStates.get(i).OnProbation);
-            if (!phaseMeta.Resolved && user.Id.equals(App.loggedInUser.Id)) {
-                setEnabled(row, true, R.id.ready_to_resolve, R.id.wants_dias);
-                setEnabled(row, false, R.id.on_probation);
-                ((CheckBox) row.findViewById(R.id.ready_to_resolve)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                        phaseStates.get(i).ReadyToResolve = b;
-                        handleReq(
-                                phaseStateService.PhaseStateUpdate(phaseStates.get(i), game.ID, phaseMeta.PhaseOrdinal.toString(), phaseStates.get(i).Nation),
-                                new Sendable<SingleContainer<PhaseState>>() {
-                                    @Override
-                                    public void send(SingleContainer<PhaseState> phaseStateSingleContainer) {
-
-                                    }
-                                }, getResources().getString(R.string.updating_phase_state));
-                    }
-                });
-                ((CheckBox) row.findViewById(R.id.wants_dias)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                        phaseStates.get(i).WantsDIAS = b;
-                        handleReq(
-                                phaseStateService.PhaseStateUpdate(phaseStates.get(i), game.ID, phaseMeta.PhaseOrdinal.toString(), phaseStates.get(i).Nation),
-                                new Sendable<SingleContainer<PhaseState>>() {
-                                    @Override
-                                    public void send(SingleContainer<PhaseState> phaseStateSingleContainer) {
-
-                                    }
-                                }, getResources().getString(R.string.updating_phase_state));
-                    }
-                });
-            } else {
-                setEnabled(row, false, R.id.ready_to_resolve, R.id.wants_dias, R.id.on_probation);
-            }
-            return row;
-        }
-
-    }
-
     public void showPhaseStates() {
         hideAllExcept(R.id.phase_state_view);
 
-        final ListView phaseStateView = (ListView) findViewById(R.id.phase_state_view);
+        final MemberTable phaseStateView = (MemberTable) findViewById(R.id.phase_state_view);
         phaseStateView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -574,9 +485,8 @@ public class GameActivity extends RetrofitActivity
                         for (SingleContainer<PhaseState> phaseStateSingleContainer : phaseStateMultiContainer.Properties) {
                             phaseStates.add(phaseStateSingleContainer.Properties);
                         }
-                        PhaseStateAdapter adapter = new PhaseStateAdapter();
-                        adapter.phaseStates = phaseStates;
-                        phaseStateView.setAdapter(adapter);
+                        phaseStateView.setPhaseStates(game, phaseMeta, phaseStates);
+                        phaseStateView.setMembers(GameActivity.this, game.Members);
                     }
                 }, getResources().getString(R.string.loading_phase_settings));
     }

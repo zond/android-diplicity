@@ -162,12 +162,10 @@
 
         </ScrollView>
 
-        <ListView
+        <se.oort.diplicity.MemberTable
             android:id="@+id/phase_state_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-        </ListView>
+            android:layout_height="match_parent"/>
 
         <ListView
             android:id="@+id/phases_view"
