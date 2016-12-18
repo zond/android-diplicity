@@ -5,7 +5,7 @@ import rx.*;
 	
 public interface GameStateService {
   @PUT("/Game/{game_id}/GameState/{nation}")
-  Observable<SingleContainer<GameState>> GameStateUpdate(@Path("game_id") String game_id, @Path("nation") String nation);
+  Observable<SingleContainer<GameState>> GameStateUpdate(@Body GameState gamestate, @Path("game_id") String game_id, @Path("nation") String nation);
 
   @GET("/Game/{game_id}/GameStates")
   Observable<MultiContainer<GameState>> ListGameStates(@Path("game_id") String game_id);

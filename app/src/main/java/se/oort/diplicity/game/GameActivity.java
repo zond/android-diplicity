@@ -18,8 +18,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
@@ -30,7 +35,9 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -49,6 +56,7 @@ import se.oort.diplicity.OptionsService;
 import se.oort.diplicity.R;
 import se.oort.diplicity.RetrofitActivity;
 import se.oort.diplicity.Sendable;
+import se.oort.diplicity.UserView;
 import se.oort.diplicity.VariantService;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.GameResult;
@@ -59,8 +67,10 @@ import se.oort.diplicity.apigen.Order;
 import se.oort.diplicity.apigen.Phase;
 import se.oort.diplicity.apigen.PhaseMeta;
 import se.oort.diplicity.apigen.PhaseResult;
+import se.oort.diplicity.apigen.PhaseState;
 import se.oort.diplicity.apigen.Resolution;
 import se.oort.diplicity.apigen.SingleContainer;
+import se.oort.diplicity.apigen.User;
 
 public class GameActivity extends RetrofitActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -170,6 +180,8 @@ public class GameActivity extends RetrofitActivity
             nav_Menu.findItem(R.id.nav_orders).setVisible(false);
             nav_Menu.findItem(R.id.nav_phases).setVisible(false);
             nav_Menu.findItem(R.id.nav_press).setVisible(false);
+            nav_Menu.findItem(R.id.nav_phase_settings).setVisible(false);
+            nav_Menu.findItem(R.id.nav_game_settings).setVisible(false);
         }
         if (phaseMeta == null || !phaseMeta.Resolved) {
             nav_Menu.findItem(R.id.nav_phase_result).setVisible(false);
@@ -228,7 +240,8 @@ public class GameActivity extends RetrofitActivity
                 R.id.phases_view,
                 R.id.press_view,
                 R.id.phase_results_view,
-                R.id.game_results_view
+                R.id.game_results_view,
+                R.id.phase_state_view
         }) {
             if (viewID == toShow) {
                 findViewById(viewID).setVisibility(View.VISIBLE);
@@ -456,6 +469,116 @@ public class GameActivity extends RetrofitActivity
                         pressView.setAdapter(new ArrayAdapter<ChannelElement>(GameActivity.this, android.R.layout.simple_list_item_1, channels));
                     }
                 }, getResources().getString(R.string.loading_channels));
+    }
+
+    private class PhaseStateAdapter extends BaseAdapter {
+        private List<PhaseState> phaseStates;
+        @Override
+        public int getCount() {
+            return phaseStates.size();
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return phaseStates.get(i);
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return i;
+        }
+
+        private void setEnabled(View row, boolean enabled, int... ids) {
+            for (int i = 0; i < ids.length; i++) {
+                ((CheckBox) row.findViewById(ids[i])).setEnabled(enabled);
+            }
+        }
+
+        @Override
+        public View getView(final int i, View view, ViewGroup viewGroup) {
+            View row = view;
+            if (row == null) {
+                row = getLayoutInflater().inflate(R.layout.phase_state_row, viewGroup, false);
+            }
+            User user = null;
+            for (Member member : game.Members) {
+                if (member.Nation.equals(phaseStates.get(i).Nation)) {
+                    user = member.User;
+                    break;
+                }
+            }
+            if (user != null) {
+                ((UserView) row.findViewById(R.id.user)).setUser(GameActivity.this, user);
+            }
+            ((CheckBox) row.findViewById(R.id.ready_to_resolve)).setChecked(phaseStates.get(i).ReadyToResolve);
+            ((CheckBox) row.findViewById(R.id.wants_dias)).setChecked(phaseStates.get(i).WantsDIAS);
+            ((CheckBox) row.findViewById(R.id.on_probation)).setChecked(phaseStates.get(i).OnProbation);
+            if (!phaseMeta.Resolved && user.Id.equals(App.loggedInUser.Id)) {
+                setEnabled(row, true, R.id.ready_to_resolve, R.id.wants_dias);
+                setEnabled(row, false, R.id.on_probation);
+                ((CheckBox) row.findViewById(R.id.ready_to_resolve)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                        phaseStates.get(i).ReadyToResolve = b;
+                        handleReq(
+                                phaseStateService.PhaseStateUpdate(phaseStates.get(i), game.ID, phaseMeta.PhaseOrdinal.toString(), phaseStates.get(i).Nation),
+                                new Sendable<SingleContainer<PhaseState>>() {
+                                    @Override
+                                    public void send(SingleContainer<PhaseState> phaseStateSingleContainer) {
+
+                                    }
+                                }, getResources().getString(R.string.updating_phase_state));
+                    }
+                });
+                ((CheckBox) row.findViewById(R.id.wants_dias)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                        phaseStates.get(i).WantsDIAS = b;
+                        handleReq(
+                                phaseStateService.PhaseStateUpdate(phaseStates.get(i), game.ID, phaseMeta.PhaseOrdinal.toString(), phaseStates.get(i).Nation),
+                                new Sendable<SingleContainer<PhaseState>>() {
+                                    @Override
+                                    public void send(SingleContainer<PhaseState> phaseStateSingleContainer) {
+
+                                    }
+                                }, getResources().getString(R.string.updating_phase_state));
+                    }
+                });
+            } else {
+                setEnabled(row, false, R.id.ready_to_resolve, R.id.wants_dias, R.id.on_probation);
+            }
+            return row;
+        }
+
+    }
+
+    public void showPhaseStates() {
+        hideAllExcept(R.id.phase_state_view);
+
+        final ListView phaseStateView = (ListView) findViewById(R.id.phase_state_view);
+        phaseStateView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                flickFrameLayout.onTouchEvent(motionEvent);
+                phaseStateView.onTouchEvent(motionEvent);
+                return true;
+            }
+        });
+
+        handleReq(
+                phaseStateService.ListPhaseStates(game.ID, phaseMeta.PhaseOrdinal.toString()),
+                new Sendable<MultiContainer<PhaseState>>() {
+                    @Override
+                    public void send(MultiContainer<PhaseState> phaseStateMultiContainer) {
+                        List<PhaseState> phaseStates = new ArrayList<PhaseState>();
+                        for (SingleContainer<PhaseState> phaseStateSingleContainer : phaseStateMultiContainer.Properties) {
+                            phaseStates.add(phaseStateSingleContainer.Properties);
+                        }
+                        PhaseStateAdapter adapter = new PhaseStateAdapter();
+                        adapter.phaseStates = phaseStates;
+                        phaseStateView.setAdapter(adapter);
+                    }
+                }, getResources().getString(R.string.loading_phase_settings));
     }
 
     public void showPhases(boolean loadPhases) {
@@ -741,6 +864,8 @@ public class GameActivity extends RetrofitActivity
             showPhaseResults();
         } else if (id == R.id.nav_game_result) {
             showGameResults();
+        } else if (id == R.id.nav_phase_settings) {
+            showPhaseStates();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

@@ -163,6 +163,13 @@
         </ScrollView>
 
         <ListView
+            android:id="@+id/phase_state_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </ListView>
+
+        <ListView
             android:id="@+id/phases_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent">

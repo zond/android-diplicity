@@ -104,4 +104,9 @@
     <string name="game_settings">Game settings</string>
     <string name="_scs">%s SCs</string>
     <string name="_points">%s points</string>
+    <string name="loading_phase_settings">Loading phase settings</string>
+    <string name="ready_to_resolve">Ready to resolve</string>
+    <string name="wants_dias">Wants DIAS</string>
+    <string name="on_probation">On probation</string>
+    <string name="updating_phase_state">Updating phase state</string>
 </resources>

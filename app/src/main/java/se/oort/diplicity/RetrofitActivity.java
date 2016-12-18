@@ -20,9 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.io.Serializable;
-import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URL;
@@ -57,6 +55,7 @@ import se.oort.diplicity.apigen.MultiContainer;
 import se.oort.diplicity.apigen.OrderService;
 import se.oort.diplicity.apigen.PhaseResultService;
 import se.oort.diplicity.apigen.PhaseService;
+import se.oort.diplicity.apigen.PhaseStateService;
 import se.oort.diplicity.apigen.User;
 import se.oort.diplicity.apigen.UserStatsService;
 
@@ -84,6 +83,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     public MessageService messageService;
     public PhaseResultService phaseResultService;
     public GameResultService gameResultService;
+    public PhaseStateService phaseStateService;
 
     private SharedPreferences prefs;
     private SharedPreferences.OnSharedPreferenceChangeListener prefsListener;
@@ -295,6 +295,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         messageService = retrofit.create(MessageService.class);
         phaseResultService = retrofit.create(PhaseResultService.class);
         gameResultService = retrofit.create(GameResultService.class);
+        phaseStateService = retrofit.create(PhaseStateService.class);
     }
 
     @Override

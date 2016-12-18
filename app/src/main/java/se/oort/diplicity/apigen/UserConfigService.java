@@ -8,6 +8,6 @@ public interface UserConfigService {
   Observable<SingleContainer<UserConfig>> UserConfigLoad(@Path("user_id") String user_id);
 
   @PUT("/User/{user_id}/UserConfig")
-  Observable<SingleContainer<UserConfig>> UserConfigUpdate(@Path("user_id") String user_id);
+  Observable<SingleContainer<UserConfig>> UserConfigUpdate(@Body UserConfig userconfig, @Path("user_id") String user_id);
 
 }

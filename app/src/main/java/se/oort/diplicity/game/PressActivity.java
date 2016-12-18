@@ -67,7 +67,6 @@ public class PressActivity extends RetrofitActivity {
 
         @Override
         public int getCount() {
-            Log.d("Diplicity", "adapter returning " + messages.size());
             return messages.size();
         }
 
