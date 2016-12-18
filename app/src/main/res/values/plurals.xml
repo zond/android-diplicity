@@ -5,4 +5,9 @@
         <item quantity="one">1 player</item>
         <item quantity="other">%d players</item>
     </plurals>
+    <plurals name="message">
+        <item quantity="zero">0 msgs</item>
+        <item quantity="one">1 msg</item>
+        <item quantity="other">%d msgs</item>
+    </plurals>
 </resources>
