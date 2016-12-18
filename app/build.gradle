@@ -45,11 +45,11 @@ dependencies {
     compile 'io.reactivex:rxjava-joins:0.22.0'
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
+    compile 'com.android.support:appcompat-v7:25.1.0'
+    compile 'com.android.support:design:25.1.0'
+    compile "com.android.support:gridlayout-v7:25.1.0"
+    compile 'com.android.support:recyclerview-v7:25.1.0'
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:25.0.1'
-    compile 'com.android.support:design:25.0.1'
-    compile "com.android.support:gridlayout-v7:25.0.1"
-    compile 'com.android.support:recyclerview-v7:25.0.1'
 }
 
 apply plugin: 'com.google.gms.google-services'
