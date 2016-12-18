@@ -24,19 +24,22 @@ public class MemberTable extends TableLayout {
     private PhaseMeta phaseMeta;
     private Game game;
     private AttributeSet attributeSet;
-    private TableRow.LayoutParams rowParams =
+    private TableRow.LayoutParams wrapContentParams =
             new TableRow.LayoutParams(
                     TableRow.LayoutParams.WRAP_CONTENT,
                     TableRow.LayoutParams.WRAP_CONTENT, 0.0f);
 
+    private void setMargins(TableRow.LayoutParams params) {
+        int margin = getResources().getDimensionPixelSize(R.dimen.member_table_margin);
+        params.bottomMargin = margin;
+        params.topMargin = margin;
+        params.leftMargin = margin;
+        params.rightMargin = margin;
+    }
     public MemberTable(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.attributeSet = attrs;
-        int margin = getResources().getDimensionPixelSize(R.dimen.member_table_margin);
-        rowParams.bottomMargin = margin;
-        rowParams.topMargin = margin;
-        rowParams.leftMargin = margin;
-        rowParams.rightMargin = margin;
+        setMargins(wrapContentParams);
     }
     public void setScores(List<GameScore> scores) {
         this.scores = scores;
@@ -51,18 +54,24 @@ public class MemberTable extends TableLayout {
         for (final Member member : members) {
             boolean rowOK = true;
             TableRow tableRow = new TableRow(retrofitActivity);
+            TableRow.LayoutParams rowParams = new TableRow.LayoutParams(
+                    TableRow.LayoutParams.MATCH_PARENT,
+                    TableRow.LayoutParams.WRAP_CONTENT);
             tableRow.setLayoutParams(rowParams);
+
             UserView userView = new UserView(retrofitActivity, attributeSet);
             TableRow.LayoutParams userParams =
                     new TableRow.LayoutParams(
                             TableRow.LayoutParams.WRAP_CONTENT,
                             TableRow.LayoutParams.WRAP_CONTENT, 1.0f);
+            setMargins(userParams);
             userView.setLayoutParams(userParams);
             userView.setUser(retrofitActivity, member.User);
             tableRow.addView(userView);
+
             if (member.Nation != null && !member.Nation.equals("")) {
                 TextView nation = new TextView(retrofitActivity);
-                nation.setLayoutParams(rowParams);
+                nation.setLayoutParams(wrapContentParams);
                 nation.setText(member.Nation);
                 tableRow.addView(nation);
             }
@@ -76,11 +85,11 @@ public class MemberTable extends TableLayout {
                 }
                 if (foundScore != null) {
                     TextView scs = new TextView(retrofitActivity);
-                    scs.setLayoutParams(rowParams);
+                    scs.setLayoutParams(wrapContentParams);
                     scs.setText(getResources().getString(R.string._scs, foundScore.SCs));
                     tableRow.addView(scs);
                     TextView points = new TextView(retrofitActivity);
-                    points.setLayoutParams(rowParams);
+                    points.setLayoutParams(wrapContentParams);
                     points.setText(getResources().getString(R.string._points, foundScore.Score.intValue()));
                     tableRow.addView(points);
                 }
@@ -97,7 +106,7 @@ public class MemberTable extends TableLayout {
                     final PhaseState finalFoundState = foundState;
                     CheckBox readyToResolve = new CheckBox(retrofitActivity);
                     readyToResolve.setText(R.string.rdy);
-                    readyToResolve.setLayoutParams(rowParams);
+                    readyToResolve.setLayoutParams(wrapContentParams);
                     readyToResolve.setChecked(finalFoundState.ReadyToResolve);
                     if (!phaseMeta.Resolved && App.loggedInUser.Id.equals(member.User.Id)) {
                         readyToResolve.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -119,7 +128,7 @@ public class MemberTable extends TableLayout {
                     tableRow.addView(readyToResolve);
                     CheckBox wantsDIAS = new CheckBox(retrofitActivity);
                     wantsDIAS.setText(R.string.DIAS);
-                    wantsDIAS.setLayoutParams(rowParams);
+                    wantsDIAS.setLayoutParams(wrapContentParams);
                     wantsDIAS.setChecked(finalFoundState.WantsDIAS);
                     if (!phaseMeta.Resolved && App.loggedInUser.Id.equals(member.User.Id)) {
                         wantsDIAS.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -140,7 +149,7 @@ public class MemberTable extends TableLayout {
                     tableRow.addView(wantsDIAS);
                     CheckBox onProbation = new CheckBox(retrofitActivity);
                     onProbation.setText(R.string.nmr);
-                    onProbation.setLayoutParams(rowParams);
+                    onProbation.setLayoutParams(wrapContentParams);
                     onProbation.setChecked(finalFoundState.OnProbation);
                     onProbation.setEnabled(false);
                     tableRow.addView(onProbation);

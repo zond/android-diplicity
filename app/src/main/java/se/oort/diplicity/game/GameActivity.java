@@ -376,19 +376,6 @@ public class GameActivity extends RetrofitActivity
         }
     }
 
-    private class ChannelElement {
-        public ChannelService.Channel channel;
-        public ChannelElement(ChannelService.Channel channel) {
-            this.channel = channel;
-        }
-        public String toString() {
-            return getResources().getString(
-                    R.string.members_unread_total,
-                    TextUtils.join(", ", channel.Members),
-                    channel.NMessagesSince.NMessages, channel.NMessages);
-        }
-    }
-
     public void showPress() {
         hideAllExcept(R.id.press_view);
         if (member != null) {
@@ -441,24 +428,12 @@ public class GameActivity extends RetrofitActivity
                 new Sendable<MultiContainer<ChannelService.Channel>>() {
                     @Override
                     public void send(MultiContainer<ChannelService.Channel> channelMultiContainer) {
-                        final List<ChannelElement> channels = new ArrayList<>();
+                        final List<ChannelService.Channel> channels = new ArrayList<>();
                         for (SingleContainer<ChannelService.Channel> channelSingleContainer : channelMultiContainer.Properties) {
-                            channels.add(new ChannelElement(channelSingleContainer.Properties));
+                            channels.add(channelSingleContainer.Properties);
                         }
-                        ListView pressView = (ListView) findViewById(R.id.press_view);
-                        pressView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                                Intent intent = new Intent(GameActivity.this, PressActivity.class);
-                                intent.putExtra(PressActivity.SERIALIZED_CHANNEL_KEY, serialize(channels.get(i).channel));
-                                intent.putExtra(PressActivity.SERIALIZED_GAME_KEY, serialize(game));
-                                if (member != null) {
-                                    intent.putExtra(PressActivity.SERIALIZED_MEMBER_KEY, serialize(member));
-                                }
-                                startActivity(intent);
-                            }
-                        });
-                        pressView.setAdapter(new ArrayAdapter<ChannelElement>(GameActivity.this, android.R.layout.simple_list_item_1, channels));
+                        ChannelTable channelTable = (ChannelTable) findViewById(R.id.press_channel_table);
+                        channelTable.setChannels(GameActivity.this, game, member, channels);
                     }
                 }, getResources().getString(R.string.loading_channels));
     }

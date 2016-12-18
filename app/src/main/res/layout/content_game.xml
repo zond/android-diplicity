@@ -175,17 +175,14 @@
         </ListView>
 
         <RelativeLayout
+            android:id="@+id/press_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <ListView
-                android:id="@+id/press_view"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentBottom="true"
+            <se.oort.diplicity.game.ChannelTable
+                android:id="@+id/press_channel_table"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-            </ListView>
+                android:layout_height="wrap_content"/>
 
             <android.support.design.widget.FloatingActionButton
                 xmlns:app="http://schemas.android.com/apk/res-auto"

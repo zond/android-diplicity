@@ -112,4 +112,6 @@
     <string name="DIAS">DIAS</string>
     <string name="probation">Probation</string>
     <string name="rdy">RDY</string>
+    <string name="_messages">%1s msgs</string>
+    <string name="_unread">%1s unread</string>
 </resources>
