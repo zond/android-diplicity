@@ -2,16 +2,12 @@ package se.oort.diplicity;
 
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,7 +27,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
         TextView desc, variant, deadline, state, rating,
                 minReliability, minQuickness, maxHated, maxHater,
                 ratingLabel, minReliabilityLabel, minQuicknessLabel,
-                maxHatedLabel, maxHaterLabel;
+                maxHatedLabel, maxHaterLabel, nextDeadline;
         MemberTable members;
         RelativeLayout expanded;
         View.OnClickListener delegateClickListener;
@@ -42,6 +38,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             desc = (TextView) view.findViewById(R.id.desc);
             variant = (TextView) view.findViewById(R.id.variant);
             deadline = (TextView) view.findViewById(R.id.deadline);
+            nextDeadline = (TextView) view.findViewById(R.id.next_deadline);
             state = (TextView) view.findViewById(R.id.state);
             rating = (TextView) view.findViewById(R.id.rating);
             minReliability = (TextView) view.findViewById(R.id.min_reliability);
@@ -65,7 +62,10 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                 desc.setText(game.Properties.Desc);
             }
             if (game.Properties.MinRating != 0 || game.Properties.MaxRating != 0) {
-                rating.setText(ctx.getResources().getString(R.string.x_to_y, game.Properties.MinRating, game.Properties.MaxRating));
+                rating.setText(ctx.getResources().getString(
+                        R.string.x_to_y,
+                        retrofitActivity.toString(game.Properties.MinRating),
+                        retrofitActivity.toString(game.Properties.MaxRating)));
                 rating.setVisibility(View.VISIBLE);
                 ratingLabel.setVisibility(View.VISIBLE);
             } else {
@@ -73,7 +73,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                 ratingLabel.setVisibility(View.GONE);
             }
             if (game.Properties.MinRating != 0) {
-                minReliability.setText("" + game.Properties.MinReliability);
+                minReliability.setText(retrofitActivity.toString(game.Properties.MinReliability));
                 minReliability.setVisibility(View.VISIBLE);
                 minReliabilityLabel.setVisibility(View.VISIBLE);
             } else {
@@ -81,7 +81,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                 minReliabilityLabel.setVisibility(View.GONE);
             }
             if (game.Properties.MinQuickness != 0) {
-                minQuickness.setText("" + game.Properties.MinQuickness);
+                minQuickness.setText(retrofitActivity.toString(game.Properties.MinQuickness));
                 minQuickness.setVisibility(View.VISIBLE);
                 minQuicknessLabel.setVisibility(View.VISIBLE);
             } else {
@@ -89,7 +89,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                 minQuicknessLabel.setVisibility(View.GONE);
             }
             if (game.Properties.MaxHated != 0) {
-                maxHated.setText("" + game.Properties.MaxHated);
+                maxHated.setText(retrofitActivity.toString(game.Properties.MaxHated));
                 maxHated.setVisibility(View.VISIBLE);
                 maxHatedLabel.setVisibility(View.VISIBLE);
             } else {
@@ -97,7 +97,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                 maxHatedLabel.setVisibility(View.GONE);
             }
             if (game.Properties.MaxHater != 0) {
-                maxHater.setText("" + game.Properties.MaxHater);
+                maxHater.setText(retrofitActivity.toString(game.Properties.MaxHater));
                 maxHater.setVisibility(View.VISIBLE);
                 maxHaterLabel.setVisibility(View.VISIBLE);
             } else {
@@ -107,27 +107,17 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
 
             variant.setText(game.Properties.Variant);
 
-            long days = game.Properties.PhaseLengthMinutes / (60 * 24);
-            long hours = (game.Properties.PhaseLengthMinutes - (60 * 24 * days)) / 60;
-            long minutes = game.Properties.PhaseLengthMinutes - (60 * 24 * days) - (60 * hours);
-            List<String> timeLabelList = new ArrayList<String>();
-            if (days > 0) {
-                timeLabelList.add("" + days + "d");
+            deadline.setText(App.minutesToDuration(game.Properties.PhaseLengthMinutes.intValue()));
+
+            if (
+                    game.Properties.Started &&
+                    game.Properties.NewestPhaseMeta.size() > 0 &&
+                    game.Properties.NewestPhaseMeta.get(0).NextDeadlineIn > 0) {
+                nextDeadline.setText(App.nanosToDuration(game.Properties.NewestPhaseMeta.get(0).NextDeadlineIn));
+                nextDeadline.setVisibility(View.VISIBLE);
+            } else {
+                nextDeadline.setVisibility(View.GONE);
             }
-            if (hours > 0) {
-                timeLabelList.add("" + hours + "h");
-            }
-            if (minutes > 0) {
-                timeLabelList.add("" + minutes + "m");
-            }
-            StringBuffer timeLabel = new StringBuffer();
-            for (int i = 0; i < timeLabelList.size(); i++) {
-                timeLabel.append(timeLabelList.get(i));
-                if (i < timeLabelList.size() - 1) {
-                    timeLabel.append(", ");
-                }
-            }
-            deadline.setText(timeLabel.toString());
 
             if (!game.Properties.Started) {
                 state.setText(ctx.getResources().getQuantityString(R.plurals.player, game.Properties.NMembers.intValue(), game.Properties.NMembers));

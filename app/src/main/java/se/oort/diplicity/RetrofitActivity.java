@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import okhttp3.HttpUrl;
@@ -256,6 +257,13 @@ public abstract class RetrofitActivity extends AppCompatActivity {
 
     public <T> void handleReq(Observable<T> req, final Sendable<T> handler, final ErrorHandler onError, final String progressMessage) {
         observe(req, handler, newProgressAndToastHandler(onError, progressMessage));
+    }
+
+    public String toString(Double d) {
+        return String.format(
+                Locale.getDefault(),
+                getResources().getString(R.string.float_format),
+                d);
     }
 
     protected void setBaseURL(String baseURL) {

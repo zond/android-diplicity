@@ -90,7 +90,7 @@ public class MemberTable extends TableLayout {
                     tableRow.addView(scs);
                     TextView points = new TextView(retrofitActivity);
                     points.setLayoutParams(wrapContentParams);
-                    points.setText(getResources().getString(R.string._points, foundScore.Score.intValue()));
+                    points.setText(getResources().getString(R.string._points, retrofitActivity.toString(foundScore.Score)));
                     tableRow.addView(points);
                 }
             }
