@@ -6,7 +6,9 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,6 +20,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
@@ -25,6 +28,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -136,12 +140,32 @@ public class GameActivity extends RetrofitActivity
         }
     }
 
-    public void draw() {
+    public void setGameTitle() {
         if (phaseMeta != null) {
-            setTitle(getResources().getString(R.string.desc_season_year_type, game.Desc, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type));
+            if (game.Desc == null || game.Desc.equals("")) {
+                if (phaseMeta.NextDeadlineIn.nanos == 0) {
+                    setTitle(getResources().getString(R.string.season_year_type, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type));
+                } else {
+                    setTitle(getResources().getString(R.string.season_year_type_deadline, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type, App.nanosToDuration(phaseMeta.NextDeadlineIn.nanosLeft())));
+                }
+            } else {
+                if (phaseMeta.NextDeadlineIn.nanos == 0) {
+                    setTitle(getResources().getString(R.string.desc_season_year_type, game.Desc, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type));
+                } else {
+                    setTitle(getResources().getString(R.string.desc_season_year_type_deadline, game.Desc, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type, App.nanosToDuration(phaseMeta.NextDeadlineIn.nanosLeft())));
+                }
+            }
         } else {
-            setTitle(game.Desc);
+            if (game.Desc == null || game.Desc.equals("")) {
+                setTitle(R.string.untitled);
+            } else {
+                setTitle(game.Desc);
+            }
         }
+    }
+
+    public void draw() {
+        setGameTitle();
 
         for (Member m : game.Members) {
             if (m.User.Id.equals(App.loggedInUser.Id)) {

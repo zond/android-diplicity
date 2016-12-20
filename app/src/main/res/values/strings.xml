@@ -115,4 +115,7 @@
     <string name="_messages">%1s msgs</string>
     <string name="_unread">%1s unread</string>
     <string name="float_format">%1$.2f</string>
+    <string name="untitled">Untitled</string>
+    <string name="desc_season_year_type_deadline">%1$s: %2$s %3$s, %4$s (%5$s)</string>
+    <string name="season_year_type_deadline">%1$s %2$s, %3$s (%4$s)</string>
 </resources>
