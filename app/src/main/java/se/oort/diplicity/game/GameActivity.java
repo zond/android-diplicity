@@ -6,9 +6,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,13 +17,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -52,7 +45,6 @@ import se.oort.diplicity.OptionsService;
 import se.oort.diplicity.R;
 import se.oort.diplicity.RetrofitActivity;
 import se.oort.diplicity.Sendable;
-import se.oort.diplicity.UserView;
 import se.oort.diplicity.VariantService;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.GameResult;
@@ -66,7 +58,6 @@ import se.oort.diplicity.apigen.PhaseResult;
 import se.oort.diplicity.apigen.PhaseState;
 import se.oort.diplicity.apigen.Resolution;
 import se.oort.diplicity.apigen.SingleContainer;
-import se.oort.diplicity.apigen.User;
 
 public class GameActivity extends RetrofitActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -140,32 +131,35 @@ public class GameActivity extends RetrofitActivity
         }
     }
 
-    public void setGameTitle() {
+    public String gameTitle() {
+        if (game == null) {
+            return getResources().getString(R.string.untitled);
+        }
         if (phaseMeta != null) {
             if (game.Desc == null || game.Desc.equals("")) {
                 if (phaseMeta.NextDeadlineIn.nanos == 0) {
-                    setTitle(getResources().getString(R.string.season_year_type, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type));
+                    return getResources().getString(R.string.season_year_type, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type);
                 } else {
-                    setTitle(getResources().getString(R.string.season_year_type_deadline, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type, App.nanosToDuration(phaseMeta.NextDeadlineIn.nanosLeft())));
+                    return getResources().getString(R.string.season_year_type_deadline, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type, App.nanosToDuration(phaseMeta.NextDeadlineIn.nanosLeft()));
                 }
             } else {
                 if (phaseMeta.NextDeadlineIn.nanos == 0) {
-                    setTitle(getResources().getString(R.string.desc_season_year_type, game.Desc, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type));
+                    return getResources().getString(R.string.desc_season_year_type, game.Desc, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type);
                 } else {
-                    setTitle(getResources().getString(R.string.desc_season_year_type_deadline, game.Desc, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type, App.nanosToDuration(phaseMeta.NextDeadlineIn.nanosLeft())));
+                    return getResources().getString(R.string.desc_season_year_type_deadline, game.Desc, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type, App.nanosToDuration(phaseMeta.NextDeadlineIn.nanosLeft()));
                 }
             }
         } else {
             if (game.Desc == null || game.Desc.equals("")) {
-                setTitle(R.string.untitled);
+                return getResources().getString(R.string.untitled);
             } else {
-                setTitle(game.Desc);
+                return game.Desc;
             }
         }
     }
 
     public void draw() {
-        setGameTitle();
+        setTitle(gameTitle());
 
         for (Member m : game.Members) {
             if (m.User.Id.equals(App.loggedInUser.Id)) {
@@ -182,9 +176,30 @@ public class GameActivity extends RetrofitActivity
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        final ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.setDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                toggle.onDrawerSlide(drawerView, slideOffset);
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                ((TextView) findViewById(R.id.nav_title)).setText(gameTitle());
+                toggle.onDrawerOpened(drawerView);
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                toggle.onDrawerClosed(drawerView);
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+                toggle.onDrawerStateChanged(newState);
+            }
+        });
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
