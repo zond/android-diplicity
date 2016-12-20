@@ -39,6 +39,7 @@ import se.oort.diplicity.apigen.MultiContainer;
 import se.oort.diplicity.apigen.Phase;
 import se.oort.diplicity.apigen.PhaseMeta;
 import se.oort.diplicity.apigen.SingleContainer;
+import se.oort.diplicity.apigen.Ticker;
 
 public class PressActivity extends RetrofitActivity {
 
@@ -86,9 +87,6 @@ public class PressActivity extends RetrofitActivity {
             if (row == null) {
                 row = getLayoutInflater().inflate(R.layout.message_list_row, viewGroup, false);
             }
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(new Date());
-            cal.add(Calendar.SECOND, (int) -(messages.get(i).Age / 1000000000));
 
             String url = null;
             for (Member member : game.Members) {
@@ -98,7 +96,7 @@ public class PressActivity extends RetrofitActivity {
             }
 
             ((TextView) row.findViewById(R.id.body)).setText(messages.get(i).Body);
-            ((TextView) row.findViewById(R.id.at)).setText(cal.getTime().toString());
+            ((TextView) row.findViewById(R.id.at)).setText(messages.get(i).Age.deadlineAt().toString());
             ((TextView) row.findViewById(R.id.sender)).setText(getResources().getString(R.string.x_, messages.get(i).Sender));
             if (url != null) {
                 PressActivity.this.populateImage((ImageView) row.findViewById(R.id.avatar), url);
@@ -140,7 +138,7 @@ public class PressActivity extends RetrofitActivity {
                     message.Body = ((EditText) findViewById(R.id.new_message_body)).getText().toString();
                     message.ChannelMembers = channel.Members;
                     message.CreatedAt = new Date();
-                    message.Age = (long) 0;
+                    message.Age = new Ticker(new Date(), (long) 0);
                     message.GameID = channel.GameID;
                     message.Sender = member.Nation;
                     handleReq(

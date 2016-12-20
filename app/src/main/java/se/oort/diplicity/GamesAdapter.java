@@ -112,8 +112,8 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             if (
                     game.Properties.Started &&
                     game.Properties.NewestPhaseMeta.size() > 0 &&
-                    game.Properties.NewestPhaseMeta.get(0).NextDeadlineIn > 0) {
-                nextDeadline.setText(App.nanosToDuration(game.Properties.NewestPhaseMeta.get(0).NextDeadlineIn));
+                    game.Properties.NewestPhaseMeta.get(0).NextDeadlineIn.nanosLeft() > 0) {
+                nextDeadline.setText(App.nanosToDuration(game.Properties.NewestPhaseMeta.get(0).NextDeadlineIn.nanosLeft()));
                 nextDeadline.setVisibility(View.VISIBLE);
             } else {
                 nextDeadline.setVisibility(View.GONE);

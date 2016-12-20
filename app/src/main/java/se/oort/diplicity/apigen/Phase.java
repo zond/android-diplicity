@@ -9,7 +9,7 @@ public class Phase implements java.io.Serializable {
   public String Type;
   public Boolean Resolved;
   public java.util.Date DeadlineAt;
-  public Long NextDeadlineIn;
+  public Ticker NextDeadlineIn;
   public String UnitsJSON;
   public String SCsJSON;
   public String GameID;

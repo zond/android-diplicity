@@ -15,6 +15,9 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -57,6 +60,8 @@ import se.oort.diplicity.apigen.OrderService;
 import se.oort.diplicity.apigen.PhaseResultService;
 import se.oort.diplicity.apigen.PhaseService;
 import se.oort.diplicity.apigen.PhaseStateService;
+import se.oort.diplicity.apigen.Ticker;
+import se.oort.diplicity.apigen.TickerUnserializer;
 import se.oort.diplicity.apigen.User;
 import se.oort.diplicity.apigen.UserStatsService;
 
@@ -285,9 +290,13 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                 return chain.proceed(toIssue);
             }
         });
+        final Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Ticker.class, new TickerUnserializer())
+                .create();
+
         retrofit = new Retrofit.Builder()
                 .baseUrl(baseURL)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(adapterFactory)
                 .client(builder.build())
                 .build();

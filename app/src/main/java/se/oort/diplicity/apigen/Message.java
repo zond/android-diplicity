@@ -9,5 +9,5 @@ public class Message implements java.io.Serializable {
   public String Sender;
   public String Body;
   public java.util.Date CreatedAt;
-  public Long Age;
+  public Ticker Age;
 }

@@ -62,7 +62,7 @@ public class ChannelTable extends TableLayout {
 
             TextView messages = new TextView(retrofitActivity);
             messages.setLayoutParams(wrapContentParams);
-            messages.setText(getResources().getQuantityString(R.plurals.message, channel.NMessages));
+            messages.setText(getResources().getQuantityString(R.plurals.message, channel.NMessages, channel.NMessages));
             tableRow.addView(messages);
 
             TextView unread = new TextView(retrofitActivity);
