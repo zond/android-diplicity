@@ -118,4 +118,10 @@
     <string name="untitled">Untitled</string>
     <string name="desc_season_year_type_deadline">%1$s: %2$s %3$s, %4$s (%5$s)</string>
     <string name="season_year_type_deadline">%1$s %2$s, %3$s (%4$s)</string>
+    <string name="loading_game_settings">Loading game settings</string>
+    <string name="muted">Muted</string>
+    <string name="updating_game_state">Updating game state</string>
+    <string name="update">Update</string>
+    <string name="channels">Channels</string>
+    <string name="members">Members</string>
 </resources>

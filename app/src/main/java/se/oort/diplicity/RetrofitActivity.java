@@ -53,6 +53,7 @@ import rx.observables.JoinObservable;
 import rx.schedulers.Schedulers;
 import se.oort.diplicity.apigen.GameResultService;
 import se.oort.diplicity.apigen.GameService;
+import se.oort.diplicity.apigen.GameStateService;
 import se.oort.diplicity.apigen.MemberService;
 import se.oort.diplicity.apigen.MessageService;
 import se.oort.diplicity.apigen.MultiContainer;
@@ -90,6 +91,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     public PhaseResultService phaseResultService;
     public GameResultService gameResultService;
     public PhaseStateService phaseStateService;
+    public GameStateService gameStateService;
 
     private SharedPreferences prefs;
     private SharedPreferences.OnSharedPreferenceChangeListener prefsListener;
@@ -313,6 +315,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         phaseResultService = retrofit.create(PhaseResultService.class);
         gameResultService = retrofit.create(GameResultService.class);
         phaseStateService = retrofit.create(PhaseStateService.class);
+        gameStateService = retrofit.create(GameStateService.class);
     }
 
     @Override

@@ -71,7 +71,7 @@ public class ChannelTable extends TableLayout {
             tableRow.addView(unread);
 
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            FloatingActionButton button = (FloatingActionButton) inflater.inflate(R.layout.channel_expand_button, null);
+            FloatingActionButton button = (FloatingActionButton) inflater.inflate(R.layout.expand_button, null);
             button.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {

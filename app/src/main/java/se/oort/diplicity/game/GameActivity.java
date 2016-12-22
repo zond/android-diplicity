@@ -1,7 +1,9 @@
 package se.oort.diplicity.game;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -13,6 +15,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -20,7 +23,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +35,7 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -48,6 +55,7 @@ import se.oort.diplicity.Sendable;
 import se.oort.diplicity.VariantService;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.GameResult;
+import se.oort.diplicity.apigen.GameState;
 import se.oort.diplicity.apigen.Link;
 import se.oort.diplicity.apigen.Member;
 import se.oort.diplicity.apigen.MultiContainer;
@@ -90,6 +98,12 @@ public class GameActivity extends RetrofitActivity
 
         byte[] serializedGame = getIntent().getByteArrayExtra(SERIALIZED_GAME_KEY);
         game = (Game) unserialize(serializedGame);
+        Collections.sort(game.Members, new Comparator<Member>() {
+            @Override
+            public int compare(Member member, Member t1) {
+                return member.Nation.compareTo(t1.Nation);
+            }
+        });
         byte[] serializedPhaseMeta = getIntent().getByteArrayExtra(SERIALIZED_PHASE_META_KEY);
         if (serializedPhaseMeta != null) {
             phaseMeta = (PhaseMeta) unserialize(serializedPhaseMeta);
@@ -272,7 +286,8 @@ public class GameActivity extends RetrofitActivity
                 R.id.press_view,
                 R.id.phase_results_view,
                 R.id.game_results_view,
-                R.id.phase_state_view
+                R.id.phase_state_view,
+                R.id.game_state_view
         }) {
             if (viewID == toShow) {
                 findViewById(viewID).setVisibility(View.VISIBLE);
@@ -436,7 +451,9 @@ public class GameActivity extends RetrofitActivity
                                 public void onClick(DialogInterface dialogInterface, int i, boolean b) {
                                     checked[i] = b;
                                 }
-                            }).setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
+                            })
+                            .setTitle(R.string.members)
+                            .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int j) {
                             List<String> channelMembers = new ArrayList<String>();
@@ -475,6 +492,112 @@ public class GameActivity extends RetrofitActivity
                         channelTable.setChannels(GameActivity.this, game, member, channels);
                     }
                 }, getResources().getString(R.string.loading_channels));
+    }
+
+    public void showGameStates() {
+        hideAllExcept(R.id.game_state_view);
+
+        handleReq(
+                gameStateService.ListGameStates(game.ID),
+                new Sendable<MultiContainer<GameState>>() {
+                    @Override
+                    public void send(MultiContainer<GameState> gameStateMultiContainer) {
+                        GameState myState = null;
+                        TableLayout mutedTable = (TableLayout) findViewById(R.id.muted_table);
+                        mutedTable.removeAllViews();
+                        FloatingActionButton button = ((FloatingActionButton) mutedTable.findViewById(R.id.open_button));
+                        if (button != null) {
+                            mutedTable.removeView(button);
+                        }
+                        final List<String> nations = new ArrayList<String>();
+                        for (Member thisMember : game.Members) {
+                            if (!thisMember.Nation.equals(member.Nation)) {
+                                nations.add(thisMember.Nation);
+                            }
+                            GameState foundState = null;
+                            for (SingleContainer<GameState> singleContainer : gameStateMultiContainer.Properties) {
+                                if (singleContainer.Properties.Nation.equals(thisMember.Nation)) {
+                                    foundState = singleContainer.Properties;
+                                }
+                            }
+                            if (thisMember.Nation.equals(member.Nation)) {
+                                myState = foundState;
+                            }
+                            TableRow.LayoutParams params =
+                                    new TableRow.LayoutParams(
+                                            TableRow.LayoutParams.WRAP_CONTENT,
+                                            TableRow.LayoutParams.WRAP_CONTENT, 1.0f);
+                            int margin = getResources().getDimensionPixelSize(R.dimen.muted_table_margin);
+                            params.bottomMargin = margin;
+                            params.topMargin = margin;
+                            params.leftMargin = margin;
+                            params.rightMargin = margin;
+                            TableRow tableRow = new TableRow(GameActivity.this);
+                            tableRow.setLayoutParams(params);
+                            TextView nation = new TextView(GameActivity.this);
+                            nation.setText(getResources().getString(R.string.x_, thisMember.Nation));
+                            nation.setLayoutParams(params);
+                            tableRow.addView(nation);
+                            TextView muteds = new TextView(GameActivity.this);
+                            muteds.setLayoutParams(params);
+                            if (foundState != null && foundState.Muted != null) {
+                                muteds.setText(TextUtils.join(", ", foundState.Muted));
+                            } else {
+                                muteds.setText("");
+                            }
+                            tableRow.addView(muteds);
+                            mutedTable.addView(tableRow);
+                        }
+                        final GameState finalMyState = myState;
+                        if (finalMyState != null) {
+                            ((FloatingActionButton) findViewById(R.id.edit_game_state_button)).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    final boolean[] checked = new boolean[nations.size()];
+                                    if (finalMyState.Muted != null) {
+                                        for (String muted : finalMyState.Muted) {
+                                            int pos = nations.indexOf(muted);
+                                            if (pos > 0) {
+                                                checked[nations.indexOf(muted)] = true;
+                                            }
+                                        }
+                                    }
+                                    final AlertDialog dialog = new AlertDialog.Builder(GameActivity.this).setMultiChoiceItems(
+                                            nations.toArray(new String[]{}),
+                                            checked,
+                                            new DialogInterface.OnMultiChoiceClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialogInterface, int i, boolean b) {
+                                                    checked[i] = b;
+                                                }
+                                            })
+                                            .setTitle(R.string.muted)
+                                            .setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int j) {
+                                            List<String> mutedMembers = new ArrayList<String>();
+                                            for (int i = 0; i < checked.length; i++) {
+                                                if (checked[i]) {
+                                                    mutedMembers.add(nations.get(i));
+                                                }
+                                            }
+                                            Collections.sort(mutedMembers);
+                                            finalMyState.Muted = mutedMembers;
+                                            handleReq(
+                                                    gameStateService.GameStateUpdate(finalMyState, game.ID, finalMyState.Nation),
+                                                    new Sendable<SingleContainer<GameState>>() {
+                                                        @Override
+                                                        public void send(SingleContainer<GameState> gameStateSingleContainer) {
+                                                            showGameStates();
+                                                        }
+                                                    }, getResources().getString(R.string.updating_game_state));
+                                        }
+                                    }).show();
+                                }
+                            });
+                        }
+                    }
+                }, getResources().getString(R.string.loading_game_settings));
     }
 
     public void showPhaseStates() {
@@ -790,6 +913,8 @@ public class GameActivity extends RetrofitActivity
             showGameResults();
         } else if (id == R.id.nav_phase_settings) {
             showPhaseStates();
+        } else if (id == R.id.nav_game_settings) {
+            showGameStates();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
