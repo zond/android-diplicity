@@ -5,7 +5,6 @@ dependencies:
     - echo y | android update sdk --no-ui --all --filter "build-tools-25.0.1"
     - echo y | android update sdk --no-ui --all --filter "extra-android-m2repository"
     - echo y | android update sdk --no-ui --all --filter "extra-google-m2repository"
-    - go get github.com/prasmussen/gdrive
 
 test:
   override:
@@ -21,4 +20,4 @@ deployment:
   production:
     branch: master
     commands:
-      - ./circle/upload_to_drive.sh
+      - ./circle/create_release.sh
