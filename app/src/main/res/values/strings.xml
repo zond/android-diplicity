@@ -124,4 +124,5 @@
     <string name="update">Update</string>
     <string name="channels">Channels</string>
     <string name="members">Members</string>
+    <string name="phase_length_must_be_less_than_30_days">Phase length must be less than 30 days</string>
 </resources>
