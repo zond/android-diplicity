@@ -101,7 +101,7 @@ func (r *release) create() error {
 	}
 	buf := &bytes.Buffer{}
 	fmt.Fprintf(buf, "Download [build-%s-%s-%s.apk](%s)\n\n", r.build, r.tag, r.shortSHA, r.webContentLink)
-	for _, commit := range commits[1:] {
+	for _, commit := range commits[:len(commits)-1] {
 		fmt.Fprintln(buf, *commit.Commit.Message)
 		fmt.Fprintf(buf, "  -- %s @ %s\n\n", *commit.Commit.Committer.Name, *commit.Commit.Committer.Date)
 	}
