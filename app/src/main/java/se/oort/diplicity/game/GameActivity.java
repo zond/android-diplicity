@@ -327,7 +327,7 @@ public class GameActivity extends RetrofitActivity
             order.Nation = member.Nation;
             order.PhaseOrdinal = phaseMeta.PhaseOrdinal;
             order.Parts = parts;
-            orders.put(parts.get(0), order);
+            orders.put(province, order);
             handleReq(
                     orderService.OrderCreate(order, game.ID, phaseMeta.PhaseOrdinal.toString()),
                     handler, getResources().getString(R.string.saving_order));
@@ -370,6 +370,9 @@ public class GameActivity extends RetrofitActivity
                                 String newSrcProvince = srcProvince;
                                 if (newSrcProvince == null) {
                                     newSrcProvince = s;
+                                    if (newSrcProvince.indexOf('/') != -1) {
+                                        newSrcProvince = newSrcProvince.substring(0, newSrcProvince.indexOf('/'));
+                                    }
                                 }
                                 completeOrder(prefix, next, newSrcProvince);
                             }
@@ -405,6 +408,10 @@ public class GameActivity extends RetrofitActivity
                 }
             }).show();
         } else if (optionType.equals("SrcProvince")) {
+            if (optionValues.size() != 1) {
+                throw new RuntimeException("Multiple SrcProvince options: " + optionValues);
+            }
+            prefix.set(0, optionValues.iterator().next());
             Map<String, OptionsService.Option> next = opts.get(optionValues.iterator().next()).Next;
             if (next == null || next.isEmpty()) {
                 setOrder(srcProvince, prefix);
@@ -858,7 +865,11 @@ public class GameActivity extends RetrofitActivity
                                 options = opts.Properties;
                                 orders.clear();
                                 for (SingleContainer<Order> orderContainer : ords.Properties) {
-                                    orders.put(orderContainer.Properties.Parts.get(0), orderContainer.Properties);
+                                    String srcProvince = orderContainer.Properties.Parts.get(0);
+                                    if (srcProvince.indexOf('/') != -1) {
+                                        srcProvince = srcProvince.substring(0, srcProvince.indexOf('/'));
+                                    }
+                                    orders.put(srcProvince, orderContainer.Properties);
                                 }
                                 return null;
                             }
