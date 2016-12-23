@@ -15,6 +15,8 @@ public class App extends Application {
     public static String authToken;
     public static String baseURL;
     public static User loggedInUser;
+    public static boolean localDevelopmentMode;
+    public static String localDevelopmentModeFakeID;
     public static MultiContainer<VariantService.Variant> variants;
 
     public static String nanosToDuration(long nanos) {

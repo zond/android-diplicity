@@ -854,7 +854,11 @@ public class GameActivity extends RetrofitActivity
         };
 
         if (game.Started) {
-            renderer.send(App.baseURL + "Game/" + game.ID + "/Phase/" + phaseMeta.PhaseOrdinal + "/Map");
+            String url = App.baseURL + "Game/" + game.ID + "/Phase/" + phaseMeta.PhaseOrdinal + "/Map";
+            if (App.localDevelopmentMode && App.localDevelopmentModeFakeID != null && !App.localDevelopmentModeFakeID.equals("")) {
+                url = url + "?fake-id=" + App.localDevelopmentModeFakeID;
+            }
+            renderer.send(url);
             if (member != null && !phaseMeta.Resolved) {
                 handleReq(JoinObservable.when(JoinObservable
                         .from(optionsService.GetOptions(game.ID, phaseMeta.PhaseOrdinal.toString()))

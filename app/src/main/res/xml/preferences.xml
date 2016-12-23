@@ -2,7 +2,10 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
   <CheckBoxPreference
       android:title="@string/local_development_mode"
-      android:inputType="textUri"
       android:summary="@string/connect_to_localhost_instead_of_cloud_service"
       android:key="local_development_mode" />
-</PreferenceScreen>
+  <EditTextPreference
+      android:title="@string/local_development_fake_id"
+      android:inputType="text"
+      android:key="local_development_mode_fake_id" />
+ </PreferenceScreen>

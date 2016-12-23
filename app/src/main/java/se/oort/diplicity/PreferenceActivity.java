@@ -13,11 +13,10 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 public class PreferenceActivity extends AppCompatActivity {
-
-    public static final String LOCAL_DEVELOPMENT_MODE = "local_development_mode";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +24,7 @@ public class PreferenceActivity extends AppCompatActivity {
         getFragmentManager().beginTransaction().replace(android.R.id.content, new Fragment()).commit();
     }
 
-    public static class Fragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+    public class Fragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
         @Override
         public void onResume() {
@@ -41,6 +40,10 @@ public class PreferenceActivity extends AppCompatActivity {
                 } else {
                     updatePreference(preference, preference.getKey());
                 }
+            }
+            if (!((CheckBoxPreference) findPreference(RetrofitActivity.LOCAL_DEVELOPMENT_MODE)).isChecked() &&
+                    findPreference(RetrofitActivity.LOCAL_DEVELOPMENT_MODE_FAKE_ID) != null) {
+                getPreferenceScreen().removePreference(findPreference(RetrofitActivity.LOCAL_DEVELOPMENT_MODE_FAKE_ID));
             }
         }
 
@@ -60,11 +63,19 @@ public class PreferenceActivity extends AppCompatActivity {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             updatePreference(findPreference(key), key);
-            if (key.equals(LOCAL_DEVELOPMENT_MODE)) {
-                if (sharedPreferences.getBoolean(LOCAL_DEVELOPMENT_MODE, false)) {
+            if (key.equals(RetrofitActivity.LOCAL_DEVELOPMENT_MODE)) {
+                if (sharedPreferences.getBoolean(RetrofitActivity.LOCAL_DEVELOPMENT_MODE, false)) {
                     sharedPreferences.edit().putString(RetrofitActivity.API_URL_KEY, RetrofitActivity.LOCAL_DEVELOPMENT_URL).apply();
+                    EditTextPreference fakeIDPref = new EditTextPreference(getActivity());
+                    fakeIDPref.setKey(RetrofitActivity.LOCAL_DEVELOPMENT_MODE_FAKE_ID);
+                    fakeIDPref.setTitle(PreferenceActivity.this.getResources().getString(R.string.local_development_fake_id));
+                    fakeIDPref.setSummary(sharedPreferences.getString(RetrofitActivity.LOCAL_DEVELOPMENT_MODE_FAKE_ID, ""));
+                    getPreferenceScreen().addPreference(fakeIDPref);
                 } else {
                     sharedPreferences.edit().putString(RetrofitActivity.API_URL_KEY, RetrofitActivity.DEFAULT_URL).apply();
+                    if (findPreference(RetrofitActivity.LOCAL_DEVELOPMENT_MODE_FAKE_ID) != null) {
+                        getPreferenceScreen().removePreference(findPreference(RetrofitActivity.LOCAL_DEVELOPMENT_MODE_FAKE_ID));
+                    }
                 }
             }
         }
@@ -78,7 +89,7 @@ public class PreferenceActivity extends AppCompatActivity {
             }
             SharedPreferences sharedPrefs = getPreferenceManager().getSharedPreferences();
             if (!(preference instanceof CheckBoxPreference)) {
-                preference.setSummary(sharedPrefs.getString(key, "Default"));
+                preference.setSummary(sharedPrefs.getString(key, ""));
             }
         }
     }

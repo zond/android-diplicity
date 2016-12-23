@@ -72,6 +72,8 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     static final String API_URL_KEY = "api_url";
     static final String DEFAULT_URL = "https://diplicity-engine.appspot.com/";
     static final String LOCAL_DEVELOPMENT_URL = "http://localhost:8080/";
+    static final String LOCAL_DEVELOPMENT_MODE = "local_development_mode";
+    static final String LOCAL_DEVELOPMENT_MODE_FAKE_ID = "local_development_mode_fake_id";
     static final String LOGGED_IN_USER_KEY = "logged_in_user";
     static final String AUTH_TOKEN_KEY = "auth_token";
     static final String VARIANTS_KEY = "variants";
@@ -223,14 +225,11 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                 });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == LOGIN_REQUEST) {
-            if (resultCode == RESULT_OK) {
-                observe(JoinObservable.when(JoinObservable
-                        .from(rootService.GetRoot())
-                        .and(variantService.GetVariants())
-                        .then(new Func2<RootService.Root, MultiContainer<VariantService.Variant>, Object>() {
+    protected void performLogin() {
+        observe(JoinObservable.when(JoinObservable
+                .from(rootService.GetRoot())
+                .and(variantService.GetVariants())
+                .then(new Func2<RootService.Root, MultiContainer<VariantService.Variant>, Object>() {
                     @Override
                     public Object call(RootService.Root root, MultiContainer<VariantService.Variant> variants) {
                         App.loggedInUser = root.Properties.User;
@@ -246,6 +245,13 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                         return null;
                     }
                 })).toObservable(), null, newProgressAndToastHandler(null, getResources().getString(R.string.logging_in)));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == LOGIN_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                performLogin();
             }
         }
     }
@@ -284,12 +290,15 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                 Request toIssue = chain.request().newBuilder()
                         .addHeader("Accept", "application/json; charset=UTF-8").build();
                 String authToken = App.authToken;
-                if (authToken != null) {
+                if (App.localDevelopmentMode && App.localDevelopmentModeFakeID != null && !App.localDevelopmentModeFakeID.equals("")) {
+                    HttpUrl url = toIssue.url().newBuilder().addQueryParameter("fake-id", App.localDevelopmentModeFakeID).build();
+                    toIssue = toIssue.newBuilder().url(url).build();
+                } else if (authToken != null) {
                     toIssue = toIssue.newBuilder()
                             .addHeader("Authorization", "bearer " + authToken)
                             .build();
                 }
-                Log.d("Diplicity", "" + chain.request().method() + "ing " + chain.request().url());
+                Log.d("Diplicity", "" + toIssue.method() + "ing " + toIssue.url());
                 return chain.proceed(toIssue);
             }
         });
@@ -356,6 +365,11 @@ public abstract class RetrofitActivity extends AppCompatActivity {
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
                 if (s.equals(API_URL_KEY)) {
                     setBaseURL(sharedPreferences.getString(API_URL_KEY, ""));
+                } else if (s.equals(LOCAL_DEVELOPMENT_MODE)) {
+                    App.localDevelopmentMode = false;
+                } else if (s.equals(LOCAL_DEVELOPMENT_MODE_FAKE_ID)) {
+                    App.authToken = null;
+                    App.localDevelopmentModeFakeID = null;
                 }
             }
         };
@@ -470,7 +484,16 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                                             synchronized (loginSubscribers) {
                                                 loginSubscribers.add(new LoginSubscriber<R>(subscriber, thisOnSubscribe));
                                                 if (loginSubscribers.size() == 1) {
-                                                    startActivityForResult(new Intent(RetrofitActivity.this, LoginActivity.class), LOGIN_REQUEST);
+                                                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(RetrofitActivity.this);
+                                                    if (prefs.getBoolean(LOCAL_DEVELOPMENT_MODE, false) &&
+                                                            !prefs.getString(LOCAL_DEVELOPMENT_MODE_FAKE_ID, "").equals("")) {
+                                                        App.localDevelopmentMode = true;
+                                                        App.localDevelopmentModeFakeID = prefs.getString(LOCAL_DEVELOPMENT_MODE_FAKE_ID, "");
+                                                        Log.d("Diplicity", "Performing fake login as " + App.localDevelopmentModeFakeID);
+                                                        performLogin();
+                                                    } else {
+                                                        startActivityForResult(new Intent(RetrofitActivity.this, LoginActivity.class), LOGIN_REQUEST);
+                                                    }
                                                 }
                                             }
                                             return;
