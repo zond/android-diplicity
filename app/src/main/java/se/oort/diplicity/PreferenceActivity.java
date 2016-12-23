@@ -24,7 +24,7 @@ public class PreferenceActivity extends AppCompatActivity {
         getFragmentManager().beginTransaction().replace(android.R.id.content, new Fragment()).commit();
     }
 
-    public class Fragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+    public static class Fragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
         @Override
         public void onResume() {
@@ -56,8 +56,8 @@ public class PreferenceActivity extends AppCompatActivity {
         }
 
         public void onDestroy() {
-            super.onDestroy();
             getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+            super.onDestroy();
         }
 
         @Override
@@ -68,7 +68,7 @@ public class PreferenceActivity extends AppCompatActivity {
                     sharedPreferences.edit().putString(RetrofitActivity.API_URL_KEY, RetrofitActivity.LOCAL_DEVELOPMENT_URL).apply();
                     EditTextPreference fakeIDPref = new EditTextPreference(getActivity());
                     fakeIDPref.setKey(RetrofitActivity.LOCAL_DEVELOPMENT_MODE_FAKE_ID);
-                    fakeIDPref.setTitle(PreferenceActivity.this.getResources().getString(R.string.local_development_fake_id));
+                    fakeIDPref.setTitle(getActivity().getResources().getString(R.string.local_development_fake_id));
                     fakeIDPref.setSummary(sharedPreferences.getString(RetrofitActivity.LOCAL_DEVELOPMENT_MODE_FAKE_ID, ""));
                     getPreferenceScreen().addPreference(fakeIDPref);
                 } else {

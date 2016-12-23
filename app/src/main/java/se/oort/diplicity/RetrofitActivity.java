@@ -74,6 +74,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     static final String LOCAL_DEVELOPMENT_URL = "http://localhost:8080/";
     static final String LOCAL_DEVELOPMENT_MODE = "local_development_mode";
     static final String LOCAL_DEVELOPMENT_MODE_FAKE_ID = "local_development_mode_fake_id";
+
     static final String LOGGED_IN_USER_KEY = "logged_in_user";
     static final String AUTH_TOKEN_KEY = "auth_token";
     static final String VARIANTS_KEY = "variants";
@@ -461,7 +462,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         }
         @Override
         public <R> Observable<R> adapt(final Call<R> call) {
-            final Observable<R> resultObservable = Observable.create(new Observable.OnSubscribe<R>() {
+            return Observable.create(new Observable.OnSubscribe<R>() {
                 @Override
                 @SuppressWarnings("unchecked")
                 public void call(final Subscriber<? super R> subscriber) {
@@ -509,7 +510,6 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                             });
                 }
             });
-            return resultObservable;
         }
     }
 }
