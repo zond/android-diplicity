@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-  <se.oort.diplicity.URLEditTextPreference android:title="API URL"
-                                           android:inputType="textUri"
-                                           android:key="api_url" />
+  <CheckBoxPreference
+      android:title="@string/local_development_mode"
+      android:inputType="textUri"
+      android:summary="@string/connect_to_localhost_instead_of_cloud_service"
+      android:key="local_development_mode" />
 </PreferenceScreen>

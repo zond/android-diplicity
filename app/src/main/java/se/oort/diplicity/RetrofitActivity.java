@@ -71,6 +71,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     static final int LOGIN_REQUEST = 1;
     static final String API_URL_KEY = "api_url";
     static final String DEFAULT_URL = "https://diplicity-engine.appspot.com/";
+    static final String LOCAL_DEVELOPMENT_URL = "http://localhost:8080/";
     static final String LOGGED_IN_USER_KEY = "logged_in_user";
     static final String AUTH_TOKEN_KEY = "auth_token";
     static final String VARIANTS_KEY = "variants";
@@ -370,7 +371,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         } else {
             Log.d("Diplicity", "Malformed URL " + baseURL + ", resetting to default URL " + DEFAULT_URL);
             setBaseURL(DEFAULT_URL);
-            prefs.edit().putString(API_URL_KEY, DEFAULT_URL).commit();
+            prefs.edit().putString(API_URL_KEY, DEFAULT_URL).apply();
         }
     }
 
