@@ -31,9 +31,7 @@
             android:id="@+id/orders_view"
             android:visibility="gone"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-        </ListView>
+            android:layout_height="wrap_content"/>
 
         <ScrollView
             android:id="@+id/phase_results_view"

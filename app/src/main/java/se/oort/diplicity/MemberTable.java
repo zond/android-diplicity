@@ -104,6 +104,7 @@ public class MemberTable extends TableLayout {
                 }
                 if (foundState != null) {
                     final PhaseState finalFoundState = foundState;
+                    final CheckBox onProbation = new CheckBox(retrofitActivity);
                     CheckBox readyToResolve = new CheckBox(retrofitActivity);
                     readyToResolve.setText(R.string.rdy);
                     readyToResolve.setLayoutParams(wrapContentParams);
@@ -117,7 +118,9 @@ public class MemberTable extends TableLayout {
                                         retrofitActivity.phaseStateService.PhaseStateUpdate(finalFoundState, game.ID, phaseMeta.PhaseOrdinal.toString(), member.Nation),
                                         new Sendable<SingleContainer<PhaseState>>() {
                                             @Override
-                                            public void send(SingleContainer<PhaseState> phaseStateSingleContainer) {}
+                                            public void send(SingleContainer<PhaseState> phaseStateSingleContainer) {
+                                                onProbation.setChecked(false);
+                                            }
                                         }, getResources().getString(R.string.updating_phase_state));
                             }
                         });
@@ -139,7 +142,9 @@ public class MemberTable extends TableLayout {
                                         retrofitActivity.phaseStateService.PhaseStateUpdate(finalFoundState, game.ID, phaseMeta.PhaseOrdinal.toString(), member.Nation),
                                         new Sendable<SingleContainer<PhaseState>>() {
                                             @Override
-                                            public void send(SingleContainer<PhaseState> phaseStateSingleContainer) {}
+                                            public void send(SingleContainer<PhaseState> phaseStateSingleContainer) {
+                                                onProbation.setChecked(false);
+                                            }
                                         }, getResources().getString(R.string.updating_phase_state));
                             }
                         });
@@ -147,7 +152,6 @@ public class MemberTable extends TableLayout {
                         wantsDIAS.setEnabled(false);
                     }
                     tableRow.addView(wantsDIAS);
-                    CheckBox onProbation = new CheckBox(retrofitActivity);
                     onProbation.setText(R.string.nmr);
                     onProbation.setLayoutParams(wrapContentParams);
                     onProbation.setChecked(finalFoundState.OnProbation);
