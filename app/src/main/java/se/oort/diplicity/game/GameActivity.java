@@ -185,6 +185,13 @@ public class GameActivity extends RetrofitActivity
 
         flickFrameLayout = (FlickFrameLayout) findViewById(R.id.game_content);
         flickFrameLayout.gameActivity = this;
+        findViewById(R.id.flick_frame_background).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                flickFrameLayout.onTouchEvent(motionEvent);
+                return true;
+            }
+        });
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -827,11 +834,12 @@ public class GameActivity extends RetrofitActivity
                                     }
                                 }
                                 Collections.sort(orders);
-                                ListView ordersView = (ListView) findViewById(R.id.orders_view);
+                                final ListView ordersView = (ListView) findViewById(R.id.orders_view);
                                 ordersView.setOnTouchListener(new View.OnTouchListener() {
                                     @Override
                                     public boolean onTouch(View view, MotionEvent motionEvent) {
                                         flickFrameLayout.onTouchEvent(motionEvent);
+                                        ordersView.onTouchEvent(motionEvent);
                                         return true;
                                     }
                                 });
