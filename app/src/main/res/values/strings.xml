@@ -126,6 +126,6 @@
     <string name="members">Members</string>
     <string name="phase_length_must_be_less_than_30_days">Phase length must be less than 30 days</string>
     <string name="local_development_mode">Local development mode</string>
-    <string name="connect_to_localhost_instead_of_cloud_service">Connect to localhost instead of cloud service</string>
+    <string name="connect_to_localhost_instead_of_cloud_service">Connect to localhost:8080 instead of cloud service</string>
     <string name="local_development_fake_id">Local development fake ID</string>
 </resources>
