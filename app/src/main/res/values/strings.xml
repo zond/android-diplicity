@@ -128,4 +128,10 @@
     <string name="local_development_mode">Local development mode</string>
     <string name="connect_to_localhost_instead_of_cloud_service">Connect to localhost:8080 instead of cloud service</string>
     <string name="local_development_fake_id">Local development fake ID</string>
+    <string name="development">Development</string>
+    <string name="notifications">Notifications</string>
+    <string name="email_notifications">Email notifications</string>
+    <string name="send_notifications_to_your_registered_email">Send notifications to your registered email address</string>
+    <string name="loading_settings">Loading settings</string>
+    <string name="updating_settings">Updating settings</string>
 </resources>

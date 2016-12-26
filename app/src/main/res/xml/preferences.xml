@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-  <CheckBoxPreference
-      android:title="@string/local_development_mode"
-      android:summary="@string/connect_to_localhost_instead_of_cloud_service"
-      android:key="local_development_mode" />
-  <EditTextPreference
-      android:title="@string/local_development_fake_id"
-      android:inputType="text"
-      android:key="local_development_mode_fake_id" />
+    <PreferenceCategory
+        android:title="@string/notifications">
+        <CheckBoxPreference
+            android:title="@string/email_notifications"
+            android:summary="@string/send_notifications_to_your_registered_email"
+            android:key="email_notifications" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="development_prefs"
+        android:title="@string/development">
+        <CheckBoxPreference
+            android:title="@string/local_development_mode"
+            android:summary="@string/connect_to_localhost_instead_of_cloud_service"
+            android:key="local_development_mode" />
+        <EditTextPreference
+            android:title="@string/local_development_fake_id"
+            android:inputType="text"
+            android:key="local_development_mode_fake_id" />
+    </PreferenceCategory>
  </PreferenceScreen>

@@ -64,6 +64,7 @@ import se.oort.diplicity.apigen.PhaseStateService;
 import se.oort.diplicity.apigen.Ticker;
 import se.oort.diplicity.apigen.TickerUnserializer;
 import se.oort.diplicity.apigen.User;
+import se.oort.diplicity.apigen.UserConfigService;
 import se.oort.diplicity.apigen.UserStatsService;
 
 public abstract class RetrofitActivity extends AppCompatActivity {
@@ -96,6 +97,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     public GameResultService gameResultService;
     public PhaseStateService phaseStateService;
     public GameStateService gameStateService;
+    public UserConfigService userConfigService;
 
     private SharedPreferences prefs;
     private SharedPreferences.OnSharedPreferenceChangeListener prefsListener;
@@ -327,6 +329,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         gameResultService = retrofit.create(GameResultService.class);
         phaseStateService = retrofit.create(PhaseStateService.class);
         gameStateService = retrofit.create(GameStateService.class);
+        userConfigService = retrofit.create(UserConfigService.class);
     }
 
     @Override
