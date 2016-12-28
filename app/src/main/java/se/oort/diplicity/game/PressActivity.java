@@ -6,7 +6,9 @@ import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -18,7 +20,10 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -51,60 +56,6 @@ public class PressActivity extends RetrofitActivity {
     public Member member;
     public Game game;
 
-    private MessageListAdapter messages = new MessageListAdapter();
-
-    private class MessageListAdapter extends BaseAdapter {
-        private List<Message> messages = new ArrayList<>();
-
-        public void add(Message message) {
-            this.messages.add(message);
-            notifyDataSetChanged();
-        }
-
-        public void replace(List<Message> messages) {
-            this.messages = messages;
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public int getCount() {
-            return messages.size();
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return messages.get(i);
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return i;
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            View row = view;
-            if (row == null) {
-                row = getLayoutInflater().inflate(R.layout.message_list_row, viewGroup, false);
-            }
-
-            String url = null;
-            for (Member member : game.Members) {
-                if (member.Nation.equals(messages.get(i).Sender)) {
-                    url = member.User.Picture;
-                }
-            }
-
-            ((TextView) row.findViewById(R.id.body)).setText(messages.get(i).Body);
-            ((TextView) row.findViewById(R.id.at)).setText(messages.get(i).Age.deadlineAt().toString());
-            ((TextView) row.findViewById(R.id.sender)).setText(getResources().getString(R.string.x_, messages.get(i).Sender));
-            if (url != null) {
-                PressActivity.this.populateImage((ImageView) row.findViewById(R.id.avatar), url);
-            }
-            return row;
-        }
-    }
-
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -124,8 +75,6 @@ public class PressActivity extends RetrofitActivity {
         game = (Game) unserialize(serializedGame);
 
         setTitle(TextUtils.join(", ", channel.Members));
-
-        ((ListView) findViewById(R.id.press_messages)).setAdapter(messages);
 
         if (member == null) {
             findViewById(R.id.send_message_button).setVisibility(View.GONE);
@@ -164,12 +113,36 @@ public class PressActivity extends RetrofitActivity {
                 new Sendable<MultiContainer<Message>>() {
                     @Override
                     public void send(final MultiContainer<Message> messageMultiContainer) {
-                        final List<Message> newMessages= new ArrayList<>();
-                        for (SingleContainer<Message> messageSingleContainer: messageMultiContainer.Properties) {
-                            newMessages.add(messageSingleContainer.Properties);
-                            Log.d("Diplicity", "Got " + messageSingleContainer.Properties.Body);
+                        ((LinearLayout) findViewById(R.id.press_messages)).removeAllViews();
+                        for (int i = 0; i < messageMultiContainer.Properties.size(); i++) {
+                            Message message = messageMultiContainer.Properties.get(messageMultiContainer.Properties.size() - i - 1).Properties;
+                            View row = getLayoutInflater().inflate(R.layout.message_list_row, (ViewGroup) findViewById(R.id.press_layout), false);
+                            String url = null;
+                            for (Member member : game.Members) {
+                                if (member.Nation.equals(message.Sender)) {
+                                    url = member.User.Picture;
+                                }
+                            }
+
+                            ((TextView) row.findViewById(R.id.body)).setText(message.Body);
+                            ((TextView) row.findViewById(R.id.at)).setText(message.Age.deadlineAt().toString());
+                            ((TextView) row.findViewById(R.id.sender)).setText(getResources().getString(R.string.x_, message.Sender));
+                            if (url != null) {
+                                PressActivity.this.populateImage((ImageView) row.findViewById(R.id.avatar), url);
+                            }
+
+                            ((LinearLayout) findViewById(R.id.press_messages)).addView(row);
                         }
-                        messages.replace(newMessages);
+                        findViewById(R.id.press_layout).invalidate();
+                        findViewById(R.id.press_messages).invalidate();
+                        final NestedScrollView pressScroll = (NestedScrollView) findViewById(R.id.press_scroll);
+                        pressScroll.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Log.d("diplicity", " *** scrolling!");
+                                pressScroll.fullScroll(View.FOCUS_DOWN);
+                            }
+                        });
                     }
                 }, getResources().getString(R.string.loading_messages));
     }

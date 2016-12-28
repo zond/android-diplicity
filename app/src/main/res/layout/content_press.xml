@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/press_scroll"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,54 +11,58 @@
     tools:context="se.oort.diplicity.game.PressActivity"
     tools:showIn="@layout/activity_press">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <android.support.design.widget.FloatingActionButton
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            app:elevation="6dp"
-            app:borderWidth="0dp"
-            app:fabSize="mini"
-            app:rippleColor="@color/colorPrimary"
-            app:useCompatPadding="true"
-            android:tint="@android:color/white"
-            android:id="@+id/send_message_button"
-            android:src="@drawable/ic_send_black_24dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/message_layout"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:layout_toStartOf="@id/send_message_button"
-            android:layout_toLeftOf="@id/send_message_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/new_message_body"
-                android:hint="@string/message"
-                android:inputType="textCapSentences|textAutoComplete|textAutoCorrect|textMultiLine"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-        </android.support.design.widget.TextInputLayout>
-
-        <ListView
-            android:id="@+id/press_messages"
-            android:layout_below="@id/message_layout"
-            android:layout_alignParentBottom="true"
+        <RelativeLayout
+            android:id="@+id/press_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-        </ListView>
+            <LinearLayout
+                android:orientation="vertical"
+                android:id="@+id/press_messages"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-    </RelativeLayout>
+            </LinearLayout>
+
+            <android.support.design.widget.FloatingActionButton
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                app:elevation="6dp"
+                app:borderWidth="0dp"
+                app:fabSize="mini"
+                app:rippleColor="@color/colorPrimary"
+                app:useCompatPadding="true"
+                android:tint="@android:color/white"
+                android:id="@+id/send_message_button"
+                android:src="@drawable/ic_send_black_24dp"
+                android:layout_below="@id/press_messages"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/message_layout"
+                android:layout_below="@id/press_messages"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_toStartOf="@id/send_message_button"
+                android:layout_toLeftOf="@id/send_message_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/new_message_body"
+                    android:hint="@string/message"
+                    android:inputType="textCapSentences|textAutoComplete|textAutoCorrect|textMultiLine"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </android.support.design.widget.TextInputLayout>
+
+
+        </RelativeLayout>
 
 </android.support.v4.widget.NestedScrollView>
