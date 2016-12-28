@@ -47,7 +47,6 @@
     <TextView
         android:id="@+id/at"
         android:layout_below="@id/body"
-        android:layout_alignParentBottom="true"
         android:layout_toEndOf="@id/avatar"
         android:layout_toRightOf="@id/avatar"
         android:layout_width="wrap_content"

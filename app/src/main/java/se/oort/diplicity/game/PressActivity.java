@@ -139,7 +139,6 @@ public class PressActivity extends RetrofitActivity {
                         pressScroll.post(new Runnable() {
                             @Override
                             public void run() {
-                                Log.d("diplicity", " *** scrolling!");
                                 pressScroll.fullScroll(View.FOCUS_DOWN);
                             }
                         });
