@@ -134,4 +134,6 @@
     <string name="send_notifications_to_your_registered_email">Send notifications to your registered email address</string>
     <string name="loading_settings">Loading settings</string>
     <string name="updating_settings">Updating settings</string>
+    <string name="push_notifications">Push notifications</string>
+    <string name="push_notifications_to_your_device">Push notifications to your device</string>
 </resources>

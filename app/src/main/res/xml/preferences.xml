@@ -6,6 +6,10 @@
             android:title="@string/email_notifications"
             android:summary="@string/send_notifications_to_your_registered_email"
             android:key="email_notifications" />
+        <CheckBoxPreference
+            android:title="@string/push_notifications"
+            android:summary="@string/push_notifications_to_your_device"
+            android:key="push_notifications" />
     </PreferenceCategory>
     <PreferenceCategory
         android:key="development_prefs"

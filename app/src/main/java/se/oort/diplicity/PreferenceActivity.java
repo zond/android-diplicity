@@ -1,19 +1,24 @@
 package se.oort.diplicity;
 
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
-import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceGroup;
-import android.os.Bundle;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import se.oort.diplicity.apigen.FCMToken;
 import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.apigen.UserConfig;
 
 public class PreferenceActivity extends RetrofitActivity {
+
+    public static String APP_NAME = "android-diplicity";
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -33,6 +38,16 @@ public class PreferenceActivity extends RetrofitActivity {
             retrofitActivity().handleReq(
                     retrofitActivity().userConfigService.UserConfigLoad(App.loggedInUser.Id),
                     new Sendable<SingleContainer<UserConfig>>() {
+                        private FCMToken getToken(UserConfig config) {
+                            FCMToken pushToken = null;
+                            for (FCMToken fcmToken : config.FCMTokens) {
+                                if (APP_NAME.equals(fcmToken.App)) {
+                                    pushToken = fcmToken;
+                                    break;
+                                }
+                            }
+                            return pushToken;
+                        }
                         @Override
                         public void send(final SingleContainer<UserConfig> userConfigSingleContainer) {
                             final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
@@ -51,6 +66,40 @@ public class PreferenceActivity extends RetrofitActivity {
                                                 }
                                             },
                                             getResources().getString(R.string.updating_settings));
+                                    return true;
+                                }
+                            });
+
+                            FCMToken pushToken = getToken(userConfigSingleContainer.Properties);
+                            final CheckBoxPreference pushPreference = (CheckBoxPreference) findPreference("push_notifications");
+                            pushPreference.setChecked(pushToken != null && !pushToken.Disabled);
+                            pushPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                                @Override
+                                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                                    FCMToken pushToken = getToken(userConfigSingleContainer.Properties);
+                                    if ((Boolean) newValue) {
+                                        if (pushToken == null) {
+                                            pushToken = new FCMToken();
+                                            pushToken.App = APP_NAME;
+                                            pushToken.Note = "Created by user action at " + new Date();
+                                            userConfigSingleContainer.Properties.FCMTokens.add(pushToken);
+                                        } else if (pushToken.Disabled) {
+                                            pushToken.Disabled = false;
+                                            pushToken.Note = "Enabled by user action at " + new Date();
+                                        }
+                                    } else {
+                                        if (pushToken != null && (pushToken.Disabled == null || !pushToken.Disabled)) {
+                                            pushToken.Disabled = true;
+                                            pushToken.Note = "Disabled by user action at " + new Date();
+                                        }
+                                    }
+                                    retrofitActivity().handleReq(
+                                            retrofitActivity().userConfigService.UserConfigUpdate(userConfigSingleContainer.Properties, App.loggedInUser.Id),
+                                            new Sendable<SingleContainer<UserConfig>>() {
+                                                @Override
+                                                public void send(SingleContainer<UserConfig> userConfigSingleContainer) {
+                                                }
+                                            }, getResources().getString(R.string.updating_settings));
                                     return true;
                                 }
                             });
