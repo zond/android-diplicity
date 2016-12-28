@@ -71,6 +71,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
 
     static final int LOGIN_REQUEST = 1;
     static final String API_URL_KEY = "api_url";
+    static final String USER_ID_KEY = "user_id";
     static final String DEFAULT_URL = "https://diplicity-engine.appspot.com/";
     static final String LOCAL_DEVELOPMENT_URL = "http://localhost:8080/";
     static final String LOCAL_DEVELOPMENT_MODE = "local_development_mode";
@@ -236,6 +237,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                     @Override
                     public Object call(RootService.Root root, MultiContainer<VariantService.Variant> variants) {
                         App.loggedInUser = root.Properties.User;
+                        PreferenceManager.getDefaultSharedPreferences(RetrofitActivity.this).edit().putString(USER_ID_KEY, root.Properties.User.Id).apply();
                         App.variants = variants;
                         List<LoginSubscriber<?>> subscribersCopy;
                         synchronized (loginSubscribers) {

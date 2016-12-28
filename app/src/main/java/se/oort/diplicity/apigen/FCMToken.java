@@ -9,4 +9,5 @@ public class FCMToken implements java.io.Serializable {
   public String App;
   public FCMNotificationConfig MessageConfig;
   public FCMNotificationConfig PhaseConfig;
+  public String ReplaceToken;
 }

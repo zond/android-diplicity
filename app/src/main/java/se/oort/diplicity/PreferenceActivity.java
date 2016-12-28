@@ -7,10 +7,13 @@ import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 
-import java.util.ArrayList;
+import com.google.firebase.iid.FirebaseInstanceId;
+
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.Date;
-import java.util.List;
 
 import se.oort.diplicity.apigen.FCMToken;
 import se.oort.diplicity.apigen.SingleContainer;
@@ -18,7 +21,10 @@ import se.oort.diplicity.apigen.UserConfig;
 
 public class PreferenceActivity extends RetrofitActivity {
 
+    public static String FCM_REPLACE_TOKEN_KEY = "fcm_replace_token";
     public static String APP_NAME = "android-diplicity";
+
+    private static SecureRandom random = new SecureRandom();
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -70,39 +76,51 @@ public class PreferenceActivity extends RetrofitActivity {
                                 }
                             });
 
-                            FCMToken pushToken = getToken(userConfigSingleContainer.Properties);
                             final CheckBoxPreference pushPreference = (CheckBoxPreference) findPreference("push_notifications");
-                            pushPreference.setChecked(pushToken != null && !pushToken.Disabled);
-                            pushPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                                @Override
-                                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                                    FCMToken pushToken = getToken(userConfigSingleContainer.Properties);
-                                    if ((Boolean) newValue) {
-                                        if (pushToken == null) {
-                                            pushToken = new FCMToken();
-                                            pushToken.App = APP_NAME;
-                                            pushToken.Note = "Created by user action at " + new Date();
-                                            userConfigSingleContainer.Properties.FCMTokens.add(pushToken);
-                                        } else if (pushToken.Disabled) {
+                            if (FirebaseInstanceId.getInstance().getToken() != null) {
+                                FCMToken pushToken = getToken(userConfigSingleContainer.Properties);
+                                pushPreference.setChecked(pushToken != null && !pushToken.Disabled);
+                                pushPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                                    @Override
+                                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                                        FCMToken pushToken = getToken(userConfigSingleContainer.Properties);
+                                        if ((Boolean) newValue) {
+                                            if (pushToken == null) {
+                                                pushToken = new FCMToken();
+                                                pushToken.Note = "Created by user action at " + new Date();
+                                                userConfigSingleContainer.Properties.FCMTokens.add(pushToken);
+                                            } else if (pushToken.Disabled) {
+                                                pushToken.Note = "Enabled by user action at " + new Date();
+                                            }
                                             pushToken.Disabled = false;
-                                            pushToken.Note = "Enabled by user action at " + new Date();
+                                            pushToken.Value = FirebaseInstanceId.getInstance().getToken();
+                                            pushToken.App = APP_NAME;
+                                            pushToken.ReplaceToken = new BigInteger(8 * 24, random).toString(32);
+                                        } else {
+                                            if (pushToken != null && (pushToken.Disabled == null || !pushToken.Disabled)) {
+                                                pushToken.Disabled = true;
+                                                pushToken.Note = "Disabled by user action at " + new Date();
+                                            }
                                         }
-                                    } else {
-                                        if (pushToken != null && (pushToken.Disabled == null || !pushToken.Disabled)) {
-                                            pushToken.Disabled = true;
-                                            pushToken.Note = "Disabled by user action at " + new Date();
+                                        if (pushToken != null) {
+                                            final FCMToken finalToken = pushToken;
+                                            retrofitActivity().handleReq(
+                                                    retrofitActivity().userConfigService.UserConfigUpdate(userConfigSingleContainer.Properties, App.loggedInUser.Id),
+                                                    new Sendable<SingleContainer<UserConfig>>() {
+                                                        @Override
+                                                        public void send(SingleContainer<UserConfig> userConfigSingleContainer) {
+                                                            PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putString(FCM_REPLACE_TOKEN_KEY, finalToken.ReplaceToken).apply();
+                                                        }
+                                                    }, getResources().getString(R.string.updating_settings));
                                         }
+                                        return true;
                                     }
-                                    retrofitActivity().handleReq(
-                                            retrofitActivity().userConfigService.UserConfigUpdate(userConfigSingleContainer.Properties, App.loggedInUser.Id),
-                                            new Sendable<SingleContainer<UserConfig>>() {
-                                                @Override
-                                                public void send(SingleContainer<UserConfig> userConfigSingleContainer) {
-                                                }
-                                            }, getResources().getString(R.string.updating_settings));
-                                    return true;
-                                }
-                            });
+                                });
+                                pushPreference.setEnabled(true);
+                            } else {
+                                pushPreference.setEnabled(false);
+                                pushPreference.setSummary(getResources().getString(R.string.dysfunctional_fcm_service));
+                            }
 
                             final EditTextPreference fakeIDPref = (EditTextPreference) findPreference(RetrofitActivity.LOCAL_DEVELOPMENT_MODE_FAKE_ID);
                             fakeIDPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
