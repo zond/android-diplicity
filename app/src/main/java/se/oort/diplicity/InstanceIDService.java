@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 
@@ -72,7 +73,9 @@ public class InstanceIDService extends FirebaseInstanceIdService {
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.d("Diplicity", "Failed updating FCM token on server: " + e);
+                        String msg = "Failed updating FCM token on server";
+                        FirebaseCrash.report(new RuntimeException(msg, e));
+                        Log.e("Diplicity", msg + ": " + e);
                     }
 
                     @Override
