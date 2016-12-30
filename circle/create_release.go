@@ -50,6 +50,9 @@ func (u *upload) push() error {
 		return fmt.Errorf("Old release %q doesn't match %v", old.Files[0].Name, apkNameReg)
 	}
 	u.previousSHA = match[1]
+	if u.previousSHA {
+		return fmt.Errorf("Found no previous SHA in %q", old.Files[0].Name)
+	}
 
 	f := &drive.File{
 		Name: fmt.Sprintf("build-%s-%s-%s.apk", u.build, u.tag, u.shortSHA),
@@ -98,6 +101,9 @@ func (r *release) create() error {
 	})
 	if err != nil {
 		return err
+	}
+	if len(commits) == 0 {
+		return fmt.Errorf("Found no commits since last release %q", r.previousSHA)
 	}
 	buf := &bytes.Buffer{}
 	fmt.Fprintf(buf, "Download [build-%s-%s-%s.apk](%s)\n\n", r.build, r.tag, r.shortSHA, r.webContentLink)
