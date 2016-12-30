@@ -1,6 +1,8 @@
 package se.oort.diplicity.game;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
@@ -55,6 +57,14 @@ public class PressActivity extends RetrofitActivity {
     public ChannelService.Channel channel;
     public Member member;
     public Game game;
+
+    public static void startPressActivity(Context context, Game game, ChannelService.Channel channel, Member member) {
+        Intent intent = new Intent(context, PressActivity.class);
+        intent.putExtra(PressActivity.SERIALIZED_CHANNEL_KEY, serialize(channel));
+        intent.putExtra(PressActivity.SERIALIZED_MEMBER_KEY, serialize(member));
+        intent.putExtra(PressActivity.SERIALIZED_GAME_KEY, serialize(game));
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {

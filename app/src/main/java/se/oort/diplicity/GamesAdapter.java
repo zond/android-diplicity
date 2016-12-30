@@ -214,12 +214,11 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             ((FloatingActionButton) itemView.findViewById(R.id.open_button)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(retrofitActivity, GameActivity.class);
-                    intent.putExtra(GameActivity.SERIALIZED_GAME_KEY, RetrofitActivity.serialize(game.Properties));
                     if (game.Properties.NewestPhaseMeta != null && game.Properties.NewestPhaseMeta.size() > 0) {
-                        intent.putExtra(GameActivity.SERIALIZED_PHASE_META_KEY, RetrofitActivity.serialize(game.Properties.NewestPhaseMeta.get(0)));
+                        GameActivity.startGameActivity(retrofitActivity, game.Properties, game.Properties.NewestPhaseMeta.get(0));
+                    } else {
+                        GameActivity.startGameActivity(retrofitActivity, game.Properties, null);
                     }
-                    retrofitActivity.startActivity(intent);
                 }
             });
         }

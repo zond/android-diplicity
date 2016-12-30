@@ -1,27 +1,31 @@
 {
   "project_info": {
-    "project_number": "821688068999",
-    "firebase_url": "https://android-diplicity.firebaseio.com",
-    "project_id": "android-diplicity",
-    "storage_bucket": "android-diplicity.appspot.com"
+    "project_number": "635122585664",
+    "firebase_url": "https://diplicity-engine.firebaseio.com",
+    "project_id": "diplicity-engine",
+    "storage_bucket": "diplicity-engine.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:821688068999:android:d13bcdb65b0625bf",
+        "mobilesdk_app_id": "1:635122585664:android:d13bcdb65b0625bf",
         "android_client_info": {
           "package_name": "se.oort.diplicity"
         }
       },
       "oauth_client": [
         {
-          "client_id": "821688068999-49bjg112koqshl0uqohifh22kpg6qcp9.apps.googleusercontent.com",
+          "client_id": "635122585664-rs3u2tb9lfi1tt6dsovie0kfdg1j5mru.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "635122585664-ao5i9f2p5365t4htql1qdb6uulso4929.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCCTC7cnBluW1heIAyie9NMfqT0rvbfmLE"
+          "current_key": "AIzaSyCvxP4bWWelmJ2A4n14oUz8eZZHItVfNx4"
         }
       ],
       "services": {

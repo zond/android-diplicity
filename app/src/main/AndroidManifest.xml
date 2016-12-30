@@ -27,6 +27,17 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".FCMReceiver"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="se.oort.diplicity.MainActivity" />
+            <intent-filter>
+                <action android:name="se.oort.diplicity.FCMNotify" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".LoginActivity"
             android:screenOrientation="portrait">
             <meta-data
@@ -51,26 +62,25 @@
         </activity>
         <activity
             android:name=".game.PressActivity"
-            android:windowSoftInputMode="adjustPan"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.NoActionBar">
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:windowSoftInputMode="adjustPan">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="se.oort.diplicity.MainActivity" />
         </activity>
 
-        <service
-            android:name=".MessagingService">
+        <service android:name=".MessagingService">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <service
-            android:name=".InstanceIDService">
+        <service android:name=".InstanceIDService">
             <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
+
     </application>
 
 </manifest>

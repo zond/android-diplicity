@@ -13,8 +13,10 @@ import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Date;
 
+import se.oort.diplicity.apigen.FCMNotificationConfig;
 import se.oort.diplicity.apigen.FCMToken;
 import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.apigen.UserConfig;
@@ -45,6 +47,9 @@ public class PreferenceActivity extends RetrofitActivity {
                     retrofitActivity().userConfigService.UserConfigLoad(App.loggedInUser.Id),
                     new Sendable<SingleContainer<UserConfig>>() {
                         private FCMToken getToken(UserConfig config) {
+                            if (config.FCMTokens == null) {
+                                return null;
+                            }
                             FCMToken pushToken = null;
                             for (FCMToken fcmToken : config.FCMTokens) {
                                 if (APP_NAME.equals(fcmToken.App)) {
@@ -88,6 +93,9 @@ public class PreferenceActivity extends RetrofitActivity {
                                             if (pushToken == null) {
                                                 pushToken = new FCMToken();
                                                 pushToken.Note = "Created by user action at " + new Date();
+                                                if (userConfigSingleContainer.Properties.FCMTokens == null) {
+                                                    userConfigSingleContainer.Properties.FCMTokens = new ArrayList<FCMToken>();
+                                                }
                                                 userConfigSingleContainer.Properties.FCMTokens.add(pushToken);
                                             } else if (pushToken.Disabled) {
                                                 pushToken.Note = "Enabled by user action at " + new Date();
@@ -96,6 +104,10 @@ public class PreferenceActivity extends RetrofitActivity {
                                             pushToken.Value = FirebaseInstanceId.getInstance().getToken();
                                             pushToken.App = APP_NAME;
                                             pushToken.ReplaceToken = new BigInteger(8 * 24, random).toString(32);
+                                            pushToken.MessageConfig = new FCMNotificationConfig();
+                                            pushToken.MessageConfig.ClickActionTemplate = "se.oort.diplicity.FCMNotify";
+                                            pushToken.PhaseConfig = new FCMNotificationConfig();
+                                            pushToken.PhaseConfig.ClickActionTemplate = "se.oort.diplicity.FCMNotify";
                                         } else {
                                             if (pushToken != null && (pushToken.Disabled == null || !pushToken.Disabled)) {
                                                 pushToken.Disabled = true;
