@@ -105,9 +105,9 @@ public class PreferenceActivity extends RetrofitActivity {
                                             pushToken.App = APP_NAME;
                                             pushToken.ReplaceToken = new BigInteger(8 * 24, random).toString(32);
                                             pushToken.MessageConfig = new FCMNotificationConfig();
-                                            pushToken.MessageConfig.ClickActionTemplate = "se.oort.diplicity.FCMNotify";
+                                            pushToken.MessageConfig.ClickActionTemplate = MessagingService.FCM_NOTIFY_ACTION;
                                             pushToken.PhaseConfig = new FCMNotificationConfig();
-                                            pushToken.PhaseConfig.ClickActionTemplate = "se.oort.diplicity.FCMNotify";
+                                            pushToken.PhaseConfig.ClickActionTemplate = MessagingService.FCM_NOTIFY_ACTION;
                                         } else {
                                             if (pushToken != null && (pushToken.Disabled == null || !pushToken.Disabled)) {
                                                 pushToken.Disabled = true;

@@ -14,10 +14,12 @@ import se.oort.diplicity.game.PressActivity;
 
 public class FCMReceiver extends RetrofitActivity {
 
+    public static final String DIPLICITY_JSON_EXTRA = "DiplicityJSON";
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        final MessagingService.DiplicityJSON message = MessagingService.decodeDataPayload(getIntent().getExtras().getString("DiplicityJSON"));
+        final MessagingService.DiplicityJSON message = MessagingService.decodeDataPayload(getIntent().getExtras().getString(DIPLICITY_JSON_EXTRA));
         if (message.type.equals("message")) {
             handleReq(
                     gameService.GameLoad(message.message.GameID),

@@ -29,6 +29,8 @@ import se.oort.diplicity.apigen.TickerUnserializer;
 
 public class MessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
 
+    public static final String FCM_NOTIFY_ACTION = "se.oort.diplicity.FCMNotify";
+
     public static Set<RetrofitActivity> messageSubscribers = Collections.synchronizedSet(new HashSet<RetrofitActivity>());
 
     public static class DiplicityJSON {
@@ -65,7 +67,39 @@ public class MessagingService extends com.google.firebase.messaging.FirebaseMess
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        Log.d("Diplicity", "MessagingService called with " + decodeDataPayload(remoteMessage.getData().get("DiplicityJSON")));
+        DiplicityJSON diplicityJSON = decodeDataPayload(remoteMessage.getData().get("DiplicityJSON"));
+        Log.d("Diplicity", "Received a " + diplicityJSON.type);
+        for (RetrofitActivity subscriber : messageSubscribers) {
+            boolean consumed = subscriber.consumeDiplicityJSON(diplicityJSON);
+            if (consumed) {
+                Log.d("Diplicity", "" + subscriber + " consumed this notification");
+                return;
+            } else {
+                Log.d("Diplicity", "" + subscriber + " didn't consume this notification, checking if anyone else wants to");
+            }
+        }
+        Log.d("Diplicity", "Nobody consumed this notification, popping up a regular notification");
+        sendNotification(remoteMessage);
+    }
+
+    private void sendNotification(RemoteMessage remoteMessage) {
+        Intent intent = new Intent(FCM_NOTIFY_ACTION);
+        intent.putExtra(FCMReceiver.DIPLICITY_JSON_EXTRA, remoteMessage.getData().get(FCMReceiver.DIPLICITY_JSON_EXTRA));
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+
+        Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.ic_otto)
+                .setContentTitle(remoteMessage.getNotification().getTitle())
+                .setContentText(remoteMessage.getNotification().getBody())
+                .setAutoCancel(true)
+                .setSound(defaultSoundUri)
+                .setContentIntent(pendingIntent);
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.notify(0, notificationBuilder.build());
     }
 
 }

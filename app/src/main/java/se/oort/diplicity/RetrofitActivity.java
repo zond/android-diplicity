@@ -229,6 +229,10 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                 });
     }
 
+    protected boolean consumeDiplicityJSON(MessagingService.DiplicityJSON diplicityJSON) {
+        return false;
+    }
+
     protected void performLogin() {
         observe(JoinObservable.when(JoinObservable
                 .from(rootService.GetRoot())
