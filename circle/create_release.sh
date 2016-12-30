@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 APK_PATH="app/build/outputs/apk/app-release.apk"
-APK_VERSION_LINE=`/usr/local/android-sdk-linux/build-tools/25.0.1/aapt dump badging ${APK_PATH}`
+APK_VERSION_LINE=`/usr/local/android-sdk-linux/build-tools/25.0.2/aapt dump badging ${APK_PATH}`
 APK_VERSION_CODE=`echo ${APK_VERSION_LINE} | sed -e "s/.*versionCode='\([^']\+\)'.*/\1/"`
 APK_VERSION_NAME=`echo ${APK_VERSION_LINE} | sed -e "s/.*versionName='\([^']\+\)'.*/\1/"`
 
