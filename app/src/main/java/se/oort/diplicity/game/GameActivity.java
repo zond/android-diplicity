@@ -48,6 +48,7 @@ import rx.observables.JoinObservable;
 import se.oort.diplicity.App;
 import se.oort.diplicity.ChannelService;
 import se.oort.diplicity.MemberTable;
+import se.oort.diplicity.MessagingService;
 import se.oort.diplicity.OptionsService;
 import se.oort.diplicity.R;
 import se.oort.diplicity.RetrofitActivity;
@@ -102,6 +103,30 @@ public class GameActivity extends RetrofitActivity
     }
 
     @Override
+    protected boolean consumeDiplicityJSON(MessagingService.DiplicityJSON diplicityJSON) {
+        if (diplicityJSON.type.equals("phase") && diplicityJSON.gameID.equals(game.ID)) {
+            phases = null;
+            game.NewestPhaseMeta.set(0, diplicityJSON.phaseMeta);
+            Toast.makeText(this, R.string.the_game_has_a_new_phase, Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        MessagingService.messageSubscribers.add(this);
+        draw();
+    }
+
+    @Override
+    public void onPause() {
+        MessagingService.messageSubscribers.remove(this);
+        super.onPause();
+    }
+
+    @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
@@ -117,11 +142,6 @@ public class GameActivity extends RetrofitActivity
         if (serializedPhaseMeta != null) {
             phaseMeta = (PhaseMeta) unserialize(serializedPhaseMeta);
         }
-    }
-
-    public void onResume() {
-        super.onResume();
-        draw();
     }
 
     public void nextPhase() {

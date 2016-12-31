@@ -167,11 +167,13 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     public Sendable<Throwable> newProgressAndToastHandler(final ErrorHandler onError, final String progressMessage) {
         final ProgressDialog progress = new ProgressDialog(this);
         if (progressMessage != null) {
-            progress.setTitle(progressMessage);
+            if (!progressMessage.equals("")) {
+                progress.setTitle(progressMessage);
+            }
+            progress.setCancelable(true);
+            progress.show();
+            this.progressDialogs.add(progress);
         }
-        progress.setCancelable(true);
-        progress.show();
-        this.progressDialogs.add(progress);
 
         return new Sendable<Throwable>() {
             @Override
@@ -202,8 +204,10 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                         }
                     }
                 } finally {
-                    RetrofitActivity.this.progressDialogs.remove(progress);
-                    progress.dismiss();
+                    if (progressMessage != null) {
+                        RetrofitActivity.this.progressDialogs.remove(progress);
+                        progress.dismiss();
+                    }
                 }
             }
         };

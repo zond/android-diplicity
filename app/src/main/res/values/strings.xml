@@ -137,4 +137,5 @@
     <string name="push_notifications">Push notifications</string>
     <string name="push_notifications_to_your_device">Push notifications to your device</string>
     <string name="dysfunctional_fcm_service">Dysfunctional FCM service?</string>
+    <string name="the_game_has_a_new_phase">The game has a new phase.</string>
 </resources>

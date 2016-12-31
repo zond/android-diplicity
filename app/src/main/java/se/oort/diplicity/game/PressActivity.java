@@ -36,6 +36,8 @@ import java.util.Date;
 import java.util.List;
 
 import se.oort.diplicity.ChannelService;
+import se.oort.diplicity.FCMReceiver;
+import se.oort.diplicity.MessagingService;
 import se.oort.diplicity.R;
 import se.oort.diplicity.RetrofitActivity;
 import se.oort.diplicity.Sendable;
@@ -64,6 +66,27 @@ public class PressActivity extends RetrofitActivity {
         intent.putExtra(PressActivity.SERIALIZED_MEMBER_KEY, serialize(member));
         intent.putExtra(PressActivity.SERIALIZED_GAME_KEY, serialize(game));
         context.startActivity(intent);
+    }
+
+    @Override
+    protected boolean consumeDiplicityJSON(MessagingService.DiplicityJSON diplicityJSON) {
+        if (diplicityJSON.type.equals("message") && diplicityJSON.message.GameID.equals(game.ID) && diplicityJSON.message.ChannelMembers.equals(channel.Members)) {
+            loadMessages(false);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        MessagingService.messageSubscribers.add(this);
+    }
+
+    @Override
+    public void onPause() {
+        MessagingService.messageSubscribers.remove(this);
+        super.onPause();
     }
 
     @Override
@@ -106,7 +129,7 @@ public class PressActivity extends RetrofitActivity {
                                 @Override
                                 public void send(SingleContainer<Message> messageSingleContainer) {
                                     ((EditText) findViewById(R.id.new_message_body)).setText("");
-                                    loadMessages();
+                                    loadMessages(false);
                                 }
                             },
                             getResources().getString(R.string.sending_message));
@@ -114,10 +137,14 @@ public class PressActivity extends RetrofitActivity {
             });
         }
 
-        loadMessages();
+        loadMessages(true);
     }
 
-    private void loadMessages() {
+    private void loadMessages(boolean withProgress) {
+        String message = null;
+        if (withProgress) {
+            message = getResources().getString(R.string.loading_messages);
+        }
         handleReq(
                 messageService.ListMessages(channel.GameID, TextUtils.join(",", channel.Members)),
                 new Sendable<MultiContainer<Message>>() {
@@ -143,16 +170,17 @@ public class PressActivity extends RetrofitActivity {
 
                             ((LinearLayout) findViewById(R.id.press_messages)).addView(row);
                         }
-                        findViewById(R.id.press_layout).invalidate();
-                        findViewById(R.id.press_messages).invalidate();
                         final NestedScrollView pressScroll = (NestedScrollView) findViewById(R.id.press_scroll);
                         pressScroll.post(new Runnable() {
                             @Override
                             public void run() {
+                                findViewById(R.id.press_layout).invalidate();
+                                findViewById(R.id.press_messages).invalidate();
+                                pressScroll.invalidate();
                                 pressScroll.fullScroll(View.FOCUS_DOWN);
                             }
                         });
                     }
-                }, getResources().getString(R.string.loading_messages));
+                }, message);
     }
 }
