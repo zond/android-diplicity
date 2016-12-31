@@ -50,7 +50,7 @@ func (u *upload) push() error {
 		return fmt.Errorf("Old release %q doesn't match %v", old.Files[0].Name, apkNameReg)
 	}
 	u.previousSHA = match[1]
-	if u.previousSHA {
+	if u.previousSHA == "" {
 		return fmt.Errorf("Found no previous SHA in %q", old.Files[0].Name)
 	}
 
