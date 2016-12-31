@@ -1,6 +1,9 @@
 package se.oort.diplicity;
 
 import android.app.Application;
+import android.util.Log;
+
+import com.google.firebase.crash.FirebaseCrash;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +22,34 @@ public class App extends Application {
     public static String localDevelopmentModeFakeID;
     public static MultiContainer<VariantService.Variant> variants;
 
+    public App() {
+        if (BuildConfig.DEBUG) {
+            Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                @Override
+                public void uncaughtException(Thread paramThread, Throwable paramThrowable) {
+                    Log.wtf("Diplicity", paramThrowable.getMessage(), paramThrowable);
+                    System.exit(2); //Prevents the service/app from freezing
+                }
+            });
+        }
+    }
+
     public static String nanosToDuration(long nanos) {
         return minutesToDuration((int) ((nanos / (long) 1000000000) / (long) 60));
+    }
+
+    public static void firebaseCrashReport(String msg) {
+        if (!BuildConfig.DEBUG) {
+            FirebaseCrash.report(new RuntimeException(msg));
+        }
+        Log.e("Diplicity", msg);
+    }
+
+    public static void firebaseCrashReport(String msg, Throwable e) {
+        if (!BuildConfig.DEBUG) {
+            FirebaseCrash.report(new RuntimeException(msg, e));
+        }
+        Log.e("Diplicity", msg, e);
     }
 
     public static String minutesToDuration(int mins) {

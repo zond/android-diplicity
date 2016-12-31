@@ -59,9 +59,7 @@ public class FCMReceiver extends RetrofitActivity {
                         }
                     }, getResources().getString(R.string.loading_state));
         } else {
-            String msg = "Unknown message type " + message.type;
-            FirebaseCrash.report(new RuntimeException(msg));
-            Log.e("Diplicity", msg);
+            App.firebaseCrashReport("Unknown message type " + message.type);
         }
     }
 }

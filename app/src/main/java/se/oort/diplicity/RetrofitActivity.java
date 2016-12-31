@@ -15,6 +15,7 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.firebase.crash.FirebaseCrash;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -175,30 +176,35 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         return new Sendable<Throwable>() {
             @Override
             public void send(Throwable e) {
-                if (e != null) {
-                    if (e instanceof HttpException) {
-                        HttpException he = (HttpException) e;
-                        if (onError != null && onError.code == he.code()) {
-                            onError.handler.send(he);
-                        } else {
-                            Log.e("Diplicity", "Error loading " + progressMessage + ": " + e);
-                            if (he.code() == 412) {
-                                Toast.makeText(RetrofitActivity.this, R.string.update_your_state, Toast.LENGTH_LONG).show();
-                            } else if (he.code() > 399 && he.code() < 500) {
-                                Toast.makeText(RetrofitActivity.this, R.string.client_misbehaved, Toast.LENGTH_SHORT).show();
-                            } else if (he.code() > 499) {
-                                Toast.makeText(RetrofitActivity.this, R.string.server_error, Toast.LENGTH_SHORT).show();
+                try {
+                    if (e != null) {
+                        String msg = "Error loading " + progressMessage;
+                        if (e instanceof HttpException) {
+                            HttpException he = (HttpException) e;
+                            if (onError != null && onError.code == he.code()) {
+                                onError.handler.send(he);
                             } else {
-                                Toast.makeText(RetrofitActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+                                if (he.code() == 412) {
+                                    Toast.makeText(RetrofitActivity.this, R.string.update_your_state, Toast.LENGTH_LONG).show();
+                                } else if (he.code() > 399 && he.code() < 500) {
+                                    App.firebaseCrashReport(msg, e);
+                                    Toast.makeText(RetrofitActivity.this, R.string.client_misbehaved, Toast.LENGTH_SHORT).show();
+                                } else if (he.code() > 499) {
+                                    App.firebaseCrashReport(msg, e);
+                                    Toast.makeText(RetrofitActivity.this, R.string.server_error, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(RetrofitActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+                                }
                             }
+                        } else {
+                            App.firebaseCrashReport(msg, e);
+                            Toast.makeText(RetrofitActivity.this, R.string.unknown_error, Toast.LENGTH_SHORT).show();
                         }
-                    } else {
-                        Log.e("Diplicity", "Error loading " + progressMessage + ": " + e);
-                        Toast.makeText(RetrofitActivity.this, R.string.unknown_error, Toast.LENGTH_SHORT).show();
                     }
+                } finally {
+                    RetrofitActivity.this.progressDialogs.remove(progress);
+                    progress.dismiss();
                 }
-                RetrofitActivity.this.progressDialogs.remove(progress);
-                progress.dismiss();
             }
         };
     }
@@ -437,7 +443,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.d("Diplicity", "Error loading " + u + ": "  + e);
+                        Log.d("Diplicity", "Error loading " + u, e);
                         view.setImageDrawable(getResources().getDrawable(R.drawable.broken_image));
                     }
 

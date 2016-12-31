@@ -7,6 +7,8 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.firebase.crash.FirebaseCrash;
+
 import java.util.concurrent.Callable;
 
 public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnScrollListener {
@@ -100,8 +102,8 @@ public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnS
                 onLoadMore(currentCursor, totalItemCount, view);
                 loading = true;
             } catch (Exception e) {
-                Log.e("Diplicity", "Loading more games: ", e);
-                Toast.makeText(view.getContext(), R.string.network_error, Toast.LENGTH_SHORT);
+                App.firebaseCrashReport("Error loading more items", e);
+                Toast.makeText(view.getContext(), R.string.network_error, Toast.LENGTH_SHORT).show();
             }
         }
     }

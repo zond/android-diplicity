@@ -73,9 +73,7 @@ public class InstanceIDService extends FirebaseInstanceIdService {
 
                     @Override
                     public void onError(Throwable e) {
-                        String msg = "Failed updating FCM token on server";
-                        FirebaseCrash.report(new RuntimeException(msg, e));
-                        Log.e("Diplicity", msg + ": " + e);
+                        App.firebaseCrashReport("Failed updating FCM token on server", e);
                     }
 
                     @Override

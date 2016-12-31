@@ -911,6 +911,7 @@ public class GameActivity extends RetrofitActivity
                     if (url != null) {
                         renderer.send(url);
                     } else {
+                        App.firebaseCrashReport("No map URL found in variant " + game.Variant + "?");
                         Toast.makeText(getBaseContext(), R.string.unknown_error, Toast.LENGTH_SHORT).show();
                     }
                 }
