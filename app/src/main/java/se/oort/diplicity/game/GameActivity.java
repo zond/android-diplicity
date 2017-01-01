@@ -596,8 +596,8 @@ public class GameActivity extends RetrofitActivity
                                     if (finalMyState.Muted != null) {
                                         for (String muted : finalMyState.Muted) {
                                             int pos = nations.indexOf(muted);
-                                            if (pos > 0) {
-                                                checked[nations.indexOf(muted)] = true;
+                                            if (pos > -1) {
+                                                checked[pos] = true;
                                             }
                                         }
                                     }
