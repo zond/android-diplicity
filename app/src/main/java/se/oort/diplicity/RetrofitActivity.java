@@ -261,7 +261,9 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                         SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(RetrofitActivity.this).edit();
                         Gson gson = new Gson();
                         prefs.putString(LOGGED_IN_USER_PREF_KEY, gson.toJson(root.Properties.User));
+                        loggedInUser = root.Properties.User;
                         prefs.putString(VARIANTS_PREF_KEY, gson.toJson(variants));
+                        variants = variants;
                         prefs.apply();
                         List<LoginSubscriber<?>> subscribersCopy;
                         synchronized (loginSubscribers) {
@@ -395,9 +397,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         prefsListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-                Log.d("Diplicity", "Prefs changed, " + s);
                 if (s.equals(API_URL_PREF_KEY)) {
-                    Log.d("Diplicity", "Prefs changed, API URL");
                     recreateServices();
                 }
             }

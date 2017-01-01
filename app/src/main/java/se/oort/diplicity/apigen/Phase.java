@@ -13,7 +13,7 @@ public class Phase implements java.io.Serializable {
   public String UnitsJSON;
   public String SCsJSON;
   public String GameID;
-  public java.util.List<Unit> Units;
+  public java.util.List<UnitWrapper> Units;
   public java.util.List<SC> SCs;
   public java.util.List<Dislodged> Dislodgeds;
   public java.util.List<Dislodger> Dislodgers;

@@ -10,4 +10,9 @@
         <item quantity="one">1 msg</item>
         <item quantity="other">%d msgs</item>
     </plurals>
+    <plurals name="unit">
+        <item quantity="zero">0 units</item>
+        <item quantity="one">1 unit</item>
+        <item quantity="other">%d units</item>
+    </plurals>
 </resources>

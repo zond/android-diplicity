@@ -44,6 +44,7 @@ import java.util.Set;
 
 import retrofit2.adapter.rxjava.HttpException;
 import rx.functions.Func2;
+import rx.functions.Func3;
 import rx.observables.JoinObservable;
 import se.oort.diplicity.App;
 import se.oort.diplicity.ChannelService;
@@ -66,7 +67,10 @@ import se.oort.diplicity.apigen.PhaseMeta;
 import se.oort.diplicity.apigen.PhaseResult;
 import se.oort.diplicity.apigen.PhaseState;
 import se.oort.diplicity.apigen.Resolution;
+import se.oort.diplicity.apigen.SC;
 import se.oort.diplicity.apigen.SingleContainer;
+import se.oort.diplicity.apigen.Unit;
+import se.oort.diplicity.apigen.UnitWrapper;
 
 public class GameActivity extends RetrofitActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -896,9 +900,10 @@ public class GameActivity extends RetrofitActivity
                 handleReq(JoinObservable.when(JoinObservable
                         .from(optionsService.GetOptions(game.ID, phaseMeta.PhaseOrdinal.toString()))
                         .and(orderService.ListOrders(game.ID, phaseMeta.PhaseOrdinal.toString()))
-                        .then(new Func2<SingleContainer<Map<String, OptionsService.Option>>, MultiContainer<Order>, Object>() {
+                        .and(phaseService.PhaseLoad(game.ID, phaseMeta.PhaseOrdinal.toString()))
+                        .then(new Func3<SingleContainer<Map<String,OptionsService.Option>>, MultiContainer<Order>, SingleContainer<Phase>, Object>() {
                             @Override
-                            public Object call(SingleContainer<Map<String, OptionsService.Option>> opts, MultiContainer<Order> ords) {
+                            public Object call(SingleContainer<Map<String, OptionsService.Option>> opts, MultiContainer<Order> ords, SingleContainer<Phase> phase) {
                                 options = opts.Properties;
                                 orders.clear();
                                 for (SingleContainer<Order> orderContainer : ords.Properties) {
@@ -907,6 +912,33 @@ public class GameActivity extends RetrofitActivity
                                         srcProvince = srcProvince.substring(0, srcProvince.indexOf('/'));
                                     }
                                     orders.put(srcProvince, orderContainer.Properties);
+                                }
+                                boolean hasBuildOpts = false;
+                                boolean hasDisbandOpts = false;
+                                for (OptionsService.Option opt : options.values()) {
+                                    if (opt.Next.containsKey("Build")) {
+                                        hasBuildOpts = true;
+                                    }
+                                    if (opt.Next.containsKey("Disband")) {
+                                        hasDisbandOpts = true;
+                                    }
+                                }
+                                int units = 0;
+                                int scs = 0;
+                                for (UnitWrapper unit : phase.Properties.Units) {
+                                    if (unit.Unit.Nation.equals(member.Nation)) {
+                                        units++;
+                                    }
+                                }
+                                for (SC sc : phase.Properties.SCs) {
+                                    if (sc.Owner.equals(member.Nation)) {
+                                        scs++;
+                                    }
+                                }
+                                if (hasBuildOpts && units < scs) {
+                                    Toast.makeText(GameActivity.this, getResources().getString(R.string.you_can_build_n_this_phase, getResources().getQuantityString(R.plurals.unit, scs - units)), Toast.LENGTH_LONG).show();
+                                } else if (hasDisbandOpts && scs < units) {
+                                    Toast.makeText(GameActivity.this, getResources().getString(R.string.you_have_to_disband_n_this_phase, getResources().getQuantityString(R.plurals.unit, units - scs)), Toast.LENGTH_LONG).show();
                                 }
                                 return null;
                             }

@@ -136,14 +136,16 @@ public class PreferenceActivity extends RetrofitActivity {
                             }
 
                             final EditTextPreference fakeIDPref = (EditTextPreference) findPreference(getResources().getString(R.string.local_development_mode_fake_id_pref_key));
-                            fakeIDPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                            final Preference.OnPreferenceChangeListener fakeIDChanged = new Preference.OnPreferenceChangeListener() {
                                 @Override
                                 public boolean onPreferenceChange(Preference preference, Object o) {
                                     fakeIDPref.setSummary((String) o);
                                     PreferenceManager.getDefaultSharedPreferences(retrofitActivity()).edit().putString(AUTH_TOKEN_PREF_KEY, "").apply();
+                                    retrofitActivity().performLogin();
                                     return true;
                                 }
-                            });
+                            };
+                            fakeIDPref.setOnPreferenceChangeListener(fakeIDChanged);
 
                             final CheckBoxPreference localDevPreference = (CheckBoxPreference) findPreference(getResources().getString(R.string.local_development_mode_pref_key));
                             localDevPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -151,24 +153,17 @@ public class PreferenceActivity extends RetrofitActivity {
                                 public boolean onPreferenceChange(Preference preference, Object o) {
                                     if ((Boolean) o) {
                                         prefs.edit().putString(RetrofitActivity.API_URL_PREF_KEY, RetrofitActivity.LOCAL_DEVELOPMENT_URL).apply();
-                                        Log.d("Diplicity", "*** updated " + API_URL_PREF_KEY);
                                         final EditTextPreference fakeIDPref = new EditTextPreference(getActivity());
                                         fakeIDPref.setKey(getResources().getString(R.string.local_development_mode_fake_id_pref_key));
                                         fakeIDPref.setTitle(getActivity().getResources().getString(R.string.local_development_fake_id));
                                         fakeIDPref.setSummary(prefs.getString(getResources().getString(R.string.local_development_mode_fake_id_pref_key), ""));
-                                        fakeIDPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                                            @Override
-                                            public boolean onPreferenceChange(Preference preference, Object o) {
-                                                fakeIDPref.setSummary((String) o);
-                                                return true;
-                                            }
-                                        });
+                                        fakeIDPref.setOnPreferenceChangeListener(fakeIDChanged);
                                         ((PreferenceCategory) findPreference("development_prefs")).addPreference(fakeIDPref);
                                     } else {
                                         prefs.edit().putString(RetrofitActivity.API_URL_PREF_KEY, RetrofitActivity.DEFAULT_URL).apply();
-                                        Log.d("Diplicity", "*** updated " + API_URL_PREF_KEY);
                                         removeFakeIDPref();
                                     }
+                                    retrofitActivity().performLogin();
                                     return true;
                                 }
                             });
