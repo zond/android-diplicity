@@ -205,7 +205,7 @@ public class GameActivity extends RetrofitActivity
         setTitle(gameTitle());
 
         for (Member m : game.Members) {
-            if (m.User.Id.equals(App.loggedInUser.Id)) {
+            if (m.User.Id.equals(getLoggedInUser().Id)) {
                 member = m;
             }
         }
@@ -882,14 +882,14 @@ public class GameActivity extends RetrofitActivity
         final Sendable<String> renderer = new Sendable<String>() {
             @Override
             public void send(String url) {
-                ((MapView) findViewById(R.id.map_view)).load(url);
+                ((MapView) findViewById(R.id.map_view)).load(GameActivity.this, url);
             }
         };
 
         if (game.Started) {
-            String url = App.baseURL + "Game/" + game.ID + "/Phase/" + phaseMeta.PhaseOrdinal + "/Map";
-            if (App.localDevelopmentMode && App.localDevelopmentModeFakeID != null && !App.localDevelopmentModeFakeID.equals("")) {
-                url = url + "?fake-id=" + App.localDevelopmentModeFakeID;
+            String url = getBaseURL() + "Game/" + game.ID + "/Phase/" + phaseMeta.PhaseOrdinal + "/Map";
+            if (getLocalDevelopmentMode() && !getLocalDevelopmentModeFakeID().equals("")) {
+                url = url + "?fake-id=" + getLocalDevelopmentModeFakeID();
             }
             renderer.send(url);
             if (member != null && !phaseMeta.Resolved) {

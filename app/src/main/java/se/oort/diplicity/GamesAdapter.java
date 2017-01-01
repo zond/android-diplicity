@@ -152,7 +152,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        retrofitActivity.handleReq(retrofitActivity.memberService.MemberDelete(game.Properties.ID, App.loggedInUser.Id),
+                        retrofitActivity.handleReq(retrofitActivity.memberService.MemberDelete(game.Properties.ID, retrofitActivity.getLoggedInUser().Id),
                                 new Sendable<SingleContainer<Member>>() {
                                     @Override
                                     public void send(SingleContainer<Member> memberSingleContainer) {

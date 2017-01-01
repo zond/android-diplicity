@@ -8,6 +8,7 @@ import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 
@@ -44,7 +45,7 @@ public class PreferenceActivity extends RetrofitActivity {
         public void onResume() {
             super.onResume();
             retrofitActivity().handleReq(
-                    retrofitActivity().userConfigService.UserConfigLoad(App.loggedInUser.Id),
+                    retrofitActivity().userConfigService.UserConfigLoad(retrofitActivity().getLoggedInUser().Id),
                     new Sendable<SingleContainer<UserConfig>>() {
                         private FCMToken getToken(UserConfig config) {
                             if (config.FCMTokens == null) {
@@ -63,14 +64,14 @@ public class PreferenceActivity extends RetrofitActivity {
                         public void send(final SingleContainer<UserConfig> userConfigSingleContainer) {
                             final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 
-                            final CheckBoxPreference emailPreference = (CheckBoxPreference) findPreference("email_notifications");
+                            final CheckBoxPreference emailPreference = (CheckBoxPreference) findPreference(getResources().getString(R.string.email_notifications_pref_key));
                             emailPreference.setChecked(userConfigSingleContainer.Properties.MailConfig.Enabled);
                             emailPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                                 @Override
                                 public boolean onPreferenceChange(Preference preference, Object o) {
                                     userConfigSingleContainer.Properties.MailConfig.Enabled = (Boolean) o;
                                     retrofitActivity().handleReq(
-                                            retrofitActivity().userConfigService.UserConfigUpdate(userConfigSingleContainer.Properties, App.loggedInUser.Id),
+                                            retrofitActivity().userConfigService.UserConfigUpdate(userConfigSingleContainer.Properties, retrofitActivity().getLoggedInUser().Id),
                                             new Sendable<SingleContainer<UserConfig>>() {
                                                 @Override
                                                 public void send(SingleContainer<UserConfig> userConfigSingleContainer) {
@@ -81,7 +82,7 @@ public class PreferenceActivity extends RetrofitActivity {
                                 }
                             });
 
-                            final CheckBoxPreference pushPreference = (CheckBoxPreference) findPreference("push_notifications");
+                            final CheckBoxPreference pushPreference = (CheckBoxPreference) findPreference(getResources().getString(R.string.push_notifications_pref_key));
                             if (FirebaseInstanceId.getInstance().getToken() != null) {
                                 FCMToken pushToken = getToken(userConfigSingleContainer.Properties);
                                 pushPreference.setChecked(pushToken != null && !pushToken.Disabled);
@@ -117,7 +118,7 @@ public class PreferenceActivity extends RetrofitActivity {
                                         if (pushToken != null) {
                                             final FCMToken finalToken = pushToken;
                                             retrofitActivity().handleReq(
-                                                    retrofitActivity().userConfigService.UserConfigUpdate(userConfigSingleContainer.Properties, App.loggedInUser.Id),
+                                                    retrofitActivity().userConfigService.UserConfigUpdate(userConfigSingleContainer.Properties, retrofitActivity().getLoggedInUser().Id),
                                                     new Sendable<SingleContainer<UserConfig>>() {
                                                         @Override
                                                         public void send(SingleContainer<UserConfig> userConfigSingleContainer) {
@@ -134,25 +135,27 @@ public class PreferenceActivity extends RetrofitActivity {
                                 pushPreference.setSummary(getResources().getString(R.string.dysfunctional_fcm_service));
                             }
 
-                            final EditTextPreference fakeIDPref = (EditTextPreference) findPreference(RetrofitActivity.LOCAL_DEVELOPMENT_MODE_FAKE_ID);
+                            final EditTextPreference fakeIDPref = (EditTextPreference) findPreference(getResources().getString(R.string.local_development_mode_fake_id_pref_key));
                             fakeIDPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                                 @Override
                                 public boolean onPreferenceChange(Preference preference, Object o) {
                                     fakeIDPref.setSummary((String) o);
+                                    PreferenceManager.getDefaultSharedPreferences(retrofitActivity()).edit().putString(AUTH_TOKEN_PREF_KEY, "").apply();
                                     return true;
                                 }
                             });
 
-                            final CheckBoxPreference localDevPreference = (CheckBoxPreference) findPreference(RetrofitActivity.LOCAL_DEVELOPMENT_MODE);
+                            final CheckBoxPreference localDevPreference = (CheckBoxPreference) findPreference(getResources().getString(R.string.local_development_mode_pref_key));
                             localDevPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                                 @Override
                                 public boolean onPreferenceChange(Preference preference, Object o) {
                                     if ((Boolean) o) {
-                                        prefs.edit().putString(RetrofitActivity.API_URL_KEY, RetrofitActivity.LOCAL_DEVELOPMENT_URL).apply();
+                                        prefs.edit().putString(RetrofitActivity.API_URL_PREF_KEY, RetrofitActivity.LOCAL_DEVELOPMENT_URL).apply();
+                                        Log.d("Diplicity", "*** updated " + API_URL_PREF_KEY);
                                         final EditTextPreference fakeIDPref = new EditTextPreference(getActivity());
-                                        fakeIDPref.setKey(RetrofitActivity.LOCAL_DEVELOPMENT_MODE_FAKE_ID);
+                                        fakeIDPref.setKey(getResources().getString(R.string.local_development_mode_fake_id_pref_key));
                                         fakeIDPref.setTitle(getActivity().getResources().getString(R.string.local_development_fake_id));
-                                        fakeIDPref.setSummary(prefs.getString(RetrofitActivity.LOCAL_DEVELOPMENT_MODE_FAKE_ID, ""));
+                                        fakeIDPref.setSummary(prefs.getString(getResources().getString(R.string.local_development_mode_fake_id_pref_key), ""));
                                         fakeIDPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                                             @Override
                                             public boolean onPreferenceChange(Preference preference, Object o) {
@@ -162,7 +165,8 @@ public class PreferenceActivity extends RetrofitActivity {
                                         });
                                         ((PreferenceCategory) findPreference("development_prefs")).addPreference(fakeIDPref);
                                     } else {
-                                        prefs.edit().putString(RetrofitActivity.API_URL_KEY, RetrofitActivity.DEFAULT_URL).apply();
+                                        prefs.edit().putString(RetrofitActivity.API_URL_PREF_KEY, RetrofitActivity.DEFAULT_URL).apply();
+                                        Log.d("Diplicity", "*** updated " + API_URL_PREF_KEY);
                                         removeFakeIDPref();
                                     }
                                     return true;
@@ -170,18 +174,18 @@ public class PreferenceActivity extends RetrofitActivity {
                             });
 
 
-                            if (!prefs.getBoolean(RetrofitActivity.LOCAL_DEVELOPMENT_MODE, false)) {
+                            if (!prefs.getBoolean(getResources().getString(R.string.local_development_mode_pref_key), false)) {
                                 removeFakeIDPref();
                             } else {
-                                findPreference(RetrofitActivity.LOCAL_DEVELOPMENT_MODE_FAKE_ID)
-                                        .setSummary(prefs.getString(RetrofitActivity.LOCAL_DEVELOPMENT_MODE_FAKE_ID, ""));
+                                findPreference(getResources().getString(R.string.local_development_mode_fake_id_pref_key))
+                                        .setSummary(prefs.getString(getResources().getString(R.string.local_development_mode_fake_id_pref_key), ""));
                             }
                         }
                     }, getResources().getString(R.string.loading_settings));
         }
 
         private void removeFakeIDPref() {
-            Preference fakeIDPref = findPreference(RetrofitActivity.LOCAL_DEVELOPMENT_MODE_FAKE_ID);
+            Preference fakeIDPref = findPreference(getResources().getString(R.string.local_development_mode_fake_id_pref_key));
             if (fakeIDPref != null) {
                 ((PreferenceCategory) getPreferenceScreen().findPreference("development_prefs")).removePreference(fakeIDPref);
             }

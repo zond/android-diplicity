@@ -82,7 +82,7 @@ public class MainActivity extends RetrofitActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                handleReq(userStatsService.UserStatsLoad(App.loggedInUser.Id), new Sendable<SingleContainer<UserStats>>() {
+                handleReq(userStatsService.UserStatsLoad(getLoggedInUser().Id), new Sendable<SingleContainer<UserStats>>() {
                     @Override
                     public void send(SingleContainer<UserStats> userStatsSingleContainer) {
                         final List<UserStats> statsContainer = new ArrayList<>();
@@ -138,7 +138,7 @@ public class MainActivity extends RetrofitActivity {
                         };
                         final Spinner variants = ((Spinner) dialog.findViewById(R.id.variants));
                         List<String> variantNames = new ArrayList<String>();
-                        for (SingleContainer<VariantService.Variant> variantContainer : App.variants.Properties) {
+                        for (SingleContainer<VariantService.Variant> variantContainer : getVariants().Properties) {
                             variantNames.add(variantContainer.Properties.Name);
                         }
                         int classical = 0;
@@ -202,7 +202,7 @@ public class MainActivity extends RetrofitActivity {
                                     }, new ErrorHandler(412, new Sendable<HttpException>() {
                                         @Override
                                         public void send(HttpException e) {
-                                            handleReq(userStatsService.UserStatsLoad(App.loggedInUser.Id), new Sendable<SingleContainer<UserStats>>() {
+                                            handleReq(userStatsService.UserStatsLoad(getLoggedInUser().Id), new Sendable<SingleContainer<UserStats>>() {
                                                 @Override
                                                 public void send(SingleContainer<UserStats> userStatsSingleContainer) {
                                                     statsContainer.set(0, userStatsSingleContainer.Properties);

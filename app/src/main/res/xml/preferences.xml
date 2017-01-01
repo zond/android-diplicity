@@ -5,11 +5,11 @@
         <CheckBoxPreference
             android:title="@string/email_notifications"
             android:summary="@string/send_notifications_to_your_registered_email"
-            android:key="email_notifications" />
+            android:key="@string/email_notifications_pref_key" />
         <CheckBoxPreference
             android:title="@string/push_notifications"
             android:summary="@string/push_notifications_to_your_device"
-            android:key="push_notifications" />
+            android:key="@string/push_notifications_pref_key" />
     </PreferenceCategory>
     <PreferenceCategory
         android:key="development_prefs"
@@ -17,10 +17,10 @@
         <CheckBoxPreference
             android:title="@string/local_development_mode"
             android:summary="@string/connect_to_localhost_instead_of_cloud_service"
-            android:key="local_development_mode" />
+            android:key="@string/local_development_mode_pref_key" />
         <EditTextPreference
             android:title="@string/local_development_fake_id"
             android:inputType="text"
-            android:key="local_development_mode_fake_id" />
+            android:key="@string/local_development_mode_fake_id_pref_key" />
     </PreferenceCategory>
  </PreferenceScreen>

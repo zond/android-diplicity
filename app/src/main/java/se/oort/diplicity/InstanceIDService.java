@@ -4,7 +4,6 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 
@@ -42,13 +41,13 @@ public class InstanceIDService extends FirebaseInstanceIdService {
             return;
         }
 
-        String baseURL = prefs.getString(RetrofitActivity.API_URL_KEY, "");
+        String baseURL = prefs.getString(RetrofitActivity.API_URL_PREF_KEY, "");
         if (baseURL.equals("")) {
             Log.d("Diplicity", "No base URL configured, ignoring");
             return;
         }
 
-        String userId = prefs.getString(RetrofitActivity.USER_ID_KEY, "");
+        String userId = prefs.getString(RetrofitActivity.USER_ID_PREF_KEY, "");
         if (userId.equals("")) {
             Log.d("Diplicity", "No user id configured, ignoring");
             return;

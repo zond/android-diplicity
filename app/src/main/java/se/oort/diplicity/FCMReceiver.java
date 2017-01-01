@@ -28,7 +28,7 @@ public class FCMReceiver extends RetrofitActivity {
                         public void send(SingleContainer<Game> gameSingleContainer) {
                                 Member member = null;
                                 for (Member m: gameSingleContainer.Properties.Members) {
-                                    if (m.User.Id.equals(App.loggedInUser.Id)) {
+                                    if (m.User.Id.equals(getLoggedInUser().Id)) {
                                         member = m;
                                         break;
                                     }

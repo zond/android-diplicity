@@ -17,6 +17,7 @@ import java.util.Map;
 
 import se.oort.diplicity.App;
 import se.oort.diplicity.R;
+import se.oort.diplicity.RetrofitActivity;
 import se.oort.diplicity.Sendable;
 
 public class MapView extends FrameLayout {
@@ -56,7 +57,7 @@ public class MapView extends FrameLayout {
         });
     }
 
-    public void load(String url) {
+    public void load(RetrofitActivity retrofitActivity, String url) {
         synchronized (this) {
             if (onFinished == null) {
                 onFinished = new ArrayList<>();
@@ -92,7 +93,7 @@ public class MapView extends FrameLayout {
         }, "Android");
 
         Map<String, String> headers = new HashMap<>();
-        headers.put("Authorization", "bearer " + App.authToken);
+        headers.put("Authorization", "bearer " + retrofitActivity.getAuthToken());
 
         Log.d("Diplicity", "Loading game view " + url);
         webView.loadUrl(url, headers);

@@ -4,12 +4,11 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URLEncoder;
 
 public class LoginActivity extends RetrofitActivity {
@@ -23,7 +22,7 @@ public class LoginActivity extends RetrofitActivity {
             mWebView.getSettings().setJavaScriptEnabled(true);
             final String fakeHost = "android-diplicity";
             String redirectTo = URLEncoder.encode("https://" + fakeHost + "/", "UTF-8");
-            String url = App.baseURL + "Auth/Login?redirect-to=" + redirectTo;
+            String url = getBaseURL() + "Auth/Login?redirect-to=" + redirectTo;
             Log.d("Diplicity", "LoginActivity GETing " + url);
             mWebView.loadUrl(url);
             mWebView.setWebViewClient(new WebViewClient() {
@@ -33,9 +32,9 @@ public class LoginActivity extends RetrofitActivity {
                     Uri parsedURI = Uri.parse(url);
                     if (parsedURI.getHost().equals(fakeHost)) {
                         Log.d("Diplicity", "LoginActivity got auth token");
-                        App.authToken = parsedURI.getQueryParameter("token");
+                        PreferenceManager.getDefaultSharedPreferences(LoginActivity.this).edit().putString(RetrofitActivity.AUTH_TOKEN_PREF_KEY, parsedURI.getQueryParameter("token")).apply();
                         Intent returnIntent = new Intent();
-                        setResult(RESULT_OK,returnIntent);
+                        setResult(RESULT_OK, returnIntent);
                         finish();
                         return true;
                     }

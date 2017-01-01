@@ -138,4 +138,8 @@
     <string name="push_notifications_to_your_device">Push notifications to your device</string>
     <string name="dysfunctional_fcm_service">Dysfunctional FCM service?</string>
     <string name="the_game_has_a_new_phase">The game has a new phase.</string>
+    <string name="push_notifications_pref_key">push_notifications_pref_key</string>
+    <string name="email_notifications_pref_key">email_notifications_pref_key</string>
+    <string name="local_development_mode_pref_key">local_development_mode_pref_key</string>
+    <string name="local_development_mode_fake_id_pref_key">local_development_mode_fake_id_pref_key</string>
 </resources>
