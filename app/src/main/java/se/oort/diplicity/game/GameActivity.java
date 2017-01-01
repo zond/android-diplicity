@@ -673,8 +673,8 @@ public class GameActivity extends RetrofitActivity
             @Override
             public void send(MultiContainer<Phase> phaseMultiContainer) {
                 final List<PhaseElement> phases = new ArrayList<>();
-                for (SingleContainer<Phase> phaseSingleContainer : phaseMultiContainer.Properties) {
-                    phases.add(new PhaseElement(phaseSingleContainer.Properties));
+                for (int i = 0; i < phaseMultiContainer.Properties.size(); i++) {
+                    phases.add(new PhaseElement(phaseMultiContainer.Properties.get(phaseMultiContainer.Properties.size() - i - 1).Properties));
                 }
                 ListView phasesView = (ListView) findViewById(R.id.phases_view);
                 phasesView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
