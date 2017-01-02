@@ -9,6 +9,7 @@ import android.preference.EditTextPreference;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
@@ -41,6 +42,8 @@ import se.oort.diplicity.MessagingService;
 import se.oort.diplicity.R;
 import se.oort.diplicity.RetrofitActivity;
 import se.oort.diplicity.Sendable;
+import se.oort.diplicity.UserStatsTable;
+import se.oort.diplicity.UserView;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Member;
 import se.oort.diplicity.apigen.Message;
@@ -49,6 +52,7 @@ import se.oort.diplicity.apigen.Phase;
 import se.oort.diplicity.apigen.PhaseMeta;
 import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.apigen.Ticker;
+import se.oort.diplicity.apigen.UserStats;
 
 public class PressActivity extends RetrofitActivity {
 
@@ -154,18 +158,36 @@ public class PressActivity extends RetrofitActivity {
                         for (int i = 0; i < messageMultiContainer.Properties.size(); i++) {
                             Message message = messageMultiContainer.Properties.get(messageMultiContainer.Properties.size() - i - 1).Properties;
                             View row = getLayoutInflater().inflate(R.layout.message_list_row, (ViewGroup) findViewById(R.id.press_layout), false);
-                            String url = null;
+                            Member author = null;
                             for (Member member : game.Members) {
                                 if (member.Nation.equals(message.Sender)) {
-                                    url = member.User.Picture;
+                                    author = member;
+                                    break;
                                 }
                             }
 
                             ((TextView) row.findViewById(R.id.body)).setText(message.Body);
                             ((TextView) row.findViewById(R.id.at)).setText(message.Age.deadlineAt().toString());
                             ((TextView) row.findViewById(R.id.sender)).setText(getResources().getString(R.string.x_, message.Sender));
-                            if (url != null) {
-                                PressActivity.this.populateImage((ImageView) row.findViewById(R.id.avatar), url);
+                            if (author != null) {
+                                ImageView avatar = (ImageView) row.findViewById(R.id.avatar);
+                                PressActivity.this.populateImage(avatar, author.User.Picture);
+                                final Member finalAuthor = author;
+                                avatar.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        PressActivity.this.handleReq(
+                                                PressActivity.this.userStatsService.UserStatsLoad(finalAuthor.User.Id),
+                                                new Sendable<SingleContainer<UserStats>>() {
+                                                    @Override
+                                                    public void send(SingleContainer<UserStats> userStatsSingleContainer) {
+                                                        final AlertDialog dialog = new AlertDialog.Builder(PressActivity.this).setView(R.layout.user_dialog).show();
+                                                        ((UserStatsTable) dialog.findViewById(R.id.user_stats)).setUserStats(PressActivity.this, userStatsSingleContainer.Properties);
+                                                        ((UserView) dialog.findViewById(R.id.user)).setUser(PressActivity.this, finalAuthor.User);
+                                                    }
+                                                }, getResources().getString(R.string.loading_user_stats));
+                                    }
+                                });
                             }
 
                             ((LinearLayout) findViewById(R.id.press_messages)).addView(row);

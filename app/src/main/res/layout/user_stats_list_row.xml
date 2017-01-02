@@ -27,10 +27,4 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <se.oort.diplicity.UserStatsTable
-        android:id="@+id/expanded"
-        android:layout_below="@id/user"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
 </RelativeLayout>
