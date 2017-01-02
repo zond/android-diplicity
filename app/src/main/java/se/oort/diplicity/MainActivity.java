@@ -390,6 +390,12 @@ public class MainActivity extends RetrofitActivity {
         case 1: // Users
             switch (child) {
             case 0: // Top rated
+                userStatsAdapter.setEmitter(new UserStatsAdapter.StatsEmitter() {
+                    @Override
+                    public String emit(UserStats stats) {
+                        return MainActivity.this.toString(stats.Glicko.PracticalRating);
+                    }
+                });
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
                     public void send(String s) {
@@ -399,6 +405,12 @@ public class MainActivity extends RetrofitActivity {
                 displayItems(userStatsService.ListTopRatedPlayers(null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
                 break;
             case 1: // Top reliable
+                userStatsAdapter.setEmitter(new UserStatsAdapter.StatsEmitter() {
+                    @Override
+                    public String emit(UserStats stats) {
+                        return MainActivity.this.toString(stats.Reliability);
+                    }
+                });
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
                     public void send(String s) {
@@ -408,6 +420,12 @@ public class MainActivity extends RetrofitActivity {
                 displayItems(userStatsService.ListTopReliablePlayers(null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
                 break;
             case 2: // Top quick
+                userStatsAdapter.setEmitter(new UserStatsAdapter.StatsEmitter() {
+                    @Override
+                    public String emit(UserStats stats) {
+                        return MainActivity.this.toString(stats.Quickness);
+                    }
+                });
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
                     public void send(String s) {
@@ -417,6 +435,12 @@ public class MainActivity extends RetrofitActivity {
                 displayItems(userStatsService.ListTopQuickPlayers(null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
                 break;
             case 3: // Top hated
+                userStatsAdapter.setEmitter(new UserStatsAdapter.StatsEmitter() {
+                    @Override
+                    public String emit(UserStats stats) {
+                        return MainActivity.this.toString(stats.Hated);
+                    }
+                });
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
                     public void send(String s) {
@@ -426,6 +450,12 @@ public class MainActivity extends RetrofitActivity {
                 displayItems(userStatsService.ListTopHatedPlayers(null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), userStatsAdapter);
                 break;
             case 4: // Top hater
+                userStatsAdapter.setEmitter(new UserStatsAdapter.StatsEmitter() {
+                    @Override
+                    public String emit(UserStats stats) {
+                        return MainActivity.this.toString(stats.Hater);
+                    }
+                });
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
                     public void send(String s) {
@@ -480,6 +510,7 @@ public class MainActivity extends RetrofitActivity {
     private <T> void displayItems(Observable<MultiContainer<T>> call, String what, String typ, RecycleAdapter<SingleContainer<T>,?> adapter) {
         adapter.clear();
         gamesAdapter.clearExpanded();
+        userStatsAdapter.clearExpanded();
         contentList.setAdapter(adapter);
         scrollListener.resetState();
         appendItems(call, what, typ, adapter);

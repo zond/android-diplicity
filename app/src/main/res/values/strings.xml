@@ -144,4 +144,17 @@
     <string name="local_development_mode_fake_id_pref_key">local_development_mode_fake_id_pref_key</string>
     <string name="you_can_build_n_this_phase">You can build %s this phase.</string>
     <string name="you_have_to_disband_n_this_phase">You have to disband %s this phase.</string>
+    <string name="started_games">Started games</string>
+    <string name="finished_games">Finished games</string>
+    <string name="solo_wins">Solo wins</string>
+    <string name="draws">Draws</string>
+    <string name="eliminations">Eliminations</string>
+    <string name="dropped_games">Dropped games</string>
+    <string name="ready_phases">Ready phases</string>
+    <string name="active_phases">Active phases</string>
+    <string name="nmr_phases">NMR phases</string>
+    <string name="owned_bans">Owned bans</string>
+    <string name="shared_bans">Shared bans</string>
+    <string name="hated">Hated</string>
+    <string name="hater">Hater</string>
 </resources>
