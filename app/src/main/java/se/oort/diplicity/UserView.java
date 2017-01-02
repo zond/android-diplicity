@@ -34,11 +34,8 @@ public class UserView extends FrameLayout {
         super(context, attrs);
         inflate();
     }
-    public void setUser(final RetrofitActivity retrofitActivity, final User user) {
-        ((TextView) findViewById(R.id.name)).setText(user.Name);
-        ImageView avatar = (ImageView) findViewById(R.id.avatar);
-        retrofitActivity.populateImage(avatar, user.Picture);
-        avatar.setOnClickListener(new OnClickListener() {
+    public static OnClickListener getAvatarClickListener(final RetrofitActivity retrofitActivity, final User user) {
+        return new OnClickListener() {
             @Override
             public void onClick(View v) {
                 retrofitActivity.handleReq(
@@ -50,8 +47,14 @@ public class UserView extends FrameLayout {
                                 ((UserStatsTable) dialog.findViewById(R.id.user_stats)).setUserStats(retrofitActivity, userStatsSingleContainer.Properties);
                                 ((UserView) dialog.findViewById(R.id.user)).setUser(retrofitActivity, user);
                             }
-                        }, getResources().getString(R.string.loading_user_stats));
+                        }, retrofitActivity.getResources().getString(R.string.loading_user_stats));
             }
-        });
+        };
+    }
+    public void setUser(RetrofitActivity retrofitActivity, User user) {
+        ((TextView) findViewById(R.id.name)).setText(user.Name);
+        ImageView avatar = (ImageView) findViewById(R.id.avatar);
+        retrofitActivity.populateImage(avatar, user.Picture);
+        avatar.setOnClickListener(getAvatarClickListener(retrofitActivity, user));
     }
 }

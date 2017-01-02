@@ -172,22 +172,7 @@ public class PressActivity extends RetrofitActivity {
                             if (author != null) {
                                 ImageView avatar = (ImageView) row.findViewById(R.id.avatar);
                                 PressActivity.this.populateImage(avatar, author.User.Picture);
-                                final Member finalAuthor = author;
-                                avatar.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        PressActivity.this.handleReq(
-                                                PressActivity.this.userStatsService.UserStatsLoad(finalAuthor.User.Id),
-                                                new Sendable<SingleContainer<UserStats>>() {
-                                                    @Override
-                                                    public void send(SingleContainer<UserStats> userStatsSingleContainer) {
-                                                        final AlertDialog dialog = new AlertDialog.Builder(PressActivity.this).setView(R.layout.user_dialog).show();
-                                                        ((UserStatsTable) dialog.findViewById(R.id.user_stats)).setUserStats(PressActivity.this, userStatsSingleContainer.Properties);
-                                                        ((UserView) dialog.findViewById(R.id.user)).setUser(PressActivity.this, finalAuthor.User);
-                                                    }
-                                                }, getResources().getString(R.string.loading_user_stats));
-                                    }
-                                });
+                                avatar.setOnClickListener(UserView.getAvatarClickListener(PressActivity.this, author.User));
                             }
 
                             ((LinearLayout) findViewById(R.id.press_messages)).addView(row);
