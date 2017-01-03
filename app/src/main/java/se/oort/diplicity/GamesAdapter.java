@@ -1,6 +1,5 @@
 package se.oort.diplicity;
 
-import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -132,7 +131,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                 expanded.setVisibility(View.GONE);
             }
 
-            members.setMembers(retrofitActivity, game.Properties.Members);
+            members.setMembers(retrofitActivity, game.Properties, game.Properties.Members);
 
             boolean hasLeave = false;
             boolean hasJoin = false;

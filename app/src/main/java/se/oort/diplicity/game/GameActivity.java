@@ -3,7 +3,6 @@ package se.oort.diplicity.game;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -15,7 +14,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -23,7 +21,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -69,7 +66,6 @@ import se.oort.diplicity.apigen.PhaseState;
 import se.oort.diplicity.apigen.Resolution;
 import se.oort.diplicity.apigen.SC;
 import se.oort.diplicity.apigen.SingleContainer;
-import se.oort.diplicity.apigen.Unit;
 import se.oort.diplicity.apigen.UnitWrapper;
 
 public class GameActivity extends RetrofitActivity
@@ -666,7 +662,7 @@ public class GameActivity extends RetrofitActivity
                             phaseStates.add(phaseStateSingleContainer.Properties);
                         }
                         phaseStateView.setPhaseStates(game, phaseMeta, phaseStates);
-                        phaseStateView.setMembers(GameActivity.this, game.Members);
+                        phaseStateView.setMembers(GameActivity.this, game, game.Members);
                     }
                 }, getResources().getString(R.string.loading_phase_settings));
     }
@@ -778,7 +774,7 @@ public class GameActivity extends RetrofitActivity
             LinearLayoutManager membersLayoutManager = new LinearLayoutManager(GameActivity.this);
             membersLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
             MemberTable table = (MemberTable) findViewById(view);
-            table.setMembers(GameActivity.this, members);
+            table.setMembers(GameActivity.this, game, members);
             table.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent) {

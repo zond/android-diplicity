@@ -49,7 +49,7 @@ public class MemberTable extends TableLayout {
         this.phaseStates = phaseStates;
         this.game = game;
     }
-    public void setMembers(final RetrofitActivity retrofitActivity, final List<Member> members) {
+    public void setMembers(final RetrofitActivity retrofitActivity, Game game, final List<Member> members) {
         removeAllViews();
         for (final Member member : members) {
             boolean rowOK = true;
@@ -66,7 +66,7 @@ public class MemberTable extends TableLayout {
                             TableRow.LayoutParams.WRAP_CONTENT, 1.0f);
             setMargins(userParams);
             userView.setLayoutParams(userParams);
-            userView.setUser(retrofitActivity, member.User);
+            userView.setMember(retrofitActivity, game, member, member.User);
             tableRow.addView(userView);
 
             if (member.Nation != null && !member.Nation.equals("")) {
@@ -115,7 +115,7 @@ public class MemberTable extends TableLayout {
                             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                                 finalFoundState.ReadyToResolve = b;
                                 retrofitActivity.handleReq(
-                                        retrofitActivity.phaseStateService.PhaseStateUpdate(finalFoundState, game.ID, phaseMeta.PhaseOrdinal.toString(), member.Nation),
+                                        retrofitActivity.phaseStateService.PhaseStateUpdate(finalFoundState, MemberTable.this.game.ID, phaseMeta.PhaseOrdinal.toString(), member.Nation),
                                         new Sendable<SingleContainer<PhaseState>>() {
                                             @Override
                                             public void send(SingleContainer<PhaseState> phaseStateSingleContainer) {
@@ -139,7 +139,7 @@ public class MemberTable extends TableLayout {
                             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                                 finalFoundState.WantsDIAS = b;
                                 retrofitActivity.handleReq(
-                                        retrofitActivity.phaseStateService.PhaseStateUpdate(finalFoundState, game.ID, phaseMeta.PhaseOrdinal.toString(), member.Nation),
+                                        retrofitActivity.phaseStateService.PhaseStateUpdate(finalFoundState, MemberTable.this.game.ID, phaseMeta.PhaseOrdinal.toString(), member.Nation),
                                         new Sendable<SingleContainer<PhaseState>>() {
                                             @Override
                                             public void send(SingleContainer<PhaseState> phaseStateSingleContainer) {

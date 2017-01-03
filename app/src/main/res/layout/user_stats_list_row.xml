@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:minHeight="?attr/listPreferredItemHeight"
-    android:mode="twoLine"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:focusable="true"
@@ -21,7 +19,7 @@
     <TextView
         android:id="@+id/sort_label"
         android:layout_below="@id/user"
-        android:layout_alignParentTop="true"
+        android:layout_alignTop="@id/user"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_width="wrap_content"
