@@ -157,4 +157,5 @@
     <string name="shared_bans">Shared bans</string>
     <string name="hated">Hated</string>
     <string name="hater">Hater</string>
+    <string name="banned">Banned</string>
 </resources>

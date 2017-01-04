@@ -25,13 +25,17 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.adapter.rxjava.HttpException;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.functions.Func2;
+import rx.functions.Func3;
 import rx.joins.JoinObserver;
 import rx.observables.JoinObservable;
 import rx.schedulers.Schedulers;
+import se.oort.diplicity.apigen.Ban;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.GameState;
 import se.oort.diplicity.apigen.Member;
@@ -51,9 +55,43 @@ public class UserView extends FrameLayout {
         inflate();
     }
 
-    private static void setupUserStats(RetrofitActivity retrofitActivity, AlertDialog dialog, UserStats userStats) {
-        ((UserStatsTable) dialog.findViewById(R.id.user_stats)).setUserStats(retrofitActivity, userStats);
-        ((UserView) dialog.findViewById(R.id.user)).setUser(retrofitActivity, userStats.User);
+    private static void setupUserStats(final RetrofitActivity retrofitActivity, AlertDialog dialog, final SingleContainer<UserStats> userStats, final SingleContainer<Ban> ban) {
+        ((UserStatsTable) dialog.findViewById(R.id.user_stats)).setUserStats(retrofitActivity, userStats.Properties);
+        ((UserView) dialog.findViewById(R.id.user)).setUser(retrofitActivity, userStats.Properties.User);
+        final CheckBox bannedCheckBox = (CheckBox) dialog.findViewById(R.id.banned);
+        if (userStats.Properties.UserId.equals(retrofitActivity.getLoggedInUser().Id)) {
+            bannedCheckBox.setVisibility(GONE);
+        } else {
+            bannedCheckBox.setVisibility(VISIBLE);
+            bannedCheckBox.setChecked(ban != null);
+            bannedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        Ban ban = new Ban();
+                        ban.UserIds = new ArrayList<String>();
+                        ban.UserIds.add(userStats.Properties.UserId);
+                        ban.UserIds.add(retrofitActivity.getLoggedInUser().Id);
+                        retrofitActivity.handleReq(
+                                retrofitActivity.banService.BanCreate(ban, retrofitActivity.getLoggedInUser().Id),
+                                new Sendable<SingleContainer<Ban>>() {
+                                    @Override
+                                    public void send(SingleContainer<Ban> banSingleContainer) {
+                                    }
+                                }, retrofitActivity.getResources().getString(R.string.updating));
+                    } else {
+                        retrofitActivity.handleReq(
+                                retrofitActivity.banService.BanDelete(retrofitActivity.getLoggedInUser().Id, userStats.Properties.UserId),
+                                new Sendable<SingleContainer<Ban>>() {
+                                    @Override
+                                    public void send(SingleContainer<Ban> banSingleContainer) {
+
+                                    }
+                                }, retrofitActivity.getResources().getString(R.string.updating));
+                    }
+                }
+            });
+        }
         dialog.findViewById(R.id.muted).setVisibility(GONE);
     }
 
@@ -62,13 +100,31 @@ public class UserView extends FrameLayout {
             @Override
             public void onClick(View v) {
                 retrofitActivity.handleReq(
-                        retrofitActivity.userStatsService.UserStatsLoad(user.Id),
-                        new Sendable<SingleContainer<UserStats>>() {
+                        JoinObservable.when(JoinObservable
+                                .from(retrofitActivity.userStatsService.UserStatsLoad(user.Id))
+                                .and(retrofitActivity.banService.BanLoad(retrofitActivity.getLoggedInUser().Id, user.Id).onErrorReturn(new Func1<Throwable, SingleContainer<Ban>>() {
+                                    @Override
+                                    public SingleContainer<Ban> call(Throwable throwable) {
+                                        if (throwable instanceof HttpException) {
+                                            HttpException he = (HttpException) throwable;
+                                            if (he.code() == 404) {
+                                                return null;
+                                            }
+                                        }
+                                        throw new RuntimeException(throwable);
+                                    }
+                                }))
+                                .then(new Func2<SingleContainer<UserStats>, SingleContainer<Ban>, Object>() {
+                                    @Override
+                                    public Object call(SingleContainer<UserStats> userStatsSingleContainer, SingleContainer<Ban> banSingleContainer) {
+                                        AlertDialog dialog = new AlertDialog.Builder(retrofitActivity).setView(R.layout.user_dialog).show();
+                                        setupUserStats(retrofitActivity, dialog, userStatsSingleContainer, banSingleContainer);
+                                        return null;
+                                    }
+                                })).toObservable(),
+                        new Sendable<Object>() {
                             @Override
-                            public void send(SingleContainer<UserStats> userStatsSingleContainer) {
-                                AlertDialog dialog = new AlertDialog.Builder(retrofitActivity).setView(R.layout.user_dialog).show();
-                                setupUserStats(retrofitActivity, dialog, userStatsSingleContainer.Properties);
-                            }
+                            public void send(Object o) {}
                         }, retrofitActivity.getResources().getString(R.string.loading_user_stats));
             }
         };
@@ -96,11 +152,23 @@ public class UserView extends FrameLayout {
                         JoinObservable.when(JoinObservable
                                 .from(retrofitActivity.userStatsService.UserStatsLoad(user.Id))
                                 .and(retrofitActivity.gameStateService.GameStateLoad(game.ID, finalMe.Nation))
-                                .then(new Func2<SingleContainer<UserStats>, SingleContainer<GameState>, Object>() {
+                                .and(retrofitActivity.banService.BanLoad(retrofitActivity.getLoggedInUser().Id, user.Id).onErrorReturn(new Func1<Throwable, SingleContainer<Ban>>() {
                                     @Override
-                                    public Object call(SingleContainer<UserStats> userStatsSingleContainer, final SingleContainer<GameState> gameStateSingleContainer) {
+                                    public SingleContainer<Ban> call(Throwable throwable) {
+                                        if (throwable instanceof HttpException) {
+                                            HttpException he = (HttpException) throwable;
+                                            if (he.code() == 404) {
+                                                return null;
+                                            }
+                                        }
+                                        throw new RuntimeException(throwable);
+                                    }
+                                }))
+                                .then(new Func3<SingleContainer<UserStats>, SingleContainer<GameState>, SingleContainer<Ban>, Object>() {
+                                    @Override
+                                    public Object call(SingleContainer<UserStats> userStatsSingleContainer, final SingleContainer<GameState> gameStateSingleContainer, final SingleContainer<Ban> banSingleContainer) {
                                         AlertDialog dialog = new AlertDialog.Builder(retrofitActivity).setView(R.layout.user_dialog).show();
-                                        setupUserStats(retrofitActivity, dialog, userStatsSingleContainer.Properties);
+                                        setupUserStats(retrofitActivity, dialog, userStatsSingleContainer, banSingleContainer);
                                         final CheckBox mutedCheckBox = (CheckBox) dialog.findViewById(R.id.muted);
                                         mutedCheckBox.setVisibility(VISIBLE);
                                         mutedCheckBox.setChecked(gameStateSingleContainer.Properties.Muted != null && gameStateSingleContainer.Properties.Muted.contains(member.Nation));

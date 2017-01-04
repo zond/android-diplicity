@@ -52,6 +52,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func2;
 import rx.observables.JoinObservable;
 import rx.schedulers.Schedulers;
+import se.oort.diplicity.apigen.BanService;
 import se.oort.diplicity.apigen.GameResultService;
 import se.oort.diplicity.apigen.GameService;
 import se.oort.diplicity.apigen.GameStateService;
@@ -100,6 +101,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     public PhaseStateService phaseStateService;
     public GameStateService gameStateService;
     public UserConfigService userConfigService;
+    public BanService banService;
 
     // prefs listening (to recreate services when the base URL is updated)
     private SharedPreferences prefs;
@@ -357,6 +359,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         phaseStateService = retrofit.create(PhaseStateService.class);
         gameStateService = retrofit.create(GameStateService.class);
         userConfigService = retrofit.create(UserConfigService.class);
+        banService = retrofit.create(BanService.class);
     }
 
     public String getLocalDevelopmentModeFakeID() {
