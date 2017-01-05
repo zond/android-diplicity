@@ -419,7 +419,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    public void populateImage(final ImageView view, final String u) {
+    public void populateImage(final ImageView view, final String u, final int width, final int height) {
         Observable.create(new Observable.OnSubscribe<Bitmap>() {
             @Override
             public void call(final Subscriber<? super Bitmap> subscriber) {
@@ -429,7 +429,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                         URL url = new URL(u);
                         bmp = ThumbnailUtils.extractThumbnail(
                                 BitmapFactory.decodeStream(url.openConnection().getInputStream()),
-                                view.getWidth(), view.getHeight());
+                                width, height);
                         pictureCache.put(u, bmp);
                     } catch(IOException e) {
                         subscriber.onError(e);

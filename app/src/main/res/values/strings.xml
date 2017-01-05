@@ -158,4 +158,8 @@
     <string name="hated">Hated</string>
     <string name="hater">Hater</string>
     <string name="banned">Banned</string>
+    <string name="bans">Bans</string>
+    <string name="as_banner">As banner</string>
+    <string name="as_banned">As banned</string>
+    <string name="loading_bans">Loading bans</string>
 </resources>

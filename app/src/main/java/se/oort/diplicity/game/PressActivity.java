@@ -171,7 +171,7 @@ public class PressActivity extends RetrofitActivity {
                             ((TextView) row.findViewById(R.id.sender)).setText(getResources().getString(R.string.x_, message.Sender));
                             if (author != null) {
                                 ImageView avatar = (ImageView) row.findViewById(R.id.avatar);
-                                PressActivity.this.populateImage(avatar, author.User.Picture);
+                                PressActivity.this.populateImage(avatar, author.User.Picture, 36, 36);
                                 avatar.setOnClickListener(UserView.getAvatarClickListener(PressActivity.this, game, author, author.User));
                             }
 

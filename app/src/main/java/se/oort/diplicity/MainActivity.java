@@ -1,5 +1,6 @@
 package se.oort.diplicity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,14 +15,21 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.Spinner;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,10 +43,13 @@ import java.util.concurrent.Callable;
 
 import retrofit2.adapter.rxjava.HttpException;
 import rx.Observable;
+import rx.Single;
+import se.oort.diplicity.apigen.Ban;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Link;
 import se.oort.diplicity.apigen.MultiContainer;
 import se.oort.diplicity.apigen.SingleContainer;
+import se.oort.diplicity.apigen.User;
 import se.oort.diplicity.apigen.UserStats;
 
 public class MainActivity extends RetrofitActivity {
@@ -540,6 +551,107 @@ public class MainActivity extends RetrofitActivity {
             Intent i = new Intent(this, PreferenceActivity.class);
             startActivity(i);
             return true;
+        } else if (id == R.id.action_bans) {
+            handleReq(
+                    banService.ListBans(getLoggedInUser().Id),
+                    new Sendable<MultiContainer<Ban>>() {
+                        private RelativeLayout.LayoutParams wrapContentParams =
+                                new RelativeLayout.LayoutParams(
+                                        RelativeLayout.LayoutParams.WRAP_CONTENT,
+                                        RelativeLayout.LayoutParams.WRAP_CONTENT);
+                        private void setMargins(RelativeLayout.LayoutParams params) {
+                            int margin = getResources().getDimensionPixelSize(R.dimen.member_table_margin);
+                            params.bottomMargin = margin;
+                            params.topMargin = margin;
+                            params.leftMargin = margin;
+                            params.rightMargin = margin;
+                        }
+                        private void setupView(final AlertDialog dialog, final MultiContainer<Ban> banMultiContainer, final SingleContainer<Ban> ban, View convertView) {
+                            User other = null;
+                            for (User u : ban.Properties.Users) {
+                                if (!u.Id.equals(getLoggedInUser().Id)) {
+                                    other = u;
+                                    break;
+                                }
+                            }
+                            if (other != null) {
+                                final User finalOther = other;
+                                ((UserView) convertView.findViewById(R.id.other_user)).setUser(MainActivity.this, other);
+                                if (ban.Properties.OwnerIds.contains(getLoggedInUser().Id)) {
+                                    LayoutInflater inflater = (LayoutInflater) MainActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                                    FloatingActionButton button = (FloatingActionButton) inflater.inflate(R.layout.clear_button, null);
+                                    setMargins(wrapContentParams);
+                                    wrapContentParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                                    wrapContentParams.addRule(RelativeLayout.ALIGN_PARENT_END);
+                                    wrapContentParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                                    button.setLayoutParams(wrapContentParams);
+                                    button.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            handleReq(banService.BanDelete(getLoggedInUser().Id, finalOther.Id),
+                                                    new Sendable<SingleContainer<Ban>>() {
+                                                        @Override
+                                                        public void send(SingleContainer<Ban> banSingleContainer) {
+                                                            ban.Properties.OwnerIds.remove(getLoggedInUser().Id);
+                                                            if (ban.Properties.OwnerIds.isEmpty()) {
+                                                                banMultiContainer.Properties.remove(ban);
+                                                            }
+                                                            setupDialog(dialog, banMultiContainer);
+                                                        }
+                                                    }, getResources().getString(R.string.updating));
+                                        }
+                                    });
+                                    ((RelativeLayout) convertView.findViewById(R.id.ban_list_row_layout)).addView(button);
+                                }
+                            }
+                        }
+                        @Override
+                        public void send(MultiContainer<Ban> banMultiContainer) {
+                            AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.bans_dialog).show();
+                            setupDialog(dialog, banMultiContainer);
+                        }
+                        private void setupDialog(AlertDialog dialog, MultiContainer<Ban> banMultiContainer) {
+                            List<SingleContainer<Ban>> asBannerList = new ArrayList<>();
+                            List<SingleContainer<Ban>> asBannedList = new ArrayList<>();
+                            for (SingleContainer<Ban> banSingleContainer : banMultiContainer.Properties) {
+                                if (banSingleContainer.Properties.OwnerIds.contains(getLoggedInUser().Id)) {
+                                    asBannerList.add(banSingleContainer);
+                                } else {
+                                    asBannedList.add(banSingleContainer);
+                                }
+                            }
+                            ViewGroup parent = (ViewGroup) dialog.findViewById(R.id.bans_dialog_layout);
+
+                            LinearLayout asBanner = (LinearLayout) dialog.findViewById(R.id.hater_list);
+                            if (asBannerList.isEmpty()) {
+                                dialog.findViewById(R.id.as_banner_no_data).setVisibility(View.VISIBLE);
+                                asBanner.setVisibility(View.GONE);
+                            } else {
+                                dialog.findViewById(R.id.as_banner_no_data).setVisibility(View.GONE);
+                                asBanner.removeAllViews();
+                                for (SingleContainer<Ban> ban : asBannerList) {
+                                    View itemView = LayoutInflater.from(MainActivity.this)
+                                            .inflate(R.layout.ban_list_row, parent, false);
+                                    asBanner.addView(itemView);
+                                    setupView(dialog, banMultiContainer, ban, itemView);
+                                }
+                            }
+                            LinearLayout asBanned = (LinearLayout) dialog.findViewById(R.id.hated_list);
+                            if (asBannedList.isEmpty()) {
+                                dialog.findViewById(R.id.as_banned_no_data).setVisibility(View.VISIBLE);
+                                asBanned.setVisibility(View.GONE);
+                            } else {
+                                dialog.findViewById(R.id.as_banner_no_data).setVisibility(View.GONE);
+                                asBanned.removeAllViews();
+                                for (SingleContainer<Ban> ban : asBannedList) {
+                                    View itemView = LayoutInflater.from(MainActivity.this)
+                                            .inflate(R.layout.ban_list_row, parent, false);
+                                    asBanned.addView(itemView);
+                                    setupView(dialog, banMultiContainer, ban, itemView);
+                                }
+                            }
+                        }
+                    }, getResources().getString(R.string.loading_bans));
         }
 
         return super.onOptionsItemSelected(item);

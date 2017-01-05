@@ -211,7 +211,7 @@ public class UserView extends FrameLayout {
     public void setMember(RetrofitActivity retrofitActivity, Game game, Member member, User user) {
         ((TextView) findViewById(R.id.name)).setText(user.Name);
         ImageView avatar = (ImageView) findViewById(R.id.avatar);
-        retrofitActivity.populateImage(avatar, user.Picture);
+        retrofitActivity.populateImage(avatar, user.Picture, 36, 36);
         avatar.setOnClickListener(getAvatarClickListener(retrofitActivity, game, member, user));
     }
 }
