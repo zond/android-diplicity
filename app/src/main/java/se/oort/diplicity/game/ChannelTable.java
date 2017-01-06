@@ -65,10 +65,12 @@ public class ChannelTable extends TableLayout {
             messages.setText(getResources().getQuantityString(R.plurals.message, channel.NMessages, channel.NMessages));
             tableRow.addView(messages);
 
-            TextView unread = new TextView(retrofitActivity);
-            unread.setLayoutParams(wrapContentParams);
-            unread.setText(getResources().getString(R.string._unread, channel.NMessagesSince.NMessages));
-            tableRow.addView(unread);
+            if (member != null) {
+                TextView unread = new TextView(retrofitActivity);
+                unread.setLayoutParams(wrapContentParams);
+                unread.setText(getResources().getString(R.string._unread, channel.NMessagesSince.NMessages));
+                tableRow.addView(unread);
+            }
 
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             FloatingActionButton button = (FloatingActionButton) inflater.inflate(R.layout.expand_button, null);

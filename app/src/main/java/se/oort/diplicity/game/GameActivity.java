@@ -514,6 +514,10 @@ public class GameActivity extends RetrofitActivity
     public void showGameStates() {
         hideAllExcept(R.id.game_state_view);
 
+        if (member == null) {
+            findViewById(R.id.edit_game_state_button).setVisibility(View.GONE);
+        }
+        
         handleReq(
                 gameStateService.ListGameStates(game.ID),
                 new Sendable<MultiContainer<GameState>>() {
@@ -528,7 +532,7 @@ public class GameActivity extends RetrofitActivity
                         }
                         final List<String> nations = new ArrayList<String>();
                         for (Member thisMember : game.Members) {
-                            if (!thisMember.Nation.equals(member.Nation)) {
+                            if (member == null || !thisMember.Nation.equals(member.Nation)) {
                                 nations.add(thisMember.Nation);
                             }
                             GameState foundState = null;
@@ -537,7 +541,7 @@ public class GameActivity extends RetrofitActivity
                                     foundState = singleContainer.Properties;
                                 }
                             }
-                            if (thisMember.Nation.equals(member.Nation)) {
+                            if (member != null && thisMember.Nation.equals(member.Nation)) {
                                 myState = foundState;
                             }
                             TableRow.LayoutParams params =

@@ -115,7 +115,7 @@ public class PressActivity extends RetrofitActivity {
 
         if (member == null) {
             findViewById(R.id.send_message_button).setVisibility(View.GONE);
-            findViewById(R.id.body).setVisibility(View.GONE);
+            findViewById(R.id.new_message_body).setVisibility(View.GONE);
         } else {
             ((FloatingActionButton) findViewById(R.id.send_message_button)).setOnClickListener(new View.OnClickListener() {
                 @Override
