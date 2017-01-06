@@ -35,7 +35,7 @@ public class InstanceIDService extends FirebaseInstanceIdService {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        String replaceToken = prefs.getString(PreferenceActivity.FCM_REPLACE_TOKEN_KEY, "");
+        String replaceToken = prefs.getString(RetrofitActivity.FCM_REPLACE_TOKEN_PREF_KEY, "");
         if (replaceToken.equals("")) {
             Log.d("Diplicity", "No replace token configured, ignoring");
             return;

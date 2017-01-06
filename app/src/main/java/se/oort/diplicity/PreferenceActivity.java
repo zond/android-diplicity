@@ -24,11 +24,6 @@ import se.oort.diplicity.apigen.UserConfig;
 
 public class PreferenceActivity extends RetrofitActivity {
 
-    public static String FCM_REPLACE_TOKEN_KEY = "fcm_replace_token";
-    public static String APP_NAME = "android-diplicity";
-
-    private static SecureRandom random = new SecureRandom();
-
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -47,19 +42,6 @@ public class PreferenceActivity extends RetrofitActivity {
             retrofitActivity().handleReq(
                     retrofitActivity().userConfigService.UserConfigLoad(retrofitActivity().getLoggedInUser().Id),
                     new Sendable<SingleContainer<UserConfig>>() {
-                        private FCMToken getToken(UserConfig config) {
-                            if (config.FCMTokens == null) {
-                                return null;
-                            }
-                            FCMToken pushToken = null;
-                            for (FCMToken fcmToken : config.FCMTokens) {
-                                if (APP_NAME.equals(fcmToken.App)) {
-                                    pushToken = fcmToken;
-                                    break;
-                                }
-                            }
-                            return pushToken;
-                        }
                         @Override
                         public void send(final SingleContainer<UserConfig> userConfigSingleContainer) {
                             final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
@@ -84,48 +66,12 @@ public class PreferenceActivity extends RetrofitActivity {
 
                             final CheckBoxPreference pushPreference = (CheckBoxPreference) findPreference(getResources().getString(R.string.push_notifications_pref_key));
                             if (FirebaseInstanceId.getInstance().getToken() != null) {
-                                FCMToken pushToken = getToken(userConfigSingleContainer.Properties);
+                                FCMToken pushToken = retrofitActivity().getFCMToken(userConfigSingleContainer.Properties);
                                 pushPreference.setChecked(pushToken != null && !pushToken.Disabled);
                                 pushPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                                     @Override
                                     public boolean onPreferenceChange(Preference preference, Object newValue) {
-                                        FCMToken pushToken = getToken(userConfigSingleContainer.Properties);
-                                        if ((Boolean) newValue) {
-                                            if (pushToken == null) {
-                                                pushToken = new FCMToken();
-                                                pushToken.Note = "Created by user action at " + new Date();
-                                                if (userConfigSingleContainer.Properties.FCMTokens == null) {
-                                                    userConfigSingleContainer.Properties.FCMTokens = new ArrayList<FCMToken>();
-                                                }
-                                                userConfigSingleContainer.Properties.FCMTokens.add(pushToken);
-                                            } else if (pushToken.Disabled) {
-                                                pushToken.Note = "Enabled by user action at " + new Date();
-                                            }
-                                            pushToken.Disabled = false;
-                                            pushToken.Value = FirebaseInstanceId.getInstance().getToken();
-                                            pushToken.App = APP_NAME;
-                                            pushToken.ReplaceToken = new BigInteger(8 * 24, random).toString(32);
-                                            pushToken.MessageConfig = new FCMNotificationConfig();
-                                            pushToken.MessageConfig.ClickActionTemplate = MessagingService.FCM_NOTIFY_ACTION;
-                                            pushToken.PhaseConfig = new FCMNotificationConfig();
-                                            pushToken.PhaseConfig.ClickActionTemplate = MessagingService.FCM_NOTIFY_ACTION;
-                                        } else {
-                                            if (pushToken != null && (pushToken.Disabled == null || !pushToken.Disabled)) {
-                                                pushToken.Disabled = true;
-                                                pushToken.Note = "Disabled by user action at " + new Date();
-                                            }
-                                        }
-                                        if (pushToken != null) {
-                                            final FCMToken finalToken = pushToken;
-                                            retrofitActivity().handleReq(
-                                                    retrofitActivity().userConfigService.UserConfigUpdate(userConfigSingleContainer.Properties, retrofitActivity().getLoggedInUser().Id),
-                                                    new Sendable<SingleContainer<UserConfig>>() {
-                                                        @Override
-                                                        public void send(SingleContainer<UserConfig> userConfigSingleContainer) {
-                                                            PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putString(FCM_REPLACE_TOKEN_KEY, finalToken.ReplaceToken).apply();
-                                                        }
-                                                    }, getResources().getString(R.string.updating_settings));
-                                        }
+                                        retrofitActivity().updateFCMPushOption(userConfigSingleContainer.Properties, (Boolean) newValue, "User action");
                                         return true;
                                     }
                                 });

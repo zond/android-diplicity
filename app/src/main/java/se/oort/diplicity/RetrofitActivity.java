@@ -15,6 +15,7 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -27,9 +28,12 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.math.BigInteger;
 import java.net.URL;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -53,6 +57,8 @@ import rx.functions.Func2;
 import rx.observables.JoinObservable;
 import rx.schedulers.Schedulers;
 import se.oort.diplicity.apigen.BanService;
+import se.oort.diplicity.apigen.FCMNotificationConfig;
+import se.oort.diplicity.apigen.FCMToken;
 import se.oort.diplicity.apigen.GameResultService;
 import se.oort.diplicity.apigen.GameService;
 import se.oort.diplicity.apigen.GameStateService;
@@ -63,9 +69,11 @@ import se.oort.diplicity.apigen.OrderService;
 import se.oort.diplicity.apigen.PhaseResultService;
 import se.oort.diplicity.apigen.PhaseService;
 import se.oort.diplicity.apigen.PhaseStateService;
+import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.apigen.Ticker;
 import se.oort.diplicity.apigen.TickerUnserializer;
 import se.oort.diplicity.apigen.User;
+import se.oort.diplicity.apigen.UserConfig;
 import se.oort.diplicity.apigen.UserConfigService;
 import se.oort.diplicity.apigen.UserStatsService;
 
@@ -74,12 +82,18 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     // start intent for result stuff
     static final int LOGIN_REQUEST = 1;
 
+    // FCM stuff
+    public static String APP_NAME = "android-diplicity";
+    public static SecureRandom random = new SecureRandom();
+
     // prefs stuff
-    static final String API_URL_PREF_KEY = "api_url_pref_key";
-    static final String USER_ID_PREF_KEY = "user_id_pref_key";
-    static final String LOGGED_IN_USER_PREF_KEY = "logged_in_user_pref_key";
-    static final String AUTH_TOKEN_PREF_KEY = "auth_token_pref_key";
-    static final String VARIANTS_PREF_KEY = "variants_pref_key";
+    public static final String API_URL_PREF_KEY = "api_url_pref_key";
+    public static final String USER_ID_PREF_KEY = "user_id_pref_key";
+    public static final String LOGGED_IN_USER_PREF_KEY = "logged_in_user_pref_key";
+    public static final String AUTH_TOKEN_PREF_KEY = "auth_token_pref_key";
+    public static final String VARIANTS_PREF_KEY = "variants_pref_key";
+    public static final String FCM_REPLACE_TOKEN_PREF_KEY = "fcm_replace_token_pref_key";
+    public static final String INITIAL_FCM_SETUP_DONE_PREF_KEY = "initial_fcm_setup_done_pref_key";
 
     // default urls
     static final String DEFAULT_URL = "https://diplicity-engine.appspot.com/";
@@ -259,14 +273,14 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                 .and(variantService.GetVariants())
                 .then(new Func2<RootService.Root, MultiContainer<VariantService.Variant>, Object>() {
                     @Override
-                    public Object call(RootService.Root root, MultiContainer<VariantService.Variant> variants) {
-                        SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(RetrofitActivity.this).edit();
+                    public Object call(final RootService.Root root, final MultiContainer<VariantService.Variant> receivedVariants) {
+                        SharedPreferences.Editor prefEditor = prefs.edit();
                         Gson gson = new Gson();
-                        prefs.putString(LOGGED_IN_USER_PREF_KEY, gson.toJson(root.Properties.User));
+                        prefEditor.putString(LOGGED_IN_USER_PREF_KEY, gson.toJson(root.Properties.User));
                         loggedInUser = root.Properties.User;
-                        prefs.putString(VARIANTS_PREF_KEY, gson.toJson(variants));
-                        variants = variants;
-                        prefs.apply();
+                        prefEditor.putString(VARIANTS_PREF_KEY, gson.toJson(receivedVariants));
+                        variants = receivedVariants;
+                        prefEditor.apply();
                         List<LoginSubscriber<?>> subscribersCopy;
                         synchronized (loginSubscribers) {
                             subscribersCopy = new ArrayList<LoginSubscriber<?>>(loginSubscribers);
@@ -274,6 +288,17 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                         }
                         for (LoginSubscriber<?> subscriber : subscribersCopy) {
                             subscriber.retry();
+                        }
+                        if (!prefs.getBoolean(INITIAL_FCM_SETUP_DONE_PREF_KEY, false)) {
+                            handleReq(
+                                    userConfigService.UserConfigLoad(root.Properties.User.Id),
+                                    new Sendable<SingleContainer<UserConfig>>() {
+                                        @Override
+                                        public void send(SingleContainer<UserConfig> userConfigSingleContainer) {
+                                            updateFCMPushOption(userConfigSingleContainer.Properties, true, "Enabled at initial startup");
+                                            prefs.edit().putBoolean(INITIAL_FCM_SETUP_DONE_PREF_KEY, true).apply();
+                                        }
+                                    }, getResources().getString(R.string.updating_settings));
                         }
                         return null;
                     }
@@ -360,6 +385,61 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         gameStateService = retrofit.create(GameStateService.class);
         userConfigService = retrofit.create(UserConfigService.class);
         banService = retrofit.create(BanService.class);
+    }
+
+    public FCMToken getFCMToken(UserConfig config) {
+        if (config.FCMTokens == null) {
+            return null;
+        }
+        FCMToken pushToken = null;
+        for (FCMToken fcmToken : config.FCMTokens) {
+            if (APP_NAME.equals(fcmToken.App)) {
+                pushToken = fcmToken;
+                break;
+            }
+        }
+        return pushToken;
+    }
+
+    public void updateFCMPushOption(UserConfig userConfig, boolean newValue, String message) {
+        FCMToken pushToken = getFCMToken(userConfig);
+        if (newValue) {
+            if (pushToken == null) {
+                pushToken = new FCMToken();
+                pushToken.Note = message + " at " + new Date();
+                if (userConfig.FCMTokens == null) {
+                    userConfig.FCMTokens = new ArrayList<FCMToken>();
+                }
+                userConfig.FCMTokens.add(pushToken);
+            } else if (pushToken.Disabled) {
+                pushToken.Note = message + " at " + new Date();
+            }
+            pushToken.Disabled = false;
+            pushToken.Value = FirebaseInstanceId.getInstance().getToken();
+            pushToken.App = APP_NAME;
+            pushToken.ReplaceToken = new BigInteger(8 * 24, random).toString(32);
+            pushToken.MessageConfig = new FCMNotificationConfig();
+            pushToken.MessageConfig.ClickActionTemplate = MessagingService.FCM_NOTIFY_ACTION;
+            pushToken.PhaseConfig = new FCMNotificationConfig();
+            pushToken.PhaseConfig.ClickActionTemplate = MessagingService.FCM_NOTIFY_ACTION;
+        } else {
+            if (pushToken != null && (pushToken.Disabled == null || !pushToken.Disabled)) {
+                pushToken.Disabled = true;
+                pushToken.Note = message + " at " + new Date();
+            }
+        }
+        if (pushToken != null) {
+            final FCMToken finalToken = pushToken;
+            handleReq(
+                    userConfigService.UserConfigUpdate(userConfig, getLoggedInUser().Id),
+                    new Sendable<SingleContainer<UserConfig>>() {
+                        @Override
+                        public void send(SingleContainer<UserConfig> userConfigSingleContainer) {
+                            PreferenceManager.getDefaultSharedPreferences(RetrofitActivity.this).edit().putString(FCM_REPLACE_TOKEN_PREF_KEY, finalToken.ReplaceToken).apply();
+                        }
+                    }, getResources().getString(R.string.updating_settings));
+        }
+
     }
 
     public String getLocalDevelopmentModeFakeID() {
