@@ -517,7 +517,7 @@ public class GameActivity extends RetrofitActivity
         if (member == null) {
             findViewById(R.id.edit_game_state_button).setVisibility(View.GONE);
         }
-        
+
         handleReq(
                 gameStateService.ListGameStates(game.ID),
                 new Sendable<MultiContainer<GameState>>() {

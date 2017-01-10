@@ -6,18 +6,29 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.ByteArrayInputStream;
@@ -30,6 +41,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,6 +58,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import retrofit2.Call;
 import retrofit2.CallAdapter;
+import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.HttpException;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
@@ -81,6 +94,10 @@ public abstract class RetrofitActivity extends AppCompatActivity {
 
     // start intent for result stuff
     static final int LOGIN_REQUEST = 1;
+
+    // Google login stuff
+    private GoogleApiClient mGoogleApiClient;
+    public static final String OAUTH2_CLIENT_ID = "635122585664-ao5i9f2p5365t4htql1qdb6uulso4929.apps.googleusercontent.com";
 
     // FCM stuff
     public static String APP_NAME = "android-diplicity";
@@ -306,10 +323,68 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(final int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == LOGIN_REQUEST) {
-            if (resultCode == RESULT_OK) {
-                performLogin();
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            if (result.isSuccess()) {
+                final GoogleSignInAccount acct = result.getSignInAccount();
+
+                Observable.create(new Observable.OnSubscribe<String>() {
+                    @Override
+                    public void call(final Subscriber<? super String> subscriber) {
+                        Response response = null;
+                        try {
+                            String url = getBaseURL() + "Auth/OAuth2Callback?code=" + URLEncoder.encode(acct.getServerAuthCode(), "UTF-8") + "&approve-redirect=true&state=" + URLEncoder.encode("https://android-diplicity", "UTF-8");
+                            Request request = new Request.Builder()
+                                    .url(url)
+                                    .build();
+                            response = new OkHttpClient.Builder()
+                                    .followRedirects(false)
+                                    .followSslRedirects(false)
+                                    .build()
+                                    .newCall(request).execute();
+                            if (response.code() != 307) {
+                                throw new RuntimeException("Unsuccessful response " + response.body().string());
+                            }
+                            url = response.headers().get("Location");
+                            if (url == null) {
+                                throw new RuntimeException("No Location header in response " + response.body().string());
+                            }
+                            Uri parsedURI = Uri.parse(url);
+                            if (parsedURI == null) {
+                                throw new RuntimeException("Unparseable Location header " + url + " in response");
+                            }
+                            subscriber.onNext(parsedURI.getQueryParameter("token"));
+                            subscriber.onCompleted();
+                        } catch (RuntimeException e) {
+                            throw e;
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }).subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<String>() {
+                            @Override
+                            public void onCompleted() {
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                App.firebaseCrashReport("Unable to log in", e);
+                                Toast.makeText(RetrofitActivity.this, R.string.login_failed, Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onNext(String token) {
+                                PreferenceManager.getDefaultSharedPreferences(RetrofitActivity.this).edit().putString(AUTH_TOKEN_PREF_KEY, token).apply();
+                                performLogin();
+                            }
+                        });
+            } else {
+                App.firebaseCrashReport("Login failed: " + result.getStatus().getStatus());
+                Toast.makeText(this, R.string.login_failed, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -476,6 +551,21 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestServerAuthCode(OAUTH2_CLIENT_ID)
+                .build();
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                        App.firebaseCrashReport("Failed connecting to Google login API: " + connectionResult.getErrorMessage());
+                        Toast.makeText(RetrofitActivity.this, R.string.login_failed, Toast.LENGTH_LONG).show();
+                    }
+                })
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefsListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
@@ -591,7 +681,8 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                                                         Log.d("Diplicity", "Performing fake login as " + getLocalDevelopmentModeFakeID());
                                                         performLogin();
                                                     } else {
-                                                        startActivityForResult(new Intent(RetrofitActivity.this, LoginActivity.class), LOGIN_REQUEST);
+                                                        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+                                                        startActivityForResult(signInIntent, LOGIN_REQUEST);
                                                     }
                                                 }
                                             }
