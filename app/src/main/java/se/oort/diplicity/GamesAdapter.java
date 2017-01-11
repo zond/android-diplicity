@@ -1,6 +1,7 @@
 package se.oort.diplicity;
 
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +31,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
         MemberTable members;
         RelativeLayout expanded;
         View.OnClickListener delegateClickListener;
-        FloatingActionButton button;
+        FloatingActionButton joinLeaveButton;
 
         public ViewHolder(View view) {
             super(view);
@@ -51,14 +52,25 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             minQuicknessLabel = (TextView) view.findViewById(R.id.min_quickness_label);
             maxHatedLabel = (TextView) view.findViewById(R.id.max_hated_label);
             maxHaterLabel = (TextView) view.findViewById(R.id.max_hater_label);
-            button = (FloatingActionButton) view.findViewById(R.id.join_leave_button);
+            joinLeaveButton = (FloatingActionButton) view.findViewById(R.id.join_leave_button);
         }
         @Override
         public void bind(final SingleContainer<Game> game, final int pos) {
-            if (game.Properties.Desc == null || game.Properties.Desc.equals("")) {
-                desc.setVisibility(View.GONE);
+            Member member = null;
+            for (Member m : game.Properties.Members) {
+                if (m.User.Id.equals(retrofitActivity.getLoggedInUser().Id)) {
+                    member = m;
+                    break;
+                }
+            }
+            if (member != null && member.GameAlias != null && !member.GameAlias.equals("")) {
+                desc.setText(member.GameAlias);
             } else {
-                desc.setText(game.Properties.Desc);
+                if (game.Properties.Desc == null || game.Properties.Desc.equals("")) {
+                    desc.setVisibility(View.GONE);
+                } else {
+                    desc.setText(game.Properties.Desc);
+                }
             }
             if (game.Properties.MinRating != 0 || game.Properties.MaxRating != 0) {
                 rating.setText(ctx.getResources().getString(
@@ -146,9 +158,9 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                 }
             }
             if (hasLeave) {
-                button.setVisibility(View.VISIBLE);
-                button.setImageDrawable(ctx.getResources().getDrawable(R.drawable.ic_clear_black_24dp, null));
-                button.setOnClickListener(new View.OnClickListener() {
+                joinLeaveButton.setVisibility(View.VISIBLE);
+                joinLeaveButton.setImageDrawable(ctx.getResources().getDrawable(R.drawable.ic_clear_black_24dp, null));
+                joinLeaveButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         retrofitActivity.handleReq(retrofitActivity.memberService.MemberDelete(game.Properties.ID, retrofitActivity.getLoggedInUser().Id),
@@ -185,9 +197,9 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                     }
                 });
             } else if (hasJoin) {
-                button.setVisibility(View.VISIBLE);
-                button.setImageDrawable(ctx.getResources().getDrawable(android.R.drawable.ic_input_add, null));
-                button.setOnClickListener(new View.OnClickListener() {
+                joinLeaveButton.setVisibility(View.VISIBLE);
+                joinLeaveButton.setImageDrawable(ctx.getResources().getDrawable(android.R.drawable.ic_input_add, null));
+                joinLeaveButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         retrofitActivity.handleReq(retrofitActivity.memberService.MemberCreate(new Member(), game.Properties.ID),
@@ -207,7 +219,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                     }
                 });
             } else {
-                button.setVisibility(View.GONE);
+                joinLeaveButton.setVisibility(View.GONE);
             }
 
             ((FloatingActionButton) itemView.findViewById(R.id.open_button)).setOnClickListener(new View.OnClickListener() {
@@ -220,6 +232,37 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                     }
                 }
             });
+
+            FloatingActionButton editMembershipButton = (FloatingActionButton) itemView.findViewById(R.id.edit_membership_button);
+            if (member != null) {
+                final Member finalMember = member;
+                editMembershipButton.setVisibility(View.VISIBLE);
+                editMembershipButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final AlertDialog dialog = new AlertDialog.Builder(retrofitActivity).setView(R.layout.edit_membership_dialog).show();
+                        final TextView aliasView = (TextView) dialog.findViewById(R.id.alias);
+                        aliasView.setText(finalMember.GameAlias);
+                        ((FloatingActionButton) dialog.findViewById(R.id.update_membership_button)).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                finalMember.GameAlias = aliasView.getText().toString();
+                                retrofitActivity.handleReq(
+                                        retrofitActivity.memberService.MemberUpdate(finalMember, game.Properties.ID, finalMember.User.Id),
+                                        new Sendable<SingleContainer<Member>>() {
+                                            @Override
+                                            public void send(SingleContainer<Member> memberSingleContainer) {
+                                                dialog.dismiss();
+                                                notifyItemChanged(pos);
+                                            }
+                                        }, retrofitActivity.getResources().getString(R.string.updating_membership));
+                            }
+                        });
+                    }
+                });
+            } else {
+                editMembershipButton.setVisibility(View.GONE);
+            }
         }
     }
     public GamesAdapter(RetrofitActivity activity, List<SingleContainer<Game>> games) {

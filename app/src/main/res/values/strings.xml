@@ -163,4 +163,6 @@
     <string name="as_banned">As banned</string>
     <string name="loading_bans">Loading bans</string>
     <string name="login_failed">Login failed</string>
+    <string name="alias">Alias</string>
+    <string name="updating_membership">Updating membership</string>
 </resources>
