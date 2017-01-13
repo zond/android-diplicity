@@ -175,30 +175,19 @@ public class GameActivity extends RetrofitActivity
     }
 
     public String gameTitle() {
-        if (game == null) {
-            return getResources().getString(R.string.untitled);
+        String descPart = getResources().getString(R.string.untitled);
+        if (member != null && member.GameAlias != null && !member.GameAlias.equals("")) {
+            descPart = member.GameAlias;
+        } else if (game != null && !game.Desc.equals("")) {
+            descPart = game.Desc;
         }
-        if (phaseMeta != null) {
-            if (game.Desc == null || game.Desc.equals("")) {
-                if (phaseMeta.NextDeadlineIn.nanos == 0) {
-                    return getResources().getString(R.string.season_year_type, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type);
-                } else {
-                    return getResources().getString(R.string.season_year_type_deadline, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type, App.nanosToDuration(phaseMeta.NextDeadlineIn.nanosLeft()));
-                }
-            } else {
-                if (phaseMeta.NextDeadlineIn.nanos == 0) {
-                    return getResources().getString(R.string.desc_season_year_type, game.Desc, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type);
-                } else {
-                    return getResources().getString(R.string.desc_season_year_type_deadline, game.Desc, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type, App.nanosToDuration(phaseMeta.NextDeadlineIn.nanosLeft()));
-                }
-            }
-        } else {
-            if (game.Desc == null || game.Desc.equals("")) {
-                return getResources().getString(R.string.untitled);
-            } else {
-                return game.Desc;
-            }
+        if (phaseMeta == null) {
+            return descPart;
         }
+        if (phaseMeta.NextDeadlineIn.nanos == 0) {
+            return getResources().getString(R.string.desc_season_year_type, descPart, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type);
+        }
+        return getResources().getString(R.string.desc_season_year_type_deadline, game.Desc, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type, App.nanosToDuration(phaseMeta.NextDeadlineIn.nanosLeft()));
     }
 
     public void draw() {
