@@ -1,6 +1,7 @@
 package se.oort.diplicity;
 
 import android.app.Application;
+import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
@@ -8,7 +9,7 @@ import com.google.firebase.crash.FirebaseCrash;
 import java.util.ArrayList;
 import java.util.List;
 
-public class App extends Application {
+public class App extends MultiDexApplication {
 
     public App() {
         if (BuildConfig.DEBUG) {
