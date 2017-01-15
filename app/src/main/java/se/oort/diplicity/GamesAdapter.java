@@ -159,7 +159,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             }
             if (hasLeave) {
                 joinLeaveButton.setVisibility(View.VISIBLE);
-                joinLeaveButton.setImageDrawable(ctx.getResources().getDrawable(R.drawable.ic_clear_black_24dp, null));
+                joinLeaveButton.setImageDrawable(ctx.getResources().getDrawable(R.drawable.ic_clear_black_24dp));
                 joinLeaveButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -198,7 +198,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                 });
             } else if (hasJoin) {
                 joinLeaveButton.setVisibility(View.VISIBLE);
-                joinLeaveButton.setImageDrawable(ctx.getResources().getDrawable(android.R.drawable.ic_input_add, null));
+                joinLeaveButton.setImageDrawable(ctx.getResources().getDrawable(android.R.drawable.ic_input_add));
                 joinLeaveButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
