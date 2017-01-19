@@ -443,7 +443,9 @@ public class GameActivity extends RetrofitActivity
     public void showPress() {
         hideAllExcept(R.id.press_view);
         if (member != null) {
-            ((FloatingActionButton) findViewById(R.id.create_channel_button)).setOnClickListener(new View.OnClickListener() {
+            FloatingActionButton button = (FloatingActionButton) findViewById(R.id.create_channel_button);
+            button.setVisibility(View.VISIBLE);
+            button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     final List<String> nations = new ArrayList<String>();
@@ -484,6 +486,8 @@ public class GameActivity extends RetrofitActivity
 
                 }
             });
+        } else {
+            findViewById(R.id.create_channel_button).setVisibility(View.GONE);
         }
         handleReq(
                 channelService.ListChannels(game.ID),
@@ -903,9 +907,19 @@ public class GameActivity extends RetrofitActivity
                                     }
                                 }
                                 if (hasBuildOpts && units < scs) {
-                                    Toast.makeText(GameActivity.this, getResources().getString(R.string.you_can_build_n_this_phase, getResources().getQuantityString(R.plurals.unit, scs - units)), Toast.LENGTH_LONG).show();
+                                    Toast.makeText(GameActivity.this,
+                                            getResources().getString(R.string.you_can_build_n_this_phase,
+                                                    getResources().getQuantityString(R.plurals.unit,
+                                                            scs - units,
+                                                            scs - units)),
+                                            Toast.LENGTH_LONG).show();
                                 } else if (hasDisbandOpts && scs < units) {
-                                    Toast.makeText(GameActivity.this, getResources().getString(R.string.you_have_to_disband_n_this_phase, getResources().getQuantityString(R.plurals.unit, units - scs)), Toast.LENGTH_LONG).show();
+                                    Toast.makeText(GameActivity.this,
+                                            getResources().getString(R.string.you_have_to_disband_n_this_phase,
+                                                    getResources().getQuantityString(R.plurals.unit,
+                                                            units - scs,
+                                                            units - scs)),
+                                            Toast.LENGTH_LONG).show();
                                 }
                                 return null;
                             }
