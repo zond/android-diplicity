@@ -2,6 +2,7 @@ package se.oort.diplicity.game;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -52,7 +53,13 @@ public class MapView extends FrameLayout {
         this.addOnFinished(new Runnable() {
             @Override
             public void run() {
-                ((WebView) findViewById(R.id.web_view)).evaluateJavascript("window.map.addReadyAction(function() { " + js + " });", null);
+                WebView mWebView = (WebView) findViewById(R.id.web_view);
+                String toEvaluate = "window.map.addReadyAction(function() { " + js + " });";
+                if (Build.VERSION.SDK_INT >= 19) {
+                    mWebView.evaluateJavascript(toEvaluate, null);
+                } else {
+                    mWebView.loadUrl("javascript:" + toEvaluate);
+                }
             }
         });
     }
