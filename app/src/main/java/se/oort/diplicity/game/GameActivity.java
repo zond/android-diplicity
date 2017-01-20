@@ -20,6 +20,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
@@ -51,6 +52,7 @@ import se.oort.diplicity.OptionsService;
 import se.oort.diplicity.R;
 import se.oort.diplicity.RetrofitActivity;
 import se.oort.diplicity.Sendable;
+import se.oort.diplicity.UserView;
 import se.oort.diplicity.VariantService;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.GameResult;
@@ -138,6 +140,12 @@ public class GameActivity extends RetrofitActivity
                 return member.Nation.compareTo(t1.Nation);
             }
         });
+        for (Member m : game.Members) {
+            if (m.User.Id.equals(getLoggedInUser().Id)) {
+                member = m;
+            }
+        }
+
         byte[] serializedPhaseMeta = getIntent().getByteArrayExtra(SERIALIZED_PHASE_META_KEY);
         if (serializedPhaseMeta != null) {
             phaseMeta = (PhaseMeta) unserialize(serializedPhaseMeta);
@@ -192,12 +200,6 @@ public class GameActivity extends RetrofitActivity
 
     public void draw() {
         setTitle(gameTitle());
-
-        for (Member m : game.Members) {
-            if (m.User.Id.equals(getLoggedInUser().Id)) {
-                member = m;
-            }
-        }
 
         setContentView(R.layout.activity_game);
 
@@ -548,10 +550,22 @@ public class GameActivity extends RetrofitActivity
                             params.rightMargin = margin;
                             TableRow tableRow = new TableRow(GameActivity.this);
                             tableRow.setLayoutParams(params);
+                            LinearLayout playerSide = new LinearLayout(GameActivity.this);
+                            LinearLayout.LayoutParams linearParams =
+                                    new LinearLayout.LayoutParams(
+                                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                                            LinearLayout.LayoutParams.WRAP_CONTENT);
+                            playerSide.setLayoutParams(params);
+                            playerSide.setOrientation(LinearLayout.VERTICAL);
+                            UserView user = new UserView(GameActivity.this, null);
+                            user.setUser(GameActivity.this, thisMember.User);
+                            user.setLayoutParams(linearParams);
+                            playerSide.addView(user);
                             TextView nation = new TextView(GameActivity.this);
-                            nation.setText(getResources().getString(R.string.x_, thisMember.Nation));
-                            nation.setLayoutParams(params);
-                            tableRow.addView(nation);
+                            nation.setText(thisMember.Nation);
+                            nation.setLayoutParams(linearParams);
+                            playerSide.addView(nation);
+                            tableRow.addView(playerSide);
                             TextView muteds = new TextView(GameActivity.this);
                             muteds.setLayoutParams(params);
                             if (foundState != null && foundState.Muted != null) {
