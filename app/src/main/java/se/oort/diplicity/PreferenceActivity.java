@@ -46,6 +46,8 @@ public class PreferenceActivity extends RetrofitActivity {
                         public void send(final SingleContainer<UserConfig> userConfigSingleContainer) {
                             final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 
+                            findPreference(getResources().getString(R.string.app_version_pref_key)).setSummary("" + BuildConfig.VERSION_CODE);
+
                             final CheckBoxPreference emailPreference = (CheckBoxPreference) findPreference(getResources().getString(R.string.email_notifications_pref_key));
                             emailPreference.setChecked(userConfigSingleContainer.Properties.MailConfig.Enabled);
                             emailPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
