@@ -14,6 +14,10 @@
     <PreferenceCategory
         android:key="development_prefs"
         android:title="@string/development">
+        <Preference
+            android:key="@string/app_version_pref_key"
+            android:selectable="false"
+            android:title="@string/version"/>
         <CheckBoxPreference
             android:title="@string/local_development_mode"
             android:summary="@string/connect_to_localhost_instead_of_cloud_service"
