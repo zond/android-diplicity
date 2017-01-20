@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference
+        android:key="@string/game_id_pref_key"
+        android:title="@string/game_id"/>
+ </PreferenceScreen>

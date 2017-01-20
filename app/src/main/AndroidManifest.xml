@@ -54,6 +54,14 @@
                 android:value="se.oort.diplicity.MainActivity" />
         </activity>
         <activity
+            android:name=".game.PreferenceActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="se.oort.diplicity.game.GameActivity" />
+        </activity>
+        <activity
             android:name=".game.PressActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar"
