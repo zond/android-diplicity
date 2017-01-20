@@ -165,4 +165,9 @@
     <string name="login_failed">Login failed</string>
     <string name="alias">Alias</string>
     <string name="updating_membership">Updating membership</string>
+    <string name="version">Version</string>
+    <string name="app_version_pref_key">app_version_pref_key</string>
+    <string name="game_id_pref_key">game_id_pref_key</string>
+    <string name="game_id">Game ID</string>
+    <string name="game_id_copied_to_clipboard">Game ID copied to clipboard.</string>
 </resources>
