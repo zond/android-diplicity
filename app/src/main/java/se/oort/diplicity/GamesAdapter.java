@@ -77,7 +77,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                     desc.setText(game.Properties.Desc);
                 }
             }
-            if (member != null) {
+            if (member != null && game.Properties.Started && !game.Properties.Finished) {
                 if (member.NewestPhaseState.OnProbation) {
                     alertIcon.setVisibility(View.VISIBLE);
                     readyIcon.setVisibility(View.GONE);
