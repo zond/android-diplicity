@@ -1,10 +1,12 @@
 package se.oort.diplicity;
 
+import android.graphics.Color;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -32,9 +34,12 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
         RelativeLayout expanded;
         View.OnClickListener delegateClickListener;
         FloatingActionButton joinLeaveButton;
+        ImageView alertIcon, readyIcon;
 
         public ViewHolder(View view) {
             super(view);
+            alertIcon = (ImageView) view.findViewById(R.id.alert_icon);
+            readyIcon = (ImageView) view.findViewById(R.id.ready_icon);
             desc = (TextView) view.findViewById(R.id.desc);
             variant = (TextView) view.findViewById(R.id.variant);
             deadline = (TextView) view.findViewById(R.id.deadline);
@@ -71,6 +76,21 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                 } else {
                     desc.setText(game.Properties.Desc);
                 }
+            }
+            if (member != null) {
+                if (member.NewestPhaseState.OnProbation) {
+                    alertIcon.setVisibility(View.VISIBLE);
+                    readyIcon.setVisibility(View.GONE);
+                } else if (member.NewestPhaseState.ReadyToResolve) {
+                    alertIcon.setVisibility(View.GONE);
+                    readyIcon.setVisibility(View.VISIBLE);
+                } else {
+                    alertIcon.setVisibility(View.GONE);
+                    readyIcon.setVisibility(View.GONE);
+                }
+            } else {
+                alertIcon.setVisibility(View.GONE);
+                readyIcon.setVisibility(View.GONE);
             }
             if (game.Properties.MinRating != 0 || game.Properties.MaxRating != 0) {
                 rating.setText(ctx.getResources().getString(
