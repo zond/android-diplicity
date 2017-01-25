@@ -130,7 +130,7 @@ public class MemberTable extends TableLayout {
                     }
                     tableRow.addView(readyToResolve);
                     CheckBox wantsDIAS = new CheckBox(retrofitActivity);
-                    wantsDIAS.setText(R.string.DIAS);
+                    wantsDIAS.setText(R.string.DRAW);
                     wantsDIAS.setLayoutParams(wrapContentParams);
                     wantsDIAS.setChecked(finalFoundState.WantsDIAS);
                     if (!phaseMeta.Resolved && retrofitActivity.getLoggedInUser().Id.equals(member.User.Id)) {

@@ -170,4 +170,6 @@
     <string name="game_id_pref_key">game_id_pref_key</string>
     <string name="game_id">Game ID</string>
     <string name="game_id_copied_to_clipboard">Game ID copied to clipboard.</string>
+    <string name="draw">Draw</string>
+    <string name="DRAW">DRAW</string>
 </resources>
