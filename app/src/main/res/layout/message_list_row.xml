@@ -23,7 +23,7 @@
     <TextView
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@id/avatar"
-        android:layout_toLeftOf="@id/avatar"
+        android:layout_toRightOf="@id/avatar"
         android:textAppearance="?attr/textAppearanceListItem"
         android:id="@+id/sender"
         android:layout_width="wrap_content"

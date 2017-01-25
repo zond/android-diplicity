@@ -111,7 +111,7 @@ public class PressActivity extends RetrofitActivity {
         byte[] serializedGame = getIntent().getByteArrayExtra(SERIALIZED_GAME_KEY);
         game = (Game) unserialize(serializedGame);
 
-        setTitle(TextUtils.join(", ", channel.Members));
+        ((TextView) findViewById(R.id.multi_line_title)).setText(TextUtils.join(", ", channel.Members));
 
         if (member == null) {
             findViewById(R.id.send_message_button).setVisibility(View.GONE);
