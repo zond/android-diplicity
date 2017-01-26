@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="se.oort.diplicity.game.PressActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -22,7 +22,7 @@
                     android:id="@+id/multi_line_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="top|center_horizontal"
+                    android:gravity="center_vertical|center_horizontal"
                     style="@android:style/TextAppearance.Large"/>
 
             </android.support.v7.widget.Toolbar>
