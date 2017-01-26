@@ -93,7 +93,9 @@ public class PreferenceActivity extends RetrofitActivity {
                                     return true;
                                 }
                             };
-                            fakeIDPref.setOnPreferenceChangeListener(fakeIDChanged);
+                            if (fakeIDPref != null) {
+                                fakeIDPref.setOnPreferenceChangeListener(fakeIDChanged);
+                            }
 
                             final CheckBoxPreference localDevPreference = (CheckBoxPreference) findPreference(getResources().getString(R.string.local_development_mode_pref_key));
                             localDevPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {

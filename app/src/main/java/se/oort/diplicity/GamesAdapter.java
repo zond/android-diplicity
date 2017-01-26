@@ -192,13 +192,13 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                                                     @Override
                                                     public void send(SingleContainer<Game> gameSingleContainer) {
                                                         GamesAdapter.this.items.set(pos, gameSingleContainer);
-                                                        GamesAdapter.this.notifyItemChanged(pos);
+                                                        GamesAdapter.this.notifyDataSetChanged();
                                                     }
                                                 }, new RetrofitActivity.ErrorHandler(404, new Sendable<HttpException>() {
                                                     @Override
                                                     public void send(HttpException e) {
                                                         GamesAdapter.this.items.remove(pos);
-                                                        GamesAdapter.this.notifyItemRemoved(pos);
+                                                        GamesAdapter.this.notifyDataSetChanged();
                                                         GamesAdapter.this.expandedItems.remove(pos);
                                                         for (int i : GamesAdapter.this.expandedItems) {
                                                             if (i > pos) {
@@ -231,7 +231,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                                                     @Override
                                                     public void send(SingleContainer<Game> gameSingleContainer) {
                                                         GamesAdapter.this.items.set(pos, gameSingleContainer);
-                                                        GamesAdapter.this.notifyItemChanged(pos);
+                                                        GamesAdapter.this.notifyDataSetChanged();
                                                     }
                                                 }, ctx.getResources().getString(R.string.updating));
                                     }
@@ -273,7 +273,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                                             @Override
                                             public void send(SingleContainer<Member> memberSingleContainer) {
                                                 dialog.dismiss();
-                                                notifyItemChanged(pos);
+                                                notifyDataSetChanged();
                                             }
                                         }, retrofitActivity.getResources().getString(R.string.updating_membership));
                             }
@@ -307,7 +307,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                 } else {
                     expandedItems.add(vh.getAdapterPosition());
                 }
-                notifyItemChanged(vh.getAdapterPosition());
+                notifyDataSetChanged();
             }
         };
         itemView.setOnClickListener(clickListener);

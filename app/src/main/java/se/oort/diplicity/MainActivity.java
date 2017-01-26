@@ -206,7 +206,7 @@ public class MainActivity extends RetrofitActivity {
                                                 findViewById(R.id.empty_view).setVisibility(View.GONE);
                                                 contentList.setVisibility(View.VISIBLE);
                                                 gamesAdapter.items.add(gameSingleContainer);
-                                                gamesAdapter.notifyItemInserted(gamesAdapter.items.size() - 1);
+                                                gamesAdapter.notifyDataSetChanged();
                                             }
                                             dialog.dismiss();
                                         }
