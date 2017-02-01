@@ -167,7 +167,7 @@ public class PressActivity extends RetrofitActivity {
                             }
 
                             ((TextView) row.findViewById(R.id.body)).setText(message.Body);
-                            ((TextView) row.findViewById(R.id.at)).setText(message.Age.deadlineAt().toString());
+                            ((TextView) row.findViewById(R.id.at)).setText(message.Age.createdAt().toString());
                             ((TextView) row.findViewById(R.id.sender)).setText(getResources().getString(R.string.x_, message.Sender));
                             if (author != null) {
                                 ImageView avatar = (ImageView) row.findViewById(R.id.avatar);
