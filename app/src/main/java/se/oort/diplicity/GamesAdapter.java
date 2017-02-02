@@ -35,9 +35,11 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
         View.OnClickListener delegateClickListener;
         FloatingActionButton joinLeaveButton;
         ImageView alertIcon, readyIcon;
+        TextView unreadMessages;
 
         public ViewHolder(View view) {
             super(view);
+            unreadMessages = (TextView) view.findViewById(R.id.unread_messages_count);
             alertIcon = (ImageView) view.findViewById(R.id.alert_icon);
             readyIcon = (ImageView) view.findViewById(R.id.ready_icon);
             desc = (TextView) view.findViewById(R.id.desc);
@@ -91,6 +93,12 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             } else {
                 alertIcon.setVisibility(View.GONE);
                 readyIcon.setVisibility(View.GONE);
+            }
+            if (member != null && member.UnreadMessages > 0) {
+                unreadMessages.setText("" + member.UnreadMessages);
+                unreadMessages.setVisibility(View.VISIBLE);
+            } else {
+                unreadMessages.setVisibility(View.GONE);
             }
             if (game.Properties.MinRating != 0 || game.Properties.MaxRating != 0) {
                 rating.setText(ctx.getResources().getString(

@@ -7,4 +7,5 @@ public class Member implements java.io.Serializable {
   public String Nation;
   public String GameAlias;
   public PhaseState NewestPhaseState;
+  public Long UnreadMessages;
 }

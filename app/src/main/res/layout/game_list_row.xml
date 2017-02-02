@@ -33,27 +33,40 @@
         android:layout_height="wrap_content"
         android:textColor="?android:attr/textColorPrimary" />
 
-    <ImageView
-        android:id="@+id/ready_icon"
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignTop="@id/state"
         android:layout_toLeftOf="@id/state"
-        android:layout_toStartOf="@id/state"
-        android:tint="@color/colorReady"
-        android:visibility="gone"
-        android:src="@drawable/ic_event_available_black_24dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_toStartOf="@id/state">
 
-    <ImageView
-        android:id="@+id/alert_icon"
-        android:layout_alignTop="@id/state"
-        android:layout_toLeftOf="@id/state"
-        android:layout_toStartOf="@id/state"
-        android:tint="@color/colorAlert"
-        android:visibility="gone"
-        android:src="@drawable/ic_warning_black_24dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/unread_messages_count"
+            android:layout_width="wrap_content"
+            android:background="@drawable/circle"
+            android:paddingRight="3dp"
+            android:paddingLeft="3dp"
+            android:textColor="@android:color/white"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/ready_icon"
+            android:tint="@color/colorReady"
+            android:visibility="gone"
+            android:src="@drawable/ic_event_available_black_24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/alert_icon"
+            android:tint="@color/colorAlert"
+            android:visibility="gone"
+            android:src="@drawable/ic_warning_black_24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/variant"
