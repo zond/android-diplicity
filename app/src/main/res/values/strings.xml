@@ -172,4 +172,5 @@
     <string name="game_id_copied_to_clipboard">Game ID copied to clipboard.</string>
     <string name="draw">Draw</string>
     <string name="DRAW">DRAW</string>
+    <string name="all_press_becomes_public">Warning: All press becomes public when the game finishes!</string>
 </resources>

@@ -28,6 +28,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -142,6 +143,7 @@ public class PressActivity extends RetrofitActivity {
         }
 
         loadMessages(true);
+        Toast.makeText(this, R.string.all_press_becomes_public, Toast.LENGTH_SHORT).show();
     }
 
     private void loadMessages(boolean withProgress) {
