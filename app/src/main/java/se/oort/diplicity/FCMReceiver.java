@@ -1,11 +1,14 @@
 package se.oort.diplicity;
 
+import android.app.TaskStackBuilder;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
 
 import rx.joins.JoinObserver;
+import se.oort.diplicity.apigen.FCMNotificationConfig;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Member;
 import se.oort.diplicity.apigen.SingleContainer;
@@ -34,10 +37,16 @@ public class FCMReceiver extends RetrofitActivity {
                                     }
                                 }
                                 if (member != null) {
+                                    Intent mainIntent = new Intent(FCMReceiver.this, MainActivity.class);
+                                    Intent gameIntent = GameActivity.startGameIntent(FCMReceiver.this, gameSingleContainer.Properties, gameSingleContainer.Properties.NewestPhaseMeta.get(0));
                                     ChannelService.Channel channel = new ChannelService.Channel();
                                     channel.GameID = message.message.GameID;
                                     channel.Members = message.message.ChannelMembers;
-                                    PressActivity.startPressActivity(FCMReceiver.this, gameSingleContainer.Properties, channel, member);
+                                    Intent pressIntent = PressActivity.startPressIntent(FCMReceiver.this, gameSingleContainer.Properties, channel, member);
+                                    TaskStackBuilder.create(FCMReceiver.this)
+                                            .addNextIntent(mainIntent)
+                                            .addNextIntent(gameIntent)
+                                            .addNextIntent(pressIntent).startActivities();
                                 }
                                 finish();
 
@@ -49,11 +58,16 @@ public class FCMReceiver extends RetrofitActivity {
                     new Sendable<SingleContainer<Game>>() {
                         @Override
                         public void send(SingleContainer<Game> gameSingleContainer) {
+                            Intent mainIntent = new Intent(FCMReceiver.this, MainActivity.class);
+                            Intent gameIntent;
                             if (gameSingleContainer.Properties.NewestPhaseMeta != null && gameSingleContainer.Properties.NewestPhaseMeta.size() > 0) {
-                                GameActivity.startGameActivity(FCMReceiver.this, gameSingleContainer.Properties, gameSingleContainer.Properties.NewestPhaseMeta.get(0));
+                                gameIntent = GameActivity.startGameIntent(FCMReceiver.this, gameSingleContainer.Properties, gameSingleContainer.Properties.NewestPhaseMeta.get(0));
                             } else {
-                                GameActivity.startGameActivity(FCMReceiver.this, gameSingleContainer.Properties, null);
+                                gameIntent = GameActivity.startGameIntent(FCMReceiver.this, gameSingleContainer.Properties, null);
                             }
+                            TaskStackBuilder.create(FCMReceiver.this)
+                                    .addNextIntent(mainIntent)
+                                    .addNextIntent(gameIntent).startActivities();
                             finish();
 
                         }

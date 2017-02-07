@@ -65,12 +65,16 @@ public class PressActivity extends RetrofitActivity {
     public Member member;
     public Game game;
 
-    public static void startPressActivity(Context context, Game game, ChannelService.Channel channel, Member member) {
+    public static Intent startPressIntent(Context context, Game game, ChannelService.Channel channel, Member member) {
         Intent intent = new Intent(context, PressActivity.class);
         intent.putExtra(PressActivity.SERIALIZED_CHANNEL_KEY, serialize(channel));
         intent.putExtra(PressActivity.SERIALIZED_MEMBER_KEY, serialize(member));
         intent.putExtra(PressActivity.SERIALIZED_GAME_KEY, serialize(game));
-        context.startActivity(intent);
+        return intent;
+    }
+
+    public static void startPressActivity(Context context, Game game, ChannelService.Channel channel, Member member) {
+        context.startActivity(startPressIntent(context, game, channel, member));
     }
 
     @Override

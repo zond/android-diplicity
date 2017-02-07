@@ -28,6 +28,8 @@
         </activity>
         <activity
             android:name=".FCMReceiver"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -40,6 +42,7 @@
         <activity
             android:name=".PreferenceActivity"
             android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -48,6 +51,7 @@
         <activity
             android:name=".game.GameActivity"
             android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -56,6 +60,7 @@
         <activity
             android:name=".game.PreferenceActivity"
             android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -65,10 +70,11 @@
             android:name=".game.PressActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:parentActivityName=".game.GameActivity"
             android:windowSoftInputMode="adjustPan">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="se.oort.diplicity.MainActivity" />
+                android:value=".game.GameActivity" />
         </activity>
 
         <service android:name=".MessagingService">

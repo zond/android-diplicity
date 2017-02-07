@@ -95,13 +95,17 @@ public class GameActivity extends RetrofitActivity
     // Used to display the phases view again after clicking it, without having to load all phases again.
     private MultiContainer<Phase> phases;
 
-    public static void startGameActivity(Context context, Game game, PhaseMeta phaseMeta) {
+    public static Intent startGameIntent(Context context, Game game, PhaseMeta phaseMeta) {
         Intent intent = new Intent(context, GameActivity.class);
         intent.putExtra(GameActivity.SERIALIZED_GAME_KEY, RetrofitActivity.serialize(game));
         if (phaseMeta != null) {
             intent.putExtra(GameActivity.SERIALIZED_PHASE_META_KEY, RetrofitActivity.serialize(phaseMeta));
         }
-        context.startActivity(intent);
+        return intent;
+    }
+
+    public static void startGameActivity(Context context, Game game, PhaseMeta phaseMeta) {
+        context.startActivity(startGameIntent(context, game, phaseMeta));
     }
 
     @Override
