@@ -25,6 +25,31 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/other_started_game_button"
+                android:text="@string/started"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/other_staging_game_button"
+                android:text="@string/staging"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/other_finished_game_button"
+                android:text="@string/finished"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
         <se.oort.diplicity.UserStatsTable
             android:id="@+id/user_stats"
             android:layout_width="match_parent"

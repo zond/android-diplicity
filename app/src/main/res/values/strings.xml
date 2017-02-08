@@ -173,4 +173,6 @@
     <string name="draw">Draw</string>
     <string name="DRAW">DRAW</string>
     <string name="all_press_becomes_public">Warning: All press becomes public when the game finishes!</string>
+    <string name="x_s_finished">%s\'s finished</string>
+    <string name="staging">Staging</string>
 </resources>

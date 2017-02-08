@@ -2,44 +2,31 @@ package se.oort.diplicity;
 
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.ThumbnailUtils;
-import android.preference.PreferenceManager;
+import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
-
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
+import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.HttpException;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.functions.Func3;
-import rx.joins.JoinObserver;
 import rx.observables.JoinObservable;
-import rx.schedulers.Schedulers;
 import se.oort.diplicity.apigen.Ban;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.GameState;
 import se.oort.diplicity.apigen.Member;
-import se.oort.diplicity.apigen.MultiContainer;
 import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.apigen.User;
 import se.oort.diplicity.apigen.UserStats;
@@ -55,7 +42,7 @@ public class UserView extends FrameLayout {
         inflate();
     }
 
-    private static void setupUserStats(final RetrofitActivity retrofitActivity, AlertDialog dialog, final SingleContainer<UserStats> userStats, final SingleContainer<Ban> ban) {
+    private static void setupUserDialog(final RetrofitActivity retrofitActivity, AlertDialog dialog, final SingleContainer<UserStats> userStats, final SingleContainer<Ban> ban) {
         ((UserStatsTable) dialog.findViewById(R.id.user_stats)).setUserStats(retrofitActivity, userStats.Properties);
         ((UserView) dialog.findViewById(R.id.user)).setUser(retrofitActivity, userStats.Properties.User);
         final CheckBox bannedCheckBox = (CheckBox) dialog.findViewById(R.id.banned);
@@ -93,6 +80,23 @@ public class UserView extends FrameLayout {
             });
         }
         dialog.findViewById(R.id.muted).setVisibility(GONE);
+        ((Button) dialog.findViewById(R.id.other_finished_game_button)).setOnClickListener(getOtherGamesClickListener(retrofitActivity, userStats.Properties.User, MainActivity.FINISHED));
+        ((Button) dialog.findViewById(R.id.other_staging_game_button)).setOnClickListener(getOtherGamesClickListener(retrofitActivity, userStats.Properties.User, MainActivity.STAGING));
+        ((Button) dialog.findViewById(R.id.other_started_game_button)).setOnClickListener(getOtherGamesClickListener(retrofitActivity, userStats.Properties.User, MainActivity.STARTED));
+    }
+
+    private static OnClickListener getOtherGamesClickListener(final RetrofitActivity retrofitActivity, final User user, final String state) {
+        return new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(retrofitActivity, MainActivity.class);
+                intent.setAction(MainActivity.ACTION_VIEW_USER_GAMES);
+                intent.putExtra(MainActivity.GAME_STATE_KEY, state);
+                intent.putExtra(MainActivity.SERIALIZED_USER_KEY, RetrofitActivity.serialize(user));
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                retrofitActivity.startActivity(intent);
+            }
+        };
     }
 
     public static OnClickListener getAvatarClickListener(final RetrofitActivity retrofitActivity, final User user) {
@@ -118,7 +122,7 @@ public class UserView extends FrameLayout {
                                     @Override
                                     public Object call(SingleContainer<UserStats> userStatsSingleContainer, SingleContainer<Ban> banSingleContainer) {
                                         AlertDialog dialog = new AlertDialog.Builder(retrofitActivity).setView(R.layout.user_dialog).show();
-                                        setupUserStats(retrofitActivity, dialog, userStatsSingleContainer, banSingleContainer);
+                                        setupUserDialog(retrofitActivity, dialog, userStatsSingleContainer, banSingleContainer);
                                         return null;
                                     }
                                 })).toObservable(),
@@ -166,9 +170,9 @@ public class UserView extends FrameLayout {
                                 }))
                                 .then(new Func3<SingleContainer<UserStats>, SingleContainer<GameState>, SingleContainer<Ban>, Object>() {
                                     @Override
-                                    public Object call(SingleContainer<UserStats> userStatsSingleContainer, final SingleContainer<GameState> gameStateSingleContainer, final SingleContainer<Ban> banSingleContainer) {
+                                    public Object call(final SingleContainer<UserStats> userStatsSingleContainer, final SingleContainer<GameState> gameStateSingleContainer, final SingleContainer<Ban> banSingleContainer) {
                                         AlertDialog dialog = new AlertDialog.Builder(retrofitActivity).setView(R.layout.user_dialog).show();
-                                        setupUserStats(retrofitActivity, dialog, userStatsSingleContainer, banSingleContainer);
+                                        setupUserDialog(retrofitActivity, dialog, userStatsSingleContainer, banSingleContainer);
                                         final CheckBox mutedCheckBox = (CheckBox) dialog.findViewById(R.id.muted);
                                         mutedCheckBox.setVisibility(VISIBLE);
                                         mutedCheckBox.setChecked(gameStateSingleContainer.Properties.Muted != null && gameStateSingleContainer.Properties.Muted.contains(member.Nation));

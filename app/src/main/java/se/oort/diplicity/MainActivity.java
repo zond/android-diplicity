@@ -47,6 +47,7 @@ import rx.Single;
 import se.oort.diplicity.apigen.Ban;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Link;
+import se.oort.diplicity.apigen.Member;
 import se.oort.diplicity.apigen.MultiContainer;
 import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.apigen.User;
@@ -73,6 +74,15 @@ public class MainActivity extends RetrofitActivity {
     private List<List<Map<String, String>>> navigationChildGroups;
     private List<Map<String, String>> navigationRootGroups;
     private FloatingActionButton button;
+
+    public static final String FINISHED = "finished";
+    public static final String STARTED = "started";
+    public static final String STAGING = "staging";
+
+    public static final String ACTION_VIEW_USER_GAMES = "view_user_games";
+
+    public static final String SERIALIZED_USER_KEY = "serialized_user";
+    public static final String GAME_STATE_KEY = "game_state";
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -250,6 +260,14 @@ public class MainActivity extends RetrofitActivity {
 
         loadMoreProcContainer.add(null);
 
+        if (ACTION_VIEW_USER_GAMES.equals(getIntent().getAction())) {
+            byte[] serializedUser = getIntent().getByteArrayExtra(SERIALIZED_USER_KEY);
+            if (serializedUser != null) {
+                User user = (User) unserialize(serializedUser);
+                displayUserGames(user, getIntent().getStringExtra(GAME_STATE_KEY));
+                return;
+            }
+        }
         navigateTo(0, 0);
     }
 
@@ -331,6 +349,34 @@ public class MainActivity extends RetrofitActivity {
                 return false;
             }
         });
+    }
+
+    private void displayUserGames(final User user, String state) {
+        if (state.equals(FINISHED)) {
+            loadMoreProcContainer.set(0, new Sendable<String>() {
+                @Override
+                public void send(String s) {
+                    appendItems(gameService.ListOtherFinishedGames(user.Id, null, null, null, null, null, null, null, null, s), null, getString(R.string.games), gamesAdapter);
+                }
+            });
+            displayItems(gameService.ListOtherFinishedGames(user.Id, null, null, null, null, null, null, null, null, null), getString(R.string.x_s_finished, user.Name), getString(R.string.games), gamesAdapter);
+        } else if (state.equals(STAGING)) {
+            loadMoreProcContainer.set(0, new Sendable<String>() {
+                @Override
+                public void send(String s) {
+                    appendItems(gameService.ListOtherStagingGames(user.Id, null, null, null, null, null, null, null, null, s), null, getString(R.string.games), gamesAdapter);
+                }
+            });
+            displayItems(gameService.ListOtherStagingGames(user.Id, null, null, null, null, null, null, null, null, null), getString(R.string.x_s_finished, user.Name), getString(R.string.games), gamesAdapter);
+        } else if (state.equals(STARTED)) {
+            loadMoreProcContainer.set(0, new Sendable<String>() {
+                @Override
+                public void send(String s) {
+                    appendItems(gameService.ListOtherStartedGames(user.Id, null, null, null, null, null, null, null, null, s), null, getString(R.string.games), gamesAdapter);
+                }
+            });
+            displayItems(gameService.ListOtherStartedGames(user.Id, null, null, null, null, null, null, null, null, null), getString(R.string.x_s_finished, user.Name), getString(R.string.games), gamesAdapter);
+        }
     }
 
     private void navigateTo(final int root, final int child) {

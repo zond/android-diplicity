@@ -28,4 +28,13 @@ public interface GameService {
   @GET("/Games/My/Finished")
   Observable<MultiContainer<Game>> ListMyFinishedGames(@Query("variant") String variant, @Query("min-reliability") String min_reliability, @Query("min-quickness") String min_quickness, @Query("max-hater") String max_hater, @Query("max-hated") String max_hated, @Query("min-rating") String min_rating, @Query("max-rating") String max_rating, @Query("limit") String limit, @Query("cursor") String cursor);
 
+  @GET("/Games/{user_id}/Staging")
+  Observable<MultiContainer<Game>> ListOtherStagingGames(@Path("user_id") String user_id, @Query("variant") String variant, @Query("min-reliability") String min_reliability, @Query("min-quickness") String min_quickness, @Query("max-hater") String max_hater, @Query("max-hated") String max_hated, @Query("min-rating") String min_rating, @Query("max-rating") String max_rating, @Query("limit") String limit, @Query("cursor") String cursor);
+
+  @GET("/Games/{user_id}/Started")
+  Observable<MultiContainer<Game>> ListOtherStartedGames(@Path("user_id") String user_id, @Query("variant") String variant, @Query("min-reliability") String min_reliability, @Query("min-quickness") String min_quickness, @Query("max-hater") String max_hater, @Query("max-hated") String max_hated, @Query("min-rating") String min_rating, @Query("max-rating") String max_rating, @Query("limit") String limit, @Query("cursor") String cursor);
+
+  @GET("/Games/{user_id}/Finished")
+  Observable<MultiContainer<Game>> ListOtherFinishedGames(@Path("user_id") String user_id, @Query("variant") String variant, @Query("min-reliability") String min_reliability, @Query("min-quickness") String min_quickness, @Query("max-hater") String max_hater, @Query("max-hated") String max_hated, @Query("min-rating") String min_rating, @Query("max-rating") String max_rating, @Query("limit") String limit, @Query("cursor") String cursor);
+
 }
