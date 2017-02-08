@@ -18,10 +18,12 @@ public class UserStatsAdapter extends RecycleAdapter<SingleContainer<UserStats>,
     public class ViewHolder extends RecycleAdapter<SingleContainer<UserStats>, UserStatsAdapter.ViewHolder>.ViewHolder {
         UserView userView;
         TextView sortLabel;
+        View row;
 
         View.OnClickListener delegateClickListener;
         public ViewHolder(View view) {
             super(view);
+            row = view;
             userView = (UserView) view.findViewById(R.id.user);
             sortLabel = (TextView) view.findViewById(R.id.sort_label);
         }
@@ -31,6 +33,7 @@ public class UserStatsAdapter extends RecycleAdapter<SingleContainer<UserStats>,
             if (emitter != null) {
                 sortLabel.setText(emitter.emit(user.Properties));
             }
+            row.setOnClickListener(userView.getAvatarClickListener(retrofitActivity, user.Properties.User));
         }
     }
     public interface StatsEmitter {
