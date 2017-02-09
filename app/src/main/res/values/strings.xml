@@ -175,4 +175,11 @@
     <string name="all_press_becomes_public">Warning: All press becomes public when the game finishes!</string>
     <string name="x_s_finished">%s\'s finished</string>
     <string name="staging">Staging</string>
+    <string name="loading_game">Loading game</string>
+    <string name="game_link_copied_to_clipboard">Game link copied to clipboard</string>
+    <string name="game_link">Game link</string>
+    <string name="game_link_x">https://diplicity-engine.appspot.com/Game/%s</string>
+    <string name="_games">games</string>
+    <string name="x_s_staging">%s\'s staging</string>
+    <string name="x_s_started">%s\'s started</string>
 </resources>

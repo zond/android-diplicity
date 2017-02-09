@@ -48,9 +48,9 @@ public class PreferenceActivity extends RetrofitActivity {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
                     ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText(getResources().getString(R.string.game_id), getActivity().getIntent().getStringExtra(GAME_ID_INTENT_KEY));
+                    ClipData clip = ClipData.newPlainText(getResources().getString(R.string.game_link), getString(R.string.game_link_x, getActivity().getIntent().getStringExtra(GAME_ID_INTENT_KEY)));
                     clipboard.setPrimaryClip(clip);
-                    Toast.makeText(getActivity(), R.string.game_id_copied_to_clipboard, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), R.string.game_link_copied_to_clipboard, Toast.LENGTH_SHORT).show();
                     return true;
                 }
             });

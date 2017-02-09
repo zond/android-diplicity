@@ -21,15 +21,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.Spinner;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,14 +37,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import retrofit2.adapter.rxjava.HttpException;
 import rx.Observable;
-import rx.Single;
+import rx.Subscriber;
 import se.oort.diplicity.apigen.Ban;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Link;
-import se.oort.diplicity.apigen.Member;
 import se.oort.diplicity.apigen.MultiContainer;
 import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.apigen.User;
@@ -73,16 +71,16 @@ public class MainActivity extends RetrofitActivity {
 
     private List<List<Map<String, String>>> navigationChildGroups;
     private List<Map<String, String>> navigationRootGroups;
-    private FloatingActionButton button;
+    private FloatingActionButton addGameButton;
 
     public static final String FINISHED = "finished";
     public static final String STARTED = "started";
     public static final String STAGING = "staging";
-
     public static final String ACTION_VIEW_USER_GAMES = "view_user_games";
-
     public static final String SERIALIZED_USER_KEY = "serialized_user";
     public static final String GAME_STATE_KEY = "game_state";
+
+    private static Pattern viewGamePattern = Pattern.compile("/Game/(.*)");
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -99,8 +97,8 @@ public class MainActivity extends RetrofitActivity {
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        button = (FloatingActionButton) findViewById(R.id.add_game_button);
-        button.setOnClickListener(new View.OnClickListener() {
+        addGameButton = (FloatingActionButton) findViewById(R.id.add_game_button);
+        addGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 handleReq(userStatsService.UserStatsLoad(getLoggedInUser().Id), new Sendable<SingleContainer<UserStats>>() {
@@ -260,15 +258,27 @@ public class MainActivity extends RetrofitActivity {
 
         loadMoreProcContainer.add(null);
 
+        if (!ACTION_VIEW_USER_GAMES.equals(getIntent().getAction()) && !Intent.ACTION_VIEW.equals(getIntent().getAction()))
+            navigateTo(0, 0);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("Diplicity", "onResume " + getIntent().getAction());
         if (ACTION_VIEW_USER_GAMES.equals(getIntent().getAction())) {
             byte[] serializedUser = getIntent().getByteArrayExtra(SERIALIZED_USER_KEY);
             if (serializedUser != null) {
                 User user = (User) unserialize(serializedUser);
                 displayUserGames(user, getIntent().getStringExtra(GAME_STATE_KEY));
-                return;
+            }
+        } else if (Intent.ACTION_VIEW.equals(getIntent().getAction())) {
+            Uri uri = getIntent().getData();
+            Matcher m = viewGamePattern.matcher(uri.getPath());
+            if (m.matches()) {
+                displaySingleGame(m.group(1));
             }
         }
-        navigateTo(0, 0);
     }
 
     private void setupNavigation() {
@@ -351,39 +361,67 @@ public class MainActivity extends RetrofitActivity {
         });
     }
 
+    private void displaySingleGame(final String gameID) {
+        handleReq(gameService.GameLoad(gameID), new Sendable<SingleContainer<Game>>() {
+            @Override
+            public void send(final SingleContainer<Game> gameSingleContainer) {
+                addGameButton.setVisibility(View.GONE);
+                loadMoreProcContainer.set(0, new Sendable<String>() {
+                    @Override
+                    public void send(String s) {
+                    }
+                });
+                displayItems(Observable.create(new Observable.OnSubscribe<MultiContainer<Game>>() {
+                    @Override
+                    public void call(final Subscriber<? super MultiContainer<Game>> subscriber) {
+                        MultiContainer<Game> multiContainer = new MultiContainer<Game>();
+                        multiContainer.Properties = new ArrayList<SingleContainer<Game>>();
+                        multiContainer.Properties.add(gameSingleContainer);
+                        multiContainer.Links = new ArrayList<Link>();
+                        subscriber.onNext(multiContainer);
+                        subscriber.onCompleted();
+                    }
+                }), gameID, null, gamesAdapter);
+            }
+        }, getString(R.string.loading_game));
+    }
+
     private void displayUserGames(final User user, String state) {
         if (state.equals(FINISHED)) {
+            addGameButton.setVisibility(View.GONE);
             loadMoreProcContainer.set(0, new Sendable<String>() {
                 @Override
                 public void send(String s) {
                     appendItems(gameService.ListOtherFinishedGames(user.Id, null, null, null, null, null, null, null, null, s), null, getString(R.string.games), gamesAdapter);
                 }
             });
-            displayItems(gameService.ListOtherFinishedGames(user.Id, null, null, null, null, null, null, null, null, null), getString(R.string.x_s_finished, user.Name), getString(R.string.games), gamesAdapter);
+            displayItems(gameService.ListOtherFinishedGames(user.Id, null, null, null, null, null, null, null, null, null), getString(R.string.x_s_finished, user.Name), getString(R.string._games), gamesAdapter);
         } else if (state.equals(STAGING)) {
+            addGameButton.setVisibility(View.GONE);
             loadMoreProcContainer.set(0, new Sendable<String>() {
                 @Override
                 public void send(String s) {
                     appendItems(gameService.ListOtherStagingGames(user.Id, null, null, null, null, null, null, null, null, s), null, getString(R.string.games), gamesAdapter);
                 }
             });
-            displayItems(gameService.ListOtherStagingGames(user.Id, null, null, null, null, null, null, null, null, null), getString(R.string.x_s_finished, user.Name), getString(R.string.games), gamesAdapter);
+            displayItems(gameService.ListOtherStagingGames(user.Id, null, null, null, null, null, null, null, null, null), getString(R.string.x_s_staging, user.Name), getString(R.string._games), gamesAdapter);
         } else if (state.equals(STARTED)) {
+            addGameButton.setVisibility(View.GONE);
             loadMoreProcContainer.set(0, new Sendable<String>() {
                 @Override
                 public void send(String s) {
                     appendItems(gameService.ListOtherStartedGames(user.Id, null, null, null, null, null, null, null, null, s), null, getString(R.string.games), gamesAdapter);
                 }
             });
-            displayItems(gameService.ListOtherStartedGames(user.Id, null, null, null, null, null, null, null, null, null), getString(R.string.x_s_finished, user.Name), getString(R.string.games), gamesAdapter);
+            displayItems(gameService.ListOtherStartedGames(user.Id, null, null, null, null, null, null, null, null, null), getString(R.string.x_s_started, user.Name), getString(R.string._games), gamesAdapter);
         }
     }
 
     private void navigateTo(final int root, final int child) {
         if (root == 0 && child == 1) {
-            button.setVisibility(View.VISIBLE);
+            addGameButton.setVisibility(View.VISIBLE);
         } else {
-            button.setVisibility(View.GONE);
+            addGameButton.setVisibility(View.GONE);
         }
         switch (root) {
         case 0: // Games
@@ -531,10 +569,12 @@ public class MainActivity extends RetrofitActivity {
         drawer.closeDrawer(GravityCompat.START);
 
         String msg = null;
-        if (what != null) {
-            msg = getResources().getString(R.string.loading_x_y, what, typ);
-        } else {
-            msg = getResources().getString(R.string.loading_x_y, getResources().getString(R.string.more), typ);
+        if (typ != null) {
+            if (what != null) {
+                msg = getResources().getString(R.string.loading_x_y, what, typ);
+            } else {
+                msg = getResources().getString(R.string.loading_x_y, getResources().getString(R.string.more), typ);
+            }
         }
 
         handleReq(call, new Sendable<MultiContainer<T>>() {
@@ -550,7 +590,11 @@ public class MainActivity extends RetrofitActivity {
                 adapter.addAll(container.Properties);
 
                 if (what != null) {
-                    ((TextView) findViewById(R.id.content_title)).setText(getResources().getString(R.string.x_y, what, typ));
+                    if (typ != null) {
+                        ((TextView) findViewById(R.id.content_title)).setText(getResources().getString(R.string.x_y, what, typ));
+                    } else {
+                        ((TextView) findViewById(R.id.content_title)).setText(what);
+                    }
                 }
                 ((TextView) findViewById(R.id.content_title)).setVisibility(View.VISIBLE);
                 if (container.Properties.isEmpty()) {
