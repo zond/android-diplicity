@@ -72,6 +72,7 @@ import rx.schedulers.Schedulers;
 import se.oort.diplicity.apigen.BanService;
 import se.oort.diplicity.apigen.FCMNotificationConfig;
 import se.oort.diplicity.apigen.FCMToken;
+import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.GameResultService;
 import se.oort.diplicity.apigen.GameService;
 import se.oort.diplicity.apigen.GameStateService;
@@ -435,6 +436,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         });
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(Ticker.class, new TickerUnserializer())
+                .registerTypeAdapter(Game.class, new GameUnserializer(this))
                 .create();
 
         Retrofit retrofit = new Retrofit.Builder()

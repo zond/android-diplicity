@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -172,7 +173,9 @@ public class PressActivity extends RetrofitActivity {
                                 }
                             }
 
-                            ((TextView) row.findViewById(R.id.body)).setText(message.Body);
+                            TextView body = (TextView) row.findViewById(R.id.body);
+                            body.setText(message.Body);
+                            Linkify.addLinks(body, Linkify.ALL);
                             ((TextView) row.findViewById(R.id.at)).setText(message.Age.createdAt().toString());
                             ((TextView) row.findViewById(R.id.sender)).setText(getResources().getString(R.string.x_, message.Sender));
                             if (author != null) {
