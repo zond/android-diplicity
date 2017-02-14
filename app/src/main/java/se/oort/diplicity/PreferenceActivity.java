@@ -103,7 +103,7 @@ public class PreferenceActivity extends RetrofitActivity {
                                     }
                                 }
                             });
-                            deadlineWarningPref.setSummary("" + App.getDeadlineWarningMinutes(getContext()));
+                            deadlineWarningPref.setSummary("" + App.getDeadlineWarningMinutes(retrofitActivity()));
 
                             final EditTextPreference fakeIDPref = (EditTextPreference) findPreference(getResources().getString(R.string.local_development_mode_fake_id_pref_key));
                             final Preference.OnPreferenceChangeListener fakeIDChanged = new Preference.OnPreferenceChangeListener() {
