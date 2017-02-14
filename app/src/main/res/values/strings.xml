@@ -188,4 +188,5 @@
     <string name="must_be_positive_integer">Must be a positive integer.</string>
     <string name="deadline_warning_minutes_ahead">Deadline warning minutes ahead</string>
     <string name="alarms">Alarms</string>
+    <string name="forum">Forum</string>
 </resources>

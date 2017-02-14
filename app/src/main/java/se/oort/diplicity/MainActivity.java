@@ -640,6 +640,11 @@ public class MainActivity extends RetrofitActivity {
             Intent i = new Intent(this, PreferenceActivity.class);
             startActivity(i);
             return true;
+        } else if (id == R.id.action_forum) {
+            String url = "https://groups.google.com/forum/#!forum/diplicity-beta";
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
         } else if (id == R.id.action_alarms) {
             AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.alarms_dialog).show();
             LinearLayout layout = (LinearLayout) dialog.findViewById(R.id.alarms_list);

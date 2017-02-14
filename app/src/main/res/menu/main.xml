@@ -16,4 +16,9 @@
         android:orderInCategory="300"
         android:title="@string/alarms"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_forum"
+        android:orderInCategory="400"
+        android:title="@string/forum"
+        app:showAsAction="never" />
 </menu>
