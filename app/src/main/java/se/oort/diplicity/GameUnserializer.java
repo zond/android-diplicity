@@ -1,5 +1,14 @@
 package se.oort.diplicity;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.SystemClock;
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -9,6 +18,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
+import java.util.Date;
 
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Member;
@@ -24,44 +34,41 @@ public class GameUnserializer implements JsonDeserializer<Game> {
                 .registerTypeAdapter(Ticker.class, new TickerUnserializer())
                 .create();
     }
-    private boolean alarmOff(Game game, Member member) {
+    private boolean alarmOn(Game game, Member member) {
         if (game.Finished) {
-            return true;
+            return false;
         }
         if (!game.Started) {
-            return true;
+            return false;
         }
         if (member.NewestPhaseState == null) {
-            return true;
+            return false;
         }
         if (member.NewestPhaseState.ReadyToResolve) {
-            return true;
+            return false;
         }
-        return false;
+        if (App.getDeadlineWarningMinutes(retrofitActivity) == 0) {
+            return false;
+        }
+        return true;
     }
-    private void turnOnAlarm(Game game) {
-
+    private void turnOnAlarm(Game game, Member member) {
+        Alarm.Alert.fromGame(game, member).turnOn(retrofitActivity);
     }
-    private void turnOffAlarm(Game game) {
-
+    private void turnOffAlarm(Game game, Member member) {
+        Alarm.Alert.fromGame(game, member).turnOff(retrofitActivity);
     }
     private void manageAlarms(Game game, Member member) {
-        if (alarmOff(game, member)) {
-            turnOffAlarm(game);
+        if (alarmOn(game, member)) {
+            turnOnAlarm(game, member);
         } else {
-            turnOnAlarm(game);
+            turnOffAlarm(game, member);
         }
     }
     public Game deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject jsonObject = json.getAsJsonObject();
         Game game = baseGson.fromJson(jsonObject, Game.class);
-        Member member = null;
-        for (Member m : game.Members) {
-            if (m.User.Id.equals(retrofitActivity.getLoggedInUser().Id)) {
-                member = m;
-                break;
-            }
-        }
+        Member member = retrofitActivity.getLoggedInMember(game);
         if (member != null && game.PhaseLengthMinutes > 0) {
             manageAlarms(game, member);
         }

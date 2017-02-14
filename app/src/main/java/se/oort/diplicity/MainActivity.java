@@ -265,7 +265,6 @@ public class MainActivity extends RetrofitActivity {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("Diplicity", "onResume " + getIntent().getAction());
         if (ACTION_VIEW_USER_GAMES.equals(getIntent().getAction())) {
             byte[] serializedUser = getIntent().getByteArrayExtra(SERIALIZED_USER_KEY);
             if (serializedUser != null) {
@@ -641,6 +640,17 @@ public class MainActivity extends RetrofitActivity {
             Intent i = new Intent(this, PreferenceActivity.class);
             startActivity(i);
             return true;
+        } else if (id == R.id.action_alarms) {
+            AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.alarms_dialog).show();
+            LinearLayout layout = (LinearLayout) dialog.findViewById(R.id.alarms_list);
+            for (Object json : Alarm.getAlarmPreferences(this).getAll().values()) {
+                Alarm.Alert alert = Alarm.Alert.fromJSON("" + json);
+                LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View row = inflater.inflate(R.layout.alarm_list_row, null);
+                ((TextView) row.findViewById(R.id.desc)).setText(alert.desc);
+                ((TextView) row.findViewById(R.id.at)).setText(alert.alertAt(this).toString());
+                layout.addView(row);
+            }
         } else if (id == R.id.action_bans) {
             handleReq(
                     banService.ListBans(getLoggedInUser().Id),

@@ -63,13 +63,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
         }
         @Override
         public void bind(final SingleContainer<Game> game, final int pos) {
-            Member member = null;
-            for (Member m : game.Properties.Members) {
-                if (m.User.Id.equals(retrofitActivity.getLoggedInUser().Id)) {
-                    member = m;
-                    break;
-                }
-            }
+            Member member = retrofitActivity.getLoggedInMember(game.Properties);
             if (member != null && member.GameAlias != null && !member.GameAlias.equals("")) {
                 desc.setText(member.GameAlias);
             } else {

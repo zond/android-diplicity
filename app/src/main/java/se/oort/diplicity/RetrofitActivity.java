@@ -23,12 +23,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.ByteArrayInputStream;
@@ -58,7 +55,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 import retrofit2.Call;
 import retrofit2.CallAdapter;
-import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.HttpException;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
@@ -76,6 +72,7 @@ import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.GameResultService;
 import se.oort.diplicity.apigen.GameService;
 import se.oort.diplicity.apigen.GameStateService;
+import se.oort.diplicity.apigen.Member;
 import se.oort.diplicity.apigen.MemberService;
 import se.oort.diplicity.apigen.MessageService;
 import se.oort.diplicity.apigen.MultiContainer;
@@ -517,6 +514,10 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                     }, getResources().getString(R.string.updating_settings));
         }
 
+    }
+
+    public Member getLoggedInMember(Game game) {
+        return App.getMemberByUser(game, getLoggedInUser().Id);
     }
 
     public String getLocalDevelopmentModeFakeID() {

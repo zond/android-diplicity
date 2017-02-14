@@ -138,13 +138,7 @@ public class UserView extends FrameLayout {
         if (game == null) {
             return getAvatarClickListener(retrofitActivity, user);
         }
-        Member me = null;
-        for (Member m : game.Members) {
-            if (m.User.Id.equals(retrofitActivity.getLoggedInUser().Id)) {
-                me = m;
-                break;
-            }
-        }
+        Member me = retrofitActivity.getLoggedInMember(game);
         if (me == null || me.Nation.equals(member.Nation)) {
             return getAvatarClickListener(retrofitActivity, user);
         }

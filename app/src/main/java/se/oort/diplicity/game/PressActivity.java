@@ -1,60 +1,36 @@
 package se.oort.diplicity.game;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.os.Bundle;
-import android.preference.EditTextPreference;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.util.Linkify;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
+import se.oort.diplicity.App;
 import se.oort.diplicity.ChannelService;
-import se.oort.diplicity.FCMReceiver;
 import se.oort.diplicity.MessagingService;
 import se.oort.diplicity.R;
 import se.oort.diplicity.RetrofitActivity;
 import se.oort.diplicity.Sendable;
-import se.oort.diplicity.UserStatsTable;
 import se.oort.diplicity.UserView;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Member;
 import se.oort.diplicity.apigen.Message;
 import se.oort.diplicity.apigen.MultiContainer;
-import se.oort.diplicity.apigen.Phase;
-import se.oort.diplicity.apigen.PhaseMeta;
 import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.apigen.Ticker;
-import se.oort.diplicity.apigen.UserStats;
 
 public class PressActivity extends RetrofitActivity {
 
@@ -165,13 +141,7 @@ public class PressActivity extends RetrofitActivity {
                         for (int i = 0; i < messageMultiContainer.Properties.size(); i++) {
                             Message message = messageMultiContainer.Properties.get(messageMultiContainer.Properties.size() - i - 1).Properties;
                             View row = getLayoutInflater().inflate(R.layout.message_list_row, (ViewGroup) findViewById(R.id.press_layout), false);
-                            Member author = null;
-                            for (Member member : game.Members) {
-                                if (member.Nation.equals(message.Sender)) {
-                                    author = member;
-                                    break;
-                                }
-                            }
+                            Member author = App.getMemberByNation(game, message.Sender);
 
                             TextView body = (TextView) row.findViewById(R.id.body);
                             body.setText(message.Body);

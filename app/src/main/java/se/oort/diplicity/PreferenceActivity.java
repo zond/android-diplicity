@@ -9,6 +9,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 
@@ -83,12 +84,33 @@ public class PreferenceActivity extends RetrofitActivity {
                                 pushPreference.setSummary(getResources().getString(R.string.dysfunctional_fcm_service));
                             }
 
+                            final EditTextPreference deadlineWarningPref = (EditTextPreference) findPreference(getResources().getString(R.string.deadline_warning_minutes_key));
+                            deadlineWarningPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                                @Override
+                                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                                    try {
+                                        long value = Long.parseLong("" + newValue);
+                                        if (value < 0) {
+                                            throw new NumberFormatException();
+                                        }
+                                        prefs.edit().putString(getResources().getString(R.string.deadline_warning_minutes_key), "" + value).apply();
+                                        deadlineWarningPref.setSummary("" + newValue);
+                                        Alarm.resetAllAlarms(retrofitActivity());
+                                        return true;
+                                    } catch (NumberFormatException e) {
+                                        Toast.makeText(retrofitActivity(), getResources().getString(R.string.must_be_positive_integer), Toast.LENGTH_SHORT).show();
+                                        return false;
+                                    }
+                                }
+                            });
+                            deadlineWarningPref.setSummary("" + App.getDeadlineWarningMinutes(getContext()));
+
                             final EditTextPreference fakeIDPref = (EditTextPreference) findPreference(getResources().getString(R.string.local_development_mode_fake_id_pref_key));
                             final Preference.OnPreferenceChangeListener fakeIDChanged = new Preference.OnPreferenceChangeListener() {
                                 @Override
                                 public boolean onPreferenceChange(Preference preference, Object o) {
                                     fakeIDPref.setSummary((String) o);
-                                    PreferenceManager.getDefaultSharedPreferences(retrofitActivity()).edit().putString(AUTH_TOKEN_PREF_KEY, "").apply();
+                                    prefs.edit().putString(AUTH_TOKEN_PREF_KEY, "").apply();
                                     retrofitActivity().performLogin();
                                     return true;
                                 }

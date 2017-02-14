@@ -182,4 +182,10 @@
     <string name="_games">games</string>
     <string name="x_s_staging">%s\'s staging</string>
     <string name="x_s_started">%s\'s started</string>
+    <string name="deadline_warning_minutes_key">deadline_warning_minutes_key</string>
+    <string name="orders_needed">Orders needed</string>
+    <string name="x_needs_orders_before_y">%1$s needs orders before %2$s.</string>
+    <string name="must_be_positive_integer">Must be a positive integer.</string>
+    <string name="deadline_warning_minutes_ahead">Deadline warning minutes ahead</string>
+    <string name="alarms">Alarms</string>
 </resources>

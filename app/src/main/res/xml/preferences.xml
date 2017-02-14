@@ -10,6 +10,9 @@
             android:title="@string/push_notifications"
             android:summary="@string/push_notifications_to_your_device"
             android:key="@string/push_notifications_pref_key" />
+        <EditTextPreference
+            android:title="@string/deadline_warning_minutes_ahead"
+            android:key="@string/deadline_warning_minutes_key"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:key="development_prefs"

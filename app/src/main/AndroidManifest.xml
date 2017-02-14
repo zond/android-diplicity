@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name=".App"
@@ -33,7 +34,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".FCMReceiver"
+            android:name=".NotificationReceiveActivity"
             android:parentActivityName=".MainActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar"
             android:screenOrientation="portrait">
@@ -42,6 +43,10 @@
                 android:value="se.oort.diplicity.MainActivity" />
             <intent-filter>
                 <action android:name="se.oort.diplicity.FCMNotify" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="se.oort.diplicity.DeadlineWarning" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -82,6 +87,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".game.GameActivity" />
         </activity>
+
+        <receiver android:name=".Alarm" />
+
+        <receiver
+            android:name=".BootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action._BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
         <service android:name=".MessagingService">
             <intent-filter>

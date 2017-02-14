@@ -11,4 +11,9 @@
         android:orderInCategory="200"
         android:title="@string/bans"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_alarms"
+        android:orderInCategory="300"
+        android:title="@string/alarms"
+        app:showAsAction="never" />
 </menu>

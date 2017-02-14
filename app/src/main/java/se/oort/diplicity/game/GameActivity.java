@@ -144,11 +144,7 @@ public class GameActivity extends RetrofitActivity
                 return member.Nation.compareTo(t1.Nation);
             }
         });
-        for (Member m : game.Members) {
-            if (m.User.Id.equals(getLoggedInUser().Id)) {
-                member = m;
-            }
-        }
+        member = getLoggedInMember(game);
 
         byte[] serializedPhaseMeta = getIntent().getByteArrayExtra(SERIALIZED_PHASE_META_KEY);
         if (serializedPhaseMeta != null) {

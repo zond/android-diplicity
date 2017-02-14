@@ -8,7 +8,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.util.Base64;
 import android.util.Log;
 
@@ -22,7 +21,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.RunnableFuture;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
@@ -30,6 +28,8 @@ import se.oort.diplicity.apigen.PhaseMeta;
 import se.oort.diplicity.apigen.Ticker;
 import se.oort.diplicity.apigen.TickerUnserializer;
 
+// MessagingService receives messages from FCM when the app is turned on as the message
+// arrives.
 public class MessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
 
     private Handler handler = new Handler();
@@ -86,30 +86,18 @@ public class MessagingService extends com.google.firebase.messaging.FirebaseMess
                         Log.d("Diplicity", "" + subscriber + " didn't consume this notification, checking if anyone else wants to");
                     }
                 }
-                Log.d("Diplicity", "Nobody consumed this notification, popping up a regular notification");
-                sendNotification(remoteMessage);
+                Log.d("Diplicity", "Nobody consumed this message, popping up a regular notification");
+
+                Intent intent = new Intent(FCM_NOTIFY_ACTION);
+                intent.putExtra(NotificationReceiveActivity.DIPLICITY_JSON_EXTRA, remoteMessage.getData().get("diplicityJSON"));
+
+                NotificationReceiveActivity.sendNotification(
+                        MessagingService.this,
+                        intent,
+                        remoteMessage.getNotification().getTitle(),
+                        remoteMessage.getNotification().getBody());
             }
         });
-    }
-
-    private void sendNotification(RemoteMessage remoteMessage) {
-        Intent intent = new Intent(FCM_NOTIFY_ACTION);
-        intent.putExtra(FCMReceiver.DIPLICITY_JSON_EXTRA, remoteMessage.getData().get(FCMReceiver.DIPLICITY_JSON_EXTRA));
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
-
-        Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_otto)
-                .setContentTitle(remoteMessage.getNotification().getTitle())
-                .setContentText(remoteMessage.getNotification().getBody())
-                .setAutoCancel(true)
-                .setSound(defaultSoundUri)
-                .setContentIntent(pendingIntent);
-
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        notificationManager.notify(0, notificationBuilder.build());
     }
 
 }
