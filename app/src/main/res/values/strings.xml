@@ -46,7 +46,7 @@
     <string name="server_error">Server error, please try later.</string>
     <string name="joining_game">Joining game</string>
     <string name="updating">Updating</string>
-    <string name="unknown_error">Unknown error</string>
+    <string name="unknown_error">Unknown error.</string>
     <string name="more">more</string>
     <string name="phase_length_in_minutes">Phase length in minutes</string>
     <string name="variant">Variant</string>
@@ -189,4 +189,7 @@
     <string name="deadline_warning_minutes_ahead">Deadline warning minutes ahead</string>
     <string name="alarms">Alarms</string>
     <string name="forum">Forum</string>
+    <string name="network_timeout_error">Network timeout error.</string>
+    <string name="error_log">Error log</string>
+    <string name="error_log_copied_to_clipboard">Error log copied to clipboard.</string>
 </resources>

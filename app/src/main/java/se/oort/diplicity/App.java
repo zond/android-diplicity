@@ -9,13 +9,18 @@ import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Member;
 
 public class App extends MultiDexApplication {
+
+    public static final StringBuffer errorLog = new StringBuffer();
 
     public App() {
         if (BuildConfig.DEBUG) {
@@ -60,6 +65,7 @@ public class App extends MultiDexApplication {
     }
 
     public static void firebaseCrashReport(String msg) {
+        errorLog.append(new Date().toString() + "\t" + msg + "\n");
         if (!BuildConfig.DEBUG) {
             FirebaseCrash.report(new RuntimeException(msg));
         }
@@ -67,6 +73,13 @@ public class App extends MultiDexApplication {
     }
 
     public static void firebaseCrashReport(String msg, Throwable e) {
+        errorLog.append(new Date().toString() + "\t" + msg + "\n");
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        e.printStackTrace(printWriter);
+        printWriter.flush();
+        printWriter.close();
+        errorLog.append(stringWriter.toString() + "\n");
         if (!BuildConfig.DEBUG) {
             FirebaseCrash.report(new RuntimeException(msg, e));
         }

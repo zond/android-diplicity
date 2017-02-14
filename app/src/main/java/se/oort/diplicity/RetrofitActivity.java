@@ -237,6 +237,9 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                                     Toast.makeText(RetrofitActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
                                 }
                             }
+                        } else if (e instanceof java.net.SocketTimeoutException) {
+                            App.firebaseCrashReport(msg, e);
+                            Toast.makeText(RetrofitActivity.this, getResources().getString(R.string.network_timeout_error), Toast.LENGTH_SHORT).show();
                         } else {
                             App.firebaseCrashReport(msg, e);
                             Toast.makeText(RetrofitActivity.this, R.string.unknown_error, Toast.LENGTH_SHORT).show();

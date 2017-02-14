@@ -1,5 +1,7 @@
 package se.oort.diplicity;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -640,6 +642,18 @@ public class MainActivity extends RetrofitActivity {
             Intent i = new Intent(this, PreferenceActivity.class);
             startActivity(i);
             return true;
+        } else if (id == R.id.action_error_log) {
+            AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.error_log_dialog).show();
+            ((EditText) dialog.findViewById(R.id.error_log)).setText(App.errorLog.toString());
+            dialog.findViewById(R.id.error_log).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ClipboardManager clipboard = (ClipboardManager) MainActivity.this.getSystemService(CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText(getResources().getString(R.string.error_log), App.errorLog.toString());
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(MainActivity.this, R.string.error_log_copied_to_clipboard, Toast.LENGTH_SHORT).show();
+                }
+            });
         } else if (id == R.id.action_forum) {
             String url = "https://groups.google.com/forum/#!forum/diplicity-beta";
             Intent i = new Intent(Intent.ACTION_VIEW);
