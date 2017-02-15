@@ -65,7 +65,7 @@ public class App extends MultiDexApplication {
     }
 
     public static void firebaseCrashReport(String msg) {
-        errorLog.append(new Date().toString() + "\t" + msg + "\n");
+        errorLog.append(new Date().toString() + ": " + msg + "\n");
         if (!BuildConfig.DEBUG) {
             FirebaseCrash.report(new RuntimeException(msg));
         }
@@ -73,7 +73,7 @@ public class App extends MultiDexApplication {
     }
 
     public static void firebaseCrashReport(String msg, Throwable e) {
-        errorLog.append(new Date().toString() + "\t" + msg + "\n");
+        errorLog.append(new Date().toString() + ": " + msg + "\n" + e.getMessage() + "\n");
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         e.printStackTrace(printWriter);

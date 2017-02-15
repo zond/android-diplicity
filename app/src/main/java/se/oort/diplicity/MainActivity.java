@@ -644,7 +644,7 @@ public class MainActivity extends RetrofitActivity {
             return true;
         } else if (id == R.id.action_error_log) {
             AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.error_log_dialog).show();
-            ((EditText) dialog.findViewById(R.id.error_log)).setText(App.errorLog.toString());
+            ((TextView) dialog.findViewById(R.id.error_log)).setText(App.errorLog.toString());
             dialog.findViewById(R.id.error_log).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
