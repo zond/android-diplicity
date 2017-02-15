@@ -73,7 +73,7 @@ public class GameUnserializer implements JsonDeserializer<Game> {
         JsonObject jsonObject = json.getAsJsonObject();
         Game game = baseGson.fromJson(jsonObject, Game.class);
         Member member = retrofitActivity.getLoggedInMember(game);
-        if (member != null && game.PhaseLengthMinutes > 0) {
+        if (member != null && && game.NewestPhaseMeta != null && game.NewestPhaseMeta.size() > 0 && game.PhaseLengthMinutes > 0) {
             manageAlarms(retrofitActivity, game, member);
         }
         return game;
