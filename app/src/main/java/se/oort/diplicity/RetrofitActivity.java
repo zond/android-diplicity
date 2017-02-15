@@ -47,6 +47,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
@@ -343,6 +344,9 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                             response = new OkHttpClient.Builder()
                                     .followRedirects(false)
                                     .followSslRedirects(false)
+                                    .connectTimeout(10, TimeUnit.SECONDS)
+                                    .readTimeout(10, TimeUnit.SECONDS)
+                                    .writeTimeout(10, TimeUnit.SECONDS)
                                     .build()
                                     .newCall(request).execute();
                             if (response.code() != 307) {
@@ -434,6 +438,9 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                 return chain.proceed(toIssue);
             }
         });
+        builder.connectTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(10, TimeUnit.SECONDS);
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(Ticker.class, new TickerUnserializer())
                 .registerTypeAdapter(Game.class, new GameUnserializer(this))
