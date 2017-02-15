@@ -34,7 +34,7 @@ public class GameUnserializer implements JsonDeserializer<Game> {
                 .registerTypeAdapter(Ticker.class, new TickerUnserializer())
                 .create();
     }
-    private boolean alarmOn(Game game, Member member) {
+    private boolean alarmOn(Context context, Game game, Member member, Alarm.Alert alert) {
         if (game.Finished) {
             return false;
         }
@@ -50,6 +50,9 @@ public class GameUnserializer implements JsonDeserializer<Game> {
         if (App.getDeadlineWarningMinutes(retrofitActivity) == 0) {
             return false;
         }
+        if (alert.alertAt(context).getTime() < new Date().getTime()) {
+            return false;
+        }
         return true;
     }
     private void turnOnAlarm(Game game, Member member) {
@@ -58,8 +61,9 @@ public class GameUnserializer implements JsonDeserializer<Game> {
     private void turnOffAlarm(Game game, Member member) {
         Alarm.Alert.fromGame(game, member).turnOff(retrofitActivity);
     }
-    private void manageAlarms(Game game, Member member) {
-        if (alarmOn(game, member)) {
+    private void manageAlarms(Context context, Game game, Member member) {
+        Alarm.Alert alert = Alarm.Alert.fromGame(game, member);
+        if (alarmOn(context, game, member, alert)) {
             turnOnAlarm(game, member);
         } else {
             turnOffAlarm(game, member);
@@ -70,7 +74,7 @@ public class GameUnserializer implements JsonDeserializer<Game> {
         Game game = baseGson.fromJson(jsonObject, Game.class);
         Member member = retrofitActivity.getLoggedInMember(game);
         if (member != null && game.PhaseLengthMinutes > 0) {
-            manageAlarms(game, member);
+            manageAlarms(retrofitActivity, game, member);
         }
         return game;
     }

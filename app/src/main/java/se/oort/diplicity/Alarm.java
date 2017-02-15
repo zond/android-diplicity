@@ -103,7 +103,11 @@ public class Alarm extends BroadcastReceiver {
     public static void resetAllAlarms(Context context) {
         for (Object json : getAlarmPreferences(context).getAll().values()) {
             Alert alert = Alert.fromJSON("" + json);
-            alert.turnOn(context);
+            if (alert.alertAt(context).getTime() > new Date().getTime()) {
+                alert.turnOn(context);
+            } else {
+                alert.turnOff(context);
+            }
         }
     }
 

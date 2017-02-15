@@ -661,14 +661,22 @@ public class MainActivity extends RetrofitActivity {
             startActivity(i);
         } else if (id == R.id.action_alarms) {
             AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.alarms_dialog).show();
+            Map<String, ?> alarms = Alarm.getAlarmPreferences(this).getAll();
             LinearLayout layout = (LinearLayout) dialog.findViewById(R.id.alarms_list);
-            for (Object json : Alarm.getAlarmPreferences(this).getAll().values()) {
-                Alarm.Alert alert = Alarm.Alert.fromJSON("" + json);
-                LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View row = inflater.inflate(R.layout.alarm_list_row, null);
-                ((TextView) row.findViewById(R.id.desc)).setText(alert.desc);
-                ((TextView) row.findViewById(R.id.at)).setText(alert.alertAt(this).toString());
-                layout.addView(row);
+            if (alarms.size() == 0) {
+                dialog.findViewById(R.id.empty_view).setVisibility(View.VISIBLE);
+                layout.setVisibility(View.GONE);
+            } else {
+                dialog.findViewById(R.id.empty_view).setVisibility(View.GONE);
+                for (Object json : Alarm.getAlarmPreferences(this).getAll().values()) {
+                    Alarm.Alert alert = Alarm.Alert.fromJSON("" + json);
+                    LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    View row = inflater.inflate(R.layout.alarm_list_row, null);
+                    ((TextView) row.findViewById(R.id.desc)).setText(alert.desc);
+                    ((TextView) row.findViewById(R.id.at)).setText(alert.alertAt(this).toString());
+                    layout.addView(row);
+                }
+                layout.setVisibility(View.VISIBLE);
             }
         } else if (id == R.id.action_bans) {
             handleReq(
