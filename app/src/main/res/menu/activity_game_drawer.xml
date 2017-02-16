@@ -17,7 +17,7 @@
         <item
             android:id="@+id/nav_press"
             android:icon="@drawable/ic_contacts_black_24dp"
-            android:title="@string/press" />
+            android:title="@string/chat" />
         <item
             android:id="@+id/nav_phase_result"
             android:icon="@drawable/ic_event_note_black_24dp"

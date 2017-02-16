@@ -134,8 +134,8 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     public BanService banService;
 
     // prefs listening (to recreate services when the base URL is updated)
-    private SharedPreferences prefs;
-    private SharedPreferences.OnSharedPreferenceChangeListener prefsListener;
+    protected SharedPreferences prefs;
+    protected SharedPreferences.OnSharedPreferenceChangeListener prefsListener;
 
     // progress dialogs (to not dismiss already removed dialogs)
     private Set<ProgressDialog> progressDialogs = new HashSet<>();

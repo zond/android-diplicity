@@ -2,12 +2,17 @@ package se.oort.diplicity.game;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TextInputEditText;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.text.util.Linkify;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -15,6 +20,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.util.Date;
 
@@ -37,6 +44,8 @@ public class PressActivity extends RetrofitActivity {
     public static final String SERIALIZED_CHANNEL_KEY = "serialized_channel";
     public static final String SERIALIZED_MEMBER_KEY = "serialized_member";
     public static final String SERIALIZED_GAME_KEY = "serialized_game";
+
+    public static final String MESSAGE_DRAFT_KEY = "message_draft";
 
     public ChannelService.Channel channel;
     public Member member;
@@ -75,6 +84,10 @@ public class PressActivity extends RetrofitActivity {
         super.onPause();
     }
 
+    private String draftKey() {
+        return MESSAGE_DRAFT_KEY + "." + game.ID + "." + channel.Members.toString();
+    }
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -99,6 +112,24 @@ public class PressActivity extends RetrofitActivity {
             findViewById(R.id.send_message_button).setVisibility(View.GONE);
             findViewById(R.id.new_message_body).setVisibility(View.GONE);
         } else {
+            final TextInputEditText body = (TextInputEditText) findViewById(R.id.new_message_body);
+            body.setText(prefs.getString(draftKey(), ""));
+            body.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    prefs.edit().putString(draftKey(), body.getText().toString()).apply();
+                }
+            });
             ((FloatingActionButton) findViewById(R.id.send_message_button)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -115,6 +146,7 @@ public class PressActivity extends RetrofitActivity {
                                 @Override
                                 public void send(SingleContainer<Message> messageSingleContainer) {
                                     ((EditText) findViewById(R.id.new_message_body)).setText("");
+                                    prefs.edit().putString(draftKey(), "").apply();
                                     loadMessages(false);
                                 }
                             },

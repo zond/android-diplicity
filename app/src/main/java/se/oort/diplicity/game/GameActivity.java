@@ -671,7 +671,7 @@ public class GameActivity extends RetrofitActivity
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                         Gson gson = new Gson();
                         phaseMeta = gson.fromJson(gson.toJson(phases.get(i).phase), PhaseMeta.class);
-                        draw();
+                        showMap();
                     }
                 });
                 phasesView.setAdapter(new ArrayAdapter<PhaseElement>(GameActivity.this, android.R.layout.simple_list_item_1, phases));

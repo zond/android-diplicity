@@ -193,4 +193,5 @@
     <string name="error_log">Error log</string>
     <string name="error_log_copied_to_clipboard">Error log copied to clipboard.</string>
     <string name="no_errors_logged">No errors logged.</string>
+    <string name="chat">Chat</string>
 </resources>

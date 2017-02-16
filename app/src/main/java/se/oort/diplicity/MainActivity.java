@@ -419,7 +419,7 @@ public class MainActivity extends RetrofitActivity {
     }
 
     private void navigateTo(final int root, final int child) {
-        if (root == 0 && child == 1) {
+        if (root == 0 && (child == 1 || child == 3)) {
             addGameButton.setVisibility(View.VISIBLE);
         } else {
             addGameButton.setVisibility(View.GONE);
