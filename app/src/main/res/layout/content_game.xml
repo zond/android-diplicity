@@ -244,14 +244,19 @@
                 android:layout_height="wrap_content"
                 android:textColor="?android:attr/textColorPrimary" />
 
-
-            <se.oort.diplicity.game.ChannelTable
+            <ScrollView
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_below="@id/channels_label"
-                android:id="@+id/press_channel_table"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content">
+
+                <se.oort.diplicity.game.ChannelTable
+                    android:id="@+id/press_channel_table"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </ScrollView>
 
             <android.support.design.widget.FloatingActionButton
                 xmlns:app="http://schemas.android.com/apk/res-auto"

@@ -70,6 +70,7 @@ public class NotificationReceiveActivity extends RetrofitActivity {
                                 Member member = getLoggedInMember(gameSingleContainer.Properties);
                                 if (member != null) {
                                     Intent mainIntent = new Intent(NotificationReceiveActivity.this, MainActivity.class);
+                                    mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                     Intent gameIntent = GameActivity.startGameIntent(NotificationReceiveActivity.this, gameSingleContainer.Properties, gameSingleContainer.Properties.NewestPhaseMeta.get(0));
                                     ChannelService.Channel channel = new ChannelService.Channel();
                                     channel.GameID = message.message.GameID;
@@ -102,6 +103,7 @@ public class NotificationReceiveActivity extends RetrofitActivity {
                     @Override
                     public void send(SingleContainer<Game> gameSingleContainer) {
                         Intent mainIntent = new Intent(NotificationReceiveActivity.this, MainActivity.class);
+                        mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         Intent gameIntent;
                         if (gameSingleContainer.Properties.NewestPhaseMeta != null && gameSingleContainer.Properties.NewestPhaseMeta.size() > 0) {
                             gameIntent = GameActivity.startGameIntent(NotificationReceiveActivity.this, gameSingleContainer.Properties, gameSingleContainer.Properties.NewestPhaseMeta.get(0));

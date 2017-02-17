@@ -56,6 +56,7 @@ public class PressActivity extends RetrofitActivity {
         intent.putExtra(PressActivity.SERIALIZED_CHANNEL_KEY, serialize(channel));
         intent.putExtra(PressActivity.SERIALIZED_MEMBER_KEY, serialize(member));
         intent.putExtra(PressActivity.SERIALIZED_GAME_KEY, serialize(game));
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         return intent;
     }
 
