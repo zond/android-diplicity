@@ -83,7 +83,7 @@ public class ChannelTable extends TableLayout {
                     if (member != null) {
                         intent.putExtra(PressActivity.SERIALIZED_MEMBER_KEY, RetrofitActivity.serialize(member));
                     }
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
                     retrofitActivity.startActivity(intent);
                 }
             });

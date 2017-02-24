@@ -93,7 +93,7 @@ public class UserView extends FrameLayout {
                 intent.setAction(MainActivity.ACTION_VIEW_USER_GAMES);
                 intent.putExtra(MainActivity.GAME_STATE_KEY, state);
                 intent.putExtra(MainActivity.SERIALIZED_USER_KEY, RetrofitActivity.serialize(user));
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
                 retrofitActivity.startActivity(intent);
             }
         };

@@ -46,6 +46,9 @@ public class MessagingService extends com.google.firebase.messaging.FirebaseMess
     }
 
     public static DiplicityJSON decodeDataPayload(String diplicityJSON) {
+        if (diplicityJSON == null) {
+            return null;
+        }
         try {
             byte[] compressedJSON = Base64.decode(diplicityJSON, Base64.DEFAULT);
 
@@ -77,25 +80,27 @@ public class MessagingService extends com.google.firebase.messaging.FirebaseMess
             public void run() {
                 DiplicityJSON diplicityJSON = decodeDataPayload(remoteMessage.getData().get("DiplicityJSON"));
                 Log.d("Diplicity", "Received a " + diplicityJSON.type);
-                for (RetrofitActivity subscriber : messageSubscribers) {
-                    boolean consumed = subscriber.consumeDiplicityJSON(diplicityJSON);
-                    if (consumed) {
-                        Log.d("Diplicity", "" + subscriber + " consumed this notification");
-                        return;
-                    } else {
-                        Log.d("Diplicity", "" + subscriber + " didn't consume this notification, checking if anyone else wants to");
+                if (diplicityJSON != null) {
+                    for (RetrofitActivity subscriber : messageSubscribers) {
+                        boolean consumed = subscriber.consumeDiplicityJSON(diplicityJSON);
+                        if (consumed) {
+                            Log.d("Diplicity", "" + subscriber + " consumed this notification");
+                            return;
+                        } else {
+                            Log.d("Diplicity", "" + subscriber + " didn't consume this notification, checking if anyone else wants to");
+                        }
                     }
+                    Log.d("Diplicity", "Nobody consumed this message, popping up a regular notification");
+
+                    Intent intent = new Intent(FCM_NOTIFY_ACTION);
+                    intent.putExtra(NotificationReceiveActivity.DIPLICITY_JSON_EXTRA, remoteMessage.getData().get("diplicityJSON"));
+
+                    NotificationReceiveActivity.sendNotification(
+                            MessagingService.this,
+                            intent,
+                            remoteMessage.getNotification().getTitle(),
+                            remoteMessage.getNotification().getBody());
                 }
-                Log.d("Diplicity", "Nobody consumed this message, popping up a regular notification");
-
-                Intent intent = new Intent(FCM_NOTIFY_ACTION);
-                intent.putExtra(NotificationReceiveActivity.DIPLICITY_JSON_EXTRA, remoteMessage.getData().get("diplicityJSON"));
-
-                NotificationReceiveActivity.sendNotification(
-                        MessagingService.this,
-                        intent,
-                        remoteMessage.getNotification().getTitle(),
-                        remoteMessage.getNotification().getBody());
             }
         });
     }
