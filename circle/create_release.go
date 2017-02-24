@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"flag"
 	"fmt"
 	"os"
@@ -92,11 +93,12 @@ type release struct {
 func (r *release) create() error {
 	msg := ""
 	typ := "commit"
-	commit, _, err := r.client.Repositories.GetCommit(repoOwner, repo, r.previousSHA)
+	ctx := context.Background()
+	commit, _, err := r.client.Repositories.GetCommit(ctx, repoOwner, repo, r.previousSHA)
 	if err != nil {
 		return err
 	}
-	commits, _, err := r.client.Repositories.ListCommits(repoOwner, repo, &github.CommitsListOptions{
+	commits, _, err := r.client.Repositories.ListCommits(ctx, repoOwner, repo, &github.CommitsListOptions{
 		Since: *commit.Commit.Committer.Date,
 	})
 	if err != nil {
@@ -111,7 +113,7 @@ func (r *release) create() error {
 		fmt.Fprintln(buf, *commit.Commit.Message)
 		fmt.Fprintf(buf, "  -- %s @ %s\n\n", *commit.Commit.Committer.Name, *commit.Commit.Committer.Date)
 	}
-	_, _, err = r.client.Git.CreateTag(repoOwner, repo, &github.Tag{
+	_, _, err = r.client.Git.CreateTag(ctx, repoOwner, repo, &github.Tag{
 		Tag:     &r.tag,
 		SHA:     commit.SHA,
 		Message: &msg,
@@ -125,7 +127,7 @@ func (r *release) create() error {
 	}
 	body := buf.String()
 	name := fmt.Sprintf("Release %s: %s", r.tag, r.shortSHA)
-	_, _, err = r.client.Repositories.CreateRelease(repoOwner, repo, &github.RepositoryRelease{
+	_, _, err = r.client.Repositories.CreateRelease(ctx, repoOwner, repo, &github.RepositoryRelease{
 		TagName:         &r.tag,
 		TargetCommitish: commit.SHA,
 		Name:            &name,
