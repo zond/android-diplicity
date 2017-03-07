@@ -138,18 +138,22 @@ public class GameActivity extends RetrofitActivity
         super.onPostCreate(savedInstanceState);
 
         byte[] serializedGame = getIntent().getByteArrayExtra(SERIALIZED_GAME_KEY);
-        game = (Game) unserialize(serializedGame);
-        Collections.sort(game.Members, new Comparator<Member>() {
-            @Override
-            public int compare(Member member, Member t1) {
-                return member.Nation.compareTo(t1.Nation);
-            }
-        });
-        member = getLoggedInMember(game);
+        if (serializedGame != null) {
+            game = (Game) unserialize(serializedGame);
+            Collections.sort(game.Members, new Comparator<Member>() {
+                @Override
+                public int compare(Member member, Member t1) {
+                    return member.Nation.compareTo(t1.Nation);
+                }
+            });
+            member = getLoggedInMember(game);
+        }
 
         byte[] serializedPhaseMeta = getIntent().getByteArrayExtra(SERIALIZED_PHASE_META_KEY);
-        if (serializedPhaseMeta != null) {
-            phaseMeta = (PhaseMeta) unserialize(serializedPhaseMeta);
+        if (serializedGame != null) {
+            if (serializedPhaseMeta != null) {
+                phaseMeta = (PhaseMeta) unserialize(serializedPhaseMeta);
+            }
         }
     }
 

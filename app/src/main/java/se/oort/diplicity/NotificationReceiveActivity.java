@@ -61,12 +61,13 @@ public class NotificationReceiveActivity extends RetrofitActivity {
 
     private void handleDiplicityJSON() {
         final MessagingService.DiplicityJSON message = MessagingService.decodeDataPayload(getIntent().getExtras().getString(DIPLICITY_JSON_EXTRA));
-        if (message != null && message.type.equals("message")) {
-            handleReq(
-                    gameService.GameLoad(message.message.GameID),
-                    new Sendable<SingleContainer<Game>>() {
-                        @Override
-                        public void send(SingleContainer<Game> gameSingleContainer) {
+        if (message != null) {
+            if (message.type.equals("message")) {
+                handleReq(
+                        gameService.GameLoad(message.message.GameID),
+                        new Sendable<SingleContainer<Game>>() {
+                            @Override
+                            public void send(SingleContainer<Game> gameSingleContainer) {
                                 Member member = getLoggedInMember(gameSingleContainer.Properties);
                                 if (member != null) {
                                     Intent mainIntent = new Intent(NotificationReceiveActivity.this, MainActivity.class);
@@ -87,12 +88,15 @@ public class NotificationReceiveActivity extends RetrofitActivity {
                                 }
                                 finish();
 
-                        }
-                    }, getResources().getString(R.string.loading_state));
-        } else if (message.type.equals("phase")) {
-            startGameActivity(message.gameID);
+                            }
+                        }, getResources().getString(R.string.loading_state));
+            } else if (message.type.equals("phase")) {
+                startGameActivity(message.gameID);
+            } else {
+                App.firebaseCrashReport("Unknown message type " + message.type);
+            }
         } else {
-            App.firebaseCrashReport("Unknown message type " + message.type);
+            App.firebaseCrashReport("Message without type: " + getIntent().getExtras());
         }
     }
 
