@@ -655,7 +655,12 @@ public class MainActivity extends RetrofitActivity {
                 }
             });
         } else if (id == R.id.action_forum) {
-            String url = "https://groups.google.com/forum/#!forum/diplicity-beta";
+            String url = "https://groups.google.com/forum/#!forum/diplicity-talk";
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
+        } else if (id == R.id.action_source) {
+            String url = "https://github.com/zond/android-diplicity";
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(url));
             startActivity(i);
