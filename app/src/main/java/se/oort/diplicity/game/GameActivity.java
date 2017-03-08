@@ -157,6 +157,32 @@ public class GameActivity extends RetrofitActivity
         }
     }
 
+    public void lastPhase() {
+        handleReq(
+                phaseService.PhaseLoad(game.ID, "" + game.NewestPhaseMeta.get(0).PhaseOrdinal),
+                new Sendable<SingleContainer<Phase>>() {
+                    @Override
+                    public void send(SingleContainer<Phase> phaseSingleContainer) {
+                        Gson gson = new Gson();
+                        phaseMeta = gson.fromJson(gson.toJson(phaseSingleContainer.Properties), PhaseMeta.class);
+                        draw();
+                    }
+                }, getResources().getString(R.string.loading_state));
+    }
+
+    public void firstPhase() {
+        handleReq(
+                phaseService.PhaseLoad(game.ID, "1"),
+                new Sendable<SingleContainer<Phase>>() {
+                    @Override
+                    public void send(SingleContainer<Phase> phaseSingleContainer) {
+                        Gson gson = new Gson();
+                        phaseMeta = gson.fromJson(gson.toJson(phaseSingleContainer.Properties), PhaseMeta.class);
+                        draw();
+                    }
+                }, getResources().getString(R.string.loading_state));
+    }
+
     public void nextPhase() {
         if (phaseMeta != null && phaseMeta.PhaseOrdinal < game.NewestPhaseMeta.get(0).PhaseOrdinal) {
             handleReq(
@@ -881,6 +907,34 @@ public class GameActivity extends RetrofitActivity
         };
 
         if (game.Started) {
+            findViewById(R.id.rewind).setVisibility(View.VISIBLE);
+            ((FloatingActionButton) findViewById(R.id.rewind)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    firstPhase();
+                }
+            });
+            findViewById(R.id.previous).setVisibility(View.VISIBLE);
+            ((FloatingActionButton) findViewById(R.id.previous)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    prevPhase();
+                }
+            });
+            findViewById(R.id.next).setVisibility(View.VISIBLE);
+            ((FloatingActionButton) findViewById(R.id.next)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    nextPhase();
+                }
+            });
+            findViewById(R.id.fast_forward).setVisibility(View.VISIBLE);
+            ((FloatingActionButton) findViewById(R.id.fast_forward)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    lastPhase();
+                }
+            });
             String url = getBaseURL() + "Game/" + game.ID + "/Phase/" + phaseMeta.PhaseOrdinal + "/Map";
             if (getLocalDevelopmentMode() && !getLocalDevelopmentModeFakeID().equals("")) {
                 url = url + "?fake-id=" + getLocalDevelopmentModeFakeID();
@@ -950,6 +1004,10 @@ public class GameActivity extends RetrofitActivity
                 }, getResources().getString(R.string.loading_state));
             }
         } else {
+            findViewById(R.id.rewind).setVisibility(View.GONE);
+            findViewById(R.id.previous).setVisibility(View.GONE);
+            findViewById(R.id.next).setVisibility(View.GONE);
+            findViewById(R.id.fast_forward).setVisibility(View.GONE);
             handleReq(variantService.GetStartPhase(game.Variant), new Sendable<SingleContainer<VariantService.Phase>>() {
                 @Override
                 public void send(SingleContainer<VariantService.Phase> phaseSingleContainer) {
