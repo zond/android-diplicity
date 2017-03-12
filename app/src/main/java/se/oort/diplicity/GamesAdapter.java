@@ -3,6 +3,7 @@ package se.oort.diplicity;
 import android.graphics.Color;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,11 +66,13 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
         public void bind(final SingleContainer<Game> game, final int pos) {
             Member member = retrofitActivity.getLoggedInMember(game.Properties);
             if (member != null && member.GameAlias != null && !member.GameAlias.equals("")) {
+                desc.setVisibility(View.VISIBLE);
                 desc.setText(member.GameAlias);
             } else {
                 if (game.Properties.Desc == null || game.Properties.Desc.equals("")) {
                     desc.setVisibility(View.GONE);
                 } else {
+                    desc.setVisibility(View.VISIBLE);
                     desc.setText(game.Properties.Desc);
                 }
             }
@@ -212,6 +215,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                                                             retrofitActivity.findViewById(R.id.empty_view).setVisibility(View.VISIBLE);
                                                             retrofitActivity.findViewById(R.id.content_list).setVisibility(View.GONE);
                                                         }
+                                                        GamesAdapter.this.notifyDataSetChanged();
                                                     }
                                                 }), ctx.getResources().getString(R.string.updating));
                                     }
@@ -294,6 +298,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
 
     public void clearExpanded() {
         expandedItems.clear();
+        notifyDataSetChanged();
     }
 
     @Override
