@@ -9,5 +9,7 @@ public class PhaseState implements java.io.Serializable {
   public Boolean ReadyToResolve;
   public Boolean WantsDIAS;
   public Boolean OnProbation;
+  public Boolean NoOrders;
+  public Boolean Eliminated;
   public String Note;
 }

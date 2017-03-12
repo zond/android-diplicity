@@ -109,7 +109,7 @@ public class MemberTable extends TableLayout {
                     readyToResolve.setText(R.string.rdy);
                     readyToResolve.setLayoutParams(wrapContentParams);
                     readyToResolve.setChecked(finalFoundState.ReadyToResolve);
-                    if (!phaseMeta.Resolved && retrofitActivity.getLoggedInUser().Id.equals(member.User.Id)) {
+                    if (!foundState.NoOrders && !phaseMeta.Resolved && retrofitActivity.getLoggedInUser().Id.equals(member.User.Id)) {
                         readyToResolve.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                             @Override
                             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -133,7 +133,7 @@ public class MemberTable extends TableLayout {
                     wantsDIAS.setText(R.string.DRAW);
                     wantsDIAS.setLayoutParams(wrapContentParams);
                     wantsDIAS.setChecked(finalFoundState.WantsDIAS);
-                    if (!phaseMeta.Resolved && retrofitActivity.getLoggedInUser().Id.equals(member.User.Id)) {
+                    if (!foundState.Eliminated && !phaseMeta.Resolved && retrofitActivity.getLoggedInUser().Id.equals(member.User.Id)) {
                         wantsDIAS.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                             @Override
                             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
