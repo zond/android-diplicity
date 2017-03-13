@@ -3,6 +3,7 @@ package se.oort.diplicity.game;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -908,33 +909,65 @@ public class GameActivity extends RetrofitActivity
 
         if (game.Started) {
             findViewById(R.id.rewind).setVisibility(View.VISIBLE);
-            ((FloatingActionButton) findViewById(R.id.rewind)).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    firstPhase();
-                }
-            });
+            FloatingActionButton firstPhaseButton = (FloatingActionButton) findViewById(R.id.rewind);
+            if (phaseMeta.PhaseOrdinal < 3) {
+                firstPhaseButton.setEnabled(false);
+                firstPhaseButton.setAlpha(0.3f);
+            } else {
+                firstPhaseButton.setEnabled(true);
+                firstPhaseButton.setAlpha(1.0f);
+                firstPhaseButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        firstPhase();
+                    }
+                });
+            }
             findViewById(R.id.previous).setVisibility(View.VISIBLE);
-            ((FloatingActionButton) findViewById(R.id.previous)).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    prevPhase();
-                }
-            });
+            FloatingActionButton previousPhaseButton = (FloatingActionButton) findViewById(R.id.previous);
+            if (phaseMeta.PhaseOrdinal < 2) {
+                previousPhaseButton.setEnabled(false);
+                previousPhaseButton.setAlpha(0.3f);
+            } else {
+                previousPhaseButton.setEnabled(true);
+                previousPhaseButton.setAlpha(1.0f);
+                previousPhaseButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        prevPhase();
+                    }
+                });
+            }
             findViewById(R.id.next).setVisibility(View.VISIBLE);
-            ((FloatingActionButton) findViewById(R.id.next)).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    nextPhase();
-                }
-            });
-            findViewById(R.id.fast_forward).setVisibility(View.VISIBLE);
-            ((FloatingActionButton) findViewById(R.id.fast_forward)).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    lastPhase();
-                }
-            });
+            FloatingActionButton nextPhaseButton = (FloatingActionButton) findViewById(R.id.next);
+            if (game.NewestPhaseMeta != null && game.NewestPhaseMeta.get(0).PhaseOrdinal <= phaseMeta.PhaseOrdinal) {
+                nextPhaseButton.setEnabled(false);
+                nextPhaseButton.setAlpha(0.3f);
+            } else {
+                nextPhaseButton.setEnabled(true);
+                nextPhaseButton.setAlpha(1.0f);
+                nextPhaseButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        nextPhase();
+                    }
+                });
+            }
+            FloatingActionButton lastPhaseButton = (FloatingActionButton) findViewById(R.id.fast_forward);
+            if (game.NewestPhaseMeta != null && game.NewestPhaseMeta.get(0).PhaseOrdinal <= phaseMeta.PhaseOrdinal + 1) {
+                lastPhaseButton.setEnabled(false);
+                lastPhaseButton.setAlpha(0.3f);
+            } else{
+                lastPhaseButton.setEnabled(true);
+                lastPhaseButton.setAlpha(1.0f);
+                findViewById(R.id.fast_forward).setVisibility(View.VISIBLE);
+                lastPhaseButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        lastPhase();
+                    }
+                });
+            }
             String url = getBaseURL() + "Game/" + game.ID + "/Phase/" + phaseMeta.PhaseOrdinal + "/Map";
             if (getLocalDevelopmentMode() && !getLocalDevelopmentModeFakeID().equals("")) {
                 url = url + "?fake-id=" + getLocalDevelopmentModeFakeID();
