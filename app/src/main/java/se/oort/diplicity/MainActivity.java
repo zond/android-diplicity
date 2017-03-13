@@ -113,7 +113,9 @@ public class MainActivity extends RetrofitActivity {
                         final Returner<Game, Boolean> validateGame = new Returner<Game, Boolean>() {
                             @Override
                             public Boolean Return(Game g) {
-                                if (g.PhaseLengthMinutes != null && g.PhaseLengthMinutes > 30 * 24 * 60) {
+                                if (g.PhaseLengthMinutes == null)
+                                    g.PhaseLengthMinutes = 30l * 24l * 60l;
+                                if (g.PhaseLengthMinutes > 30 * 24 * 60) {
                                     Toast.makeText(MainActivity.this, R.string.phase_length_must_be_less_than_30_days, Toast.LENGTH_LONG).show();
                                     return false;
                                 }
