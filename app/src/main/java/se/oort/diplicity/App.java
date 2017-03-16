@@ -34,8 +34,8 @@ public class App extends MultiDexApplication {
         }
     }
 
-    public static String nanosToDuration(long nanos) {
-        return minutesToDuration((int) ((nanos / (long) 1000000000) / (long) 60));
+    public static String millisToDuration(long millis) {
+        return minutesToDuration((int) ((millis / (long) 1000) / (long) 60));
     }
 
     public static long getDeadlineWarningMinutes(Context context) {

@@ -227,7 +227,7 @@ public class GameActivity extends RetrofitActivity
         if (phaseMeta.NextDeadlineIn.nanos == 0) {
             return getResources().getString(R.string.desc_season_year_type, descPart, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type);
         }
-        return getResources().getString(R.string.desc_season_year_type_deadline, descPart, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type, App.nanosToDuration(phaseMeta.NextDeadlineIn.nanosLeft()));
+        return getResources().getString(R.string.desc_season_year_type_deadline, descPart, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type, App.millisToDuration(phaseMeta.NextDeadlineIn.millisLeft()));
     }
 
     public void draw() {
