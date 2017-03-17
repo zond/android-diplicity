@@ -646,16 +646,7 @@ public class MainActivity extends RetrofitActivity {
             return true;
         } else if (id == R.id.action_error_log) {
             AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.error_log_dialog).show();
-            ((TextView) dialog.findViewById(R.id.error_log)).setText(App.errorLog.toString());
-            dialog.findViewById(R.id.error_log).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ClipboardManager clipboard = (ClipboardManager) MainActivity.this.getSystemService(CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText(getResources().getString(R.string.error_log), App.errorLog.toString());
-                    clipboard.setPrimaryClip(clip);
-                    Toast.makeText(MainActivity.this, R.string.error_log_copied_to_clipboard, Toast.LENGTH_SHORT).show();
-                }
-            });
+            ((EditText) dialog.findViewById(R.id.error_log)).setText(App.errorLog.toString());
         } else if (id == R.id.action_forum) {
             String url = "https://groups.google.com/forum/#!forum/diplicity-talk";
             Intent i = new Intent(Intent.ACTION_VIEW);

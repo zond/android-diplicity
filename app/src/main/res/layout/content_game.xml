@@ -27,9 +27,13 @@
 
         </se.oort.diplicity.game.MapView>
 
-        <ListView
-            android:id="@+id/orders_view"
-            android:visibility="gone"
+        <EditText android:id="@+id/orders_view"
+            android:inputType="none"
+            android:textIsSelectable="true"
+            android:textSize="16sp"
+            android:background="@android:color/transparent"
+            android:textAppearance="@android:style/Widget.TextView"
+            android:hint="@string/use_map_to_add_orders"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 

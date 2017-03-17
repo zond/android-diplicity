@@ -21,6 +21,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
@@ -880,7 +881,7 @@ public class GameActivity extends RetrofitActivity
                                     }
                                 }
                                 Collections.sort(orders);
-                                final ListView ordersView = (ListView) findViewById(R.id.orders_view);
+                                final EditText ordersView = (EditText) findViewById(R.id.orders_view);
                                 ordersView.setOnTouchListener(new View.OnTouchListener() {
                                     @Override
                                     public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -889,7 +890,11 @@ public class GameActivity extends RetrofitActivity
                                         return true;
                                     }
                                 });
-                                ordersView.setAdapter(new ArrayAdapter<String>(GameActivity.this, android.R.layout.simple_list_item_1, orders));
+                                StringBuffer orderBuffer = new StringBuffer();
+                                for (String order : orders) {
+                                    orderBuffer.append(order + "\n");
+                                }
+                                ordersView.setText(orderBuffer);
                                 return null;
                             }
                         })).toObservable(),
