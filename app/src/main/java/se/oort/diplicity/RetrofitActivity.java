@@ -26,6 +26,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.ByteArrayInputStream;
@@ -329,7 +330,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == LOGIN_REQUEST) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if (result.isSuccess()) {
+            if (result != null && result.isSuccess()) {
                 final GoogleSignInAccount acct = result.getSignInAccount();
 
                 Observable.create(new Observable.OnSubscribe<String>() {
@@ -540,7 +541,12 @@ public abstract class RetrofitActivity extends AppCompatActivity {
 
     public User getLoggedInUser() {
         if (loggedInUser == null) {
-            loggedInUser = new Gson().fromJson(prefs.getString(LOGGED_IN_USER_PREF_KEY, "{}"), User.class);
+            try {
+                loggedInUser = new Gson().fromJson(prefs.getString(LOGGED_IN_USER_PREF_KEY, "{}"), User.class);
+            } catch (JsonSyntaxException e) {
+                prefs.edit().remove(LOGGED_IN_USER_PREF_KEY).apply();
+                loggedInUser = new User();
+            }
         }
         return loggedInUser;
     }
