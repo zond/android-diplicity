@@ -236,6 +236,12 @@ public class GameActivity extends RetrofitActivity
 
         setContentView(R.layout.activity_game);
 
+        if (game == null) {
+            App.firebaseCrashReport("Drawing null game");
+            Toast.makeText(this, R.string.unknown_error, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         flickFrameLayout = (FlickFrameLayout) findViewById(R.id.game_content);
         flickFrameLayout.gameActivity = this;
         findViewById(R.id.flick_frame_background).setOnTouchListener(new View.OnTouchListener() {

@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,7 +26,7 @@ import se.oort.diplicity.game.GameActivity;
 
 public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAdapter.ViewHolder> {
     private RetrofitActivity retrofitActivity;
-    private Set<Integer> expandedItems = new HashSet<>();
+    private Set<Integer> expandedItems = Collections.synchronizedSet(new HashSet<Integer>());
     public class ViewHolder extends RecycleAdapter<SingleContainer<Game>, GamesAdapter.ViewHolder>.ViewHolder {
         TextView desc, variant, deadline, state, rating,
                 minReliability, minQuickness, maxHated, maxHater,

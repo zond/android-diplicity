@@ -330,66 +330,71 @@ public abstract class RetrofitActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == LOGIN_REQUEST) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if (result != null && result.isSuccess()) {
-                final GoogleSignInAccount acct = result.getSignInAccount();
+            if (result != null) {
+                if (result.isSuccess()) {
+                    final GoogleSignInAccount acct = result.getSignInAccount();
 
-                Observable.create(new Observable.OnSubscribe<String>() {
-                    @Override
-                    public void call(final Subscriber<? super String> subscriber) {
-                        Response response = null;
-                        try {
-                            String url = getBaseURL() + "Auth/OAuth2Callback?code=" + URLEncoder.encode(acct.getServerAuthCode(), "UTF-8") + "&approve-redirect=true&state=" + URLEncoder.encode("https://android-diplicity", "UTF-8");
-                            Request request = new Request.Builder()
-                                    .url(url)
-                                    .build();
-                            response = new OkHttpClient.Builder()
-                                    .followRedirects(false)
-                                    .followSslRedirects(false)
-                                    .connectTimeout(10, TimeUnit.SECONDS)
-                                    .readTimeout(10, TimeUnit.SECONDS)
-                                    .writeTimeout(10, TimeUnit.SECONDS)
-                                    .build()
-                                    .newCall(request).execute();
-                            if (response.code() != 307) {
-                                throw new RuntimeException("Unsuccessful response " + response.body().string());
+                    Observable.create(new Observable.OnSubscribe<String>() {
+                        @Override
+                        public void call(final Subscriber<? super String> subscriber) {
+                            Response response = null;
+                            try {
+                                String url = getBaseURL() + "Auth/OAuth2Callback?code=" + URLEncoder.encode(acct.getServerAuthCode(), "UTF-8") + "&approve-redirect=true&state=" + URLEncoder.encode("https://android-diplicity", "UTF-8");
+                                Request request = new Request.Builder()
+                                        .url(url)
+                                        .build();
+                                response = new OkHttpClient.Builder()
+                                        .followRedirects(false)
+                                        .followSslRedirects(false)
+                                        .connectTimeout(10, TimeUnit.SECONDS)
+                                        .readTimeout(10, TimeUnit.SECONDS)
+                                        .writeTimeout(10, TimeUnit.SECONDS)
+                                        .build()
+                                        .newCall(request).execute();
+                                if (response.code() != 307) {
+                                    throw new RuntimeException("Unsuccessful response " + response.body().string());
+                                }
+                                url = response.headers().get("Location");
+                                if (url == null) {
+                                    throw new RuntimeException("No Location header in response " + response.body().string());
+                                }
+                                Uri parsedURI = Uri.parse(url);
+                                if (parsedURI == null) {
+                                    throw new RuntimeException("Unparseable Location header " + url + " in response");
+                                }
+                                subscriber.onNext(parsedURI.getQueryParameter("token"));
+                                subscriber.onCompleted();
+                            } catch (RuntimeException e) {
+                                throw e;
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
                             }
-                            url = response.headers().get("Location");
-                            if (url == null) {
-                                throw new RuntimeException("No Location header in response " + response.body().string());
-                            }
-                            Uri parsedURI = Uri.parse(url);
-                            if (parsedURI == null) {
-                                throw new RuntimeException("Unparseable Location header " + url + " in response");
-                            }
-                            subscriber.onNext(parsedURI.getQueryParameter("token"));
-                            subscriber.onCompleted();
-                        } catch (RuntimeException e) {
-                            throw e;
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
                         }
-                    }
-                }).subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Subscriber<String>() {
-                            @Override
-                            public void onCompleted() {
-                            }
+                    }).subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Subscriber<String>() {
+                                @Override
+                                public void onCompleted() {
+                                }
 
-                            @Override
-                            public void onError(Throwable e) {
-                                App.firebaseCrashReport("Unable to log in", e);
-                                Toast.makeText(RetrofitActivity.this, R.string.login_failed, Toast.LENGTH_SHORT).show();
-                            }
+                                @Override
+                                public void onError(Throwable e) {
+                                    App.firebaseCrashReport("Unable to log in", e);
+                                    Toast.makeText(RetrofitActivity.this, R.string.login_failed, Toast.LENGTH_SHORT).show();
+                                }
 
-                            @Override
-                            public void onNext(String token) {
-                                PreferenceManager.getDefaultSharedPreferences(RetrofitActivity.this).edit().putString(AUTH_TOKEN_PREF_KEY, token).apply();
-                                performLogin();
-                            }
-                        });
+                                @Override
+                                public void onNext(String token) {
+                                    PreferenceManager.getDefaultSharedPreferences(RetrofitActivity.this).edit().putString(AUTH_TOKEN_PREF_KEY, token).apply();
+                                    performLogin();
+                                }
+                            });
+                } else {
+                    App.firebaseCrashReport("Login failed: " + result.getStatus().getStatus());
+                    Toast.makeText(this, R.string.login_failed, Toast.LENGTH_SHORT).show();
+                }
             } else {
-                App.firebaseCrashReport("Login failed: " + result.getStatus().getStatus());
+                App.firebaseCrashReport("Login failed, null result");
                 Toast.makeText(this, R.string.login_failed, Toast.LENGTH_SHORT).show();
             }
         }
