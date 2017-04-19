@@ -40,115 +40,117 @@ public class PreferenceActivity extends RetrofitActivity {
         @Override
         public void onResume() {
             super.onResume();
-            retrofitActivity().handleReq(
-                    retrofitActivity().userConfigService.UserConfigLoad(retrofitActivity().getLoggedInUser().Id),
-                    new Sendable<SingleContainer<UserConfig>>() {
-                        @Override
-                        public void send(final SingleContainer<UserConfig> userConfigSingleContainer) {
-                            final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+            if (retrofitActivity().getLoggedInUser() != null) {
+                retrofitActivity().handleReq(
+                        retrofitActivity().userConfigService.UserConfigLoad(retrofitActivity().getLoggedInUser().Id),
+                        new Sendable<SingleContainer<UserConfig>>() {
+                            @Override
+                            public void send(final SingleContainer<UserConfig> userConfigSingleContainer) {
+                                final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 
-                            findPreference(getResources().getString(R.string.app_version_pref_key)).setSummary("" + BuildConfig.VERSION_CODE);
+                                findPreference(getResources().getString(R.string.app_version_pref_key)).setSummary("" + BuildConfig.VERSION_CODE);
 
-                            final CheckBoxPreference emailPreference = (CheckBoxPreference) findPreference(getResources().getString(R.string.email_notifications_pref_key));
-                            emailPreference.setChecked(userConfigSingleContainer.Properties.MailConfig.Enabled);
-                            emailPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                                @Override
-                                public boolean onPreferenceChange(Preference preference, Object o) {
-                                    userConfigSingleContainer.Properties.MailConfig.Enabled = (Boolean) o;
-                                    retrofitActivity().handleReq(
-                                            retrofitActivity().userConfigService.UserConfigUpdate(userConfigSingleContainer.Properties, retrofitActivity().getLoggedInUser().Id),
-                                            new Sendable<SingleContainer<UserConfig>>() {
-                                                @Override
-                                                public void send(SingleContainer<UserConfig> userConfigSingleContainer) {
-                                                }
-                                            },
-                                            getResources().getString(R.string.updating_settings));
-                                    return true;
-                                }
-                            });
-
-                            final CheckBoxPreference pushPreference = (CheckBoxPreference) findPreference(getResources().getString(R.string.push_notifications_pref_key));
-                            if (FirebaseInstanceId.getInstance().getToken() != null) {
-                                FCMToken pushToken = retrofitActivity().getFCMToken(userConfigSingleContainer.Properties);
-                                pushPreference.setChecked(pushToken != null && !pushToken.Disabled);
-                                pushPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                                final CheckBoxPreference emailPreference = (CheckBoxPreference) findPreference(getResources().getString(R.string.email_notifications_pref_key));
+                                emailPreference.setChecked(userConfigSingleContainer.Properties.MailConfig.Enabled);
+                                emailPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                                     @Override
-                                    public boolean onPreferenceChange(Preference preference, Object newValue) {
-                                        retrofitActivity().updateFCMPushOption(userConfigSingleContainer.Properties, (Boolean) newValue, "User action");
+                                    public boolean onPreferenceChange(Preference preference, Object o) {
+                                        userConfigSingleContainer.Properties.MailConfig.Enabled = (Boolean) o;
+                                        retrofitActivity().handleReq(
+                                                retrofitActivity().userConfigService.UserConfigUpdate(userConfigSingleContainer.Properties, retrofitActivity().getLoggedInUser().Id),
+                                                new Sendable<SingleContainer<UserConfig>>() {
+                                                    @Override
+                                                    public void send(SingleContainer<UserConfig> userConfigSingleContainer) {
+                                                    }
+                                                },
+                                                getResources().getString(R.string.updating_settings));
                                         return true;
                                     }
                                 });
-                                pushPreference.setEnabled(true);
-                            } else {
-                                pushPreference.setEnabled(false);
-                                pushPreference.setSummary(getResources().getString(R.string.dysfunctional_fcm_service));
-                            }
 
-                            final EditTextPreference deadlineWarningPref = (EditTextPreference) findPreference(getResources().getString(R.string.deadline_warning_minutes_key));
-                            deadlineWarningPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                                @Override
-                                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                                    try {
-                                        long value = Long.parseLong("" + newValue);
-                                        if (value < 0) {
-                                            throw new NumberFormatException();
+                                final CheckBoxPreference pushPreference = (CheckBoxPreference) findPreference(getResources().getString(R.string.push_notifications_pref_key));
+                                if (FirebaseInstanceId.getInstance().getToken() != null) {
+                                    FCMToken pushToken = retrofitActivity().getFCMToken(userConfigSingleContainer.Properties);
+                                    pushPreference.setChecked(pushToken != null && !pushToken.Disabled);
+                                    pushPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                                        @Override
+                                        public boolean onPreferenceChange(Preference preference, Object newValue) {
+                                            retrofitActivity().updateFCMPushOption(userConfigSingleContainer.Properties, (Boolean) newValue, "User action");
+                                            return true;
                                         }
-                                        prefs.edit().putString(getResources().getString(R.string.deadline_warning_minutes_key), "" + value).apply();
-                                        deadlineWarningPref.setSummary("" + newValue);
-                                        Alarm.resetAllAlarms(retrofitActivity());
+                                    });
+                                    pushPreference.setEnabled(true);
+                                } else {
+                                    pushPreference.setEnabled(false);
+                                    pushPreference.setSummary(getResources().getString(R.string.dysfunctional_fcm_service));
+                                }
+
+                                final EditTextPreference deadlineWarningPref = (EditTextPreference) findPreference(getResources().getString(R.string.deadline_warning_minutes_key));
+                                deadlineWarningPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                                    @Override
+                                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                                        try {
+                                            long value = Long.parseLong("" + newValue);
+                                            if (value < 0) {
+                                                throw new NumberFormatException();
+                                            }
+                                            prefs.edit().putString(getResources().getString(R.string.deadline_warning_minutes_key), "" + value).apply();
+                                            deadlineWarningPref.setSummary("" + newValue);
+                                            Alarm.resetAllAlarms(retrofitActivity());
+                                            return true;
+                                        } catch (NumberFormatException e) {
+                                            Toast.makeText(retrofitActivity(), getResources().getString(R.string.must_be_positive_integer), Toast.LENGTH_SHORT).show();
+                                            return false;
+                                        }
+                                    }
+                                });
+                                deadlineWarningPref.setSummary("" + App.getDeadlineWarningMinutes(retrofitActivity()));
+
+                                final EditTextPreference fakeIDPref = (EditTextPreference) findPreference(getResources().getString(R.string.local_development_mode_fake_id_pref_key));
+                                final Preference.OnPreferenceChangeListener fakeIDChanged = new Preference.OnPreferenceChangeListener() {
+                                    @Override
+                                    public boolean onPreferenceChange(Preference preference, Object o) {
+                                        fakeIDPref.setSummary((String) o);
+                                        prefs.edit().putString(AUTH_TOKEN_PREF_KEY, "").apply();
+                                        retrofitActivity().performLogin();
                                         return true;
-                                    } catch (NumberFormatException e) {
-                                        Toast.makeText(retrofitActivity(), getResources().getString(R.string.must_be_positive_integer), Toast.LENGTH_SHORT).show();
-                                        return false;
                                     }
+                                };
+                                if (fakeIDPref != null) {
+                                    fakeIDPref.setOnPreferenceChangeListener(fakeIDChanged);
                                 }
-                            });
-                            deadlineWarningPref.setSummary("" + App.getDeadlineWarningMinutes(retrofitActivity()));
 
-                            final EditTextPreference fakeIDPref = (EditTextPreference) findPreference(getResources().getString(R.string.local_development_mode_fake_id_pref_key));
-                            final Preference.OnPreferenceChangeListener fakeIDChanged = new Preference.OnPreferenceChangeListener() {
-                                @Override
-                                public boolean onPreferenceChange(Preference preference, Object o) {
-                                    fakeIDPref.setSummary((String) o);
-                                    prefs.edit().putString(AUTH_TOKEN_PREF_KEY, "").apply();
-                                    retrofitActivity().performLogin();
-                                    return true;
-                                }
-                            };
-                            if (fakeIDPref != null) {
-                                fakeIDPref.setOnPreferenceChangeListener(fakeIDChanged);
-                            }
-
-                            final CheckBoxPreference localDevPreference = (CheckBoxPreference) findPreference(getResources().getString(R.string.local_development_mode_pref_key));
-                            localDevPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                                @Override
-                                public boolean onPreferenceChange(Preference preference, Object o) {
-                                    if ((Boolean) o) {
-                                        prefs.edit().putString(RetrofitActivity.API_URL_PREF_KEY, RetrofitActivity.LOCAL_DEVELOPMENT_URL).apply();
-                                        final EditTextPreference fakeIDPref = new EditTextPreference(getActivity());
-                                        fakeIDPref.setKey(getResources().getString(R.string.local_development_mode_fake_id_pref_key));
-                                        fakeIDPref.setTitle(getActivity().getResources().getString(R.string.local_development_fake_id));
-                                        fakeIDPref.setSummary(prefs.getString(getResources().getString(R.string.local_development_mode_fake_id_pref_key), ""));
-                                        fakeIDPref.setOnPreferenceChangeListener(fakeIDChanged);
-                                        ((PreferenceCategory) findPreference("development_prefs")).addPreference(fakeIDPref);
-                                    } else {
-                                        prefs.edit().putString(RetrofitActivity.API_URL_PREF_KEY, RetrofitActivity.DEFAULT_URL).apply();
-                                        removeFakeIDPref();
+                                final CheckBoxPreference localDevPreference = (CheckBoxPreference) findPreference(getResources().getString(R.string.local_development_mode_pref_key));
+                                localDevPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                                    @Override
+                                    public boolean onPreferenceChange(Preference preference, Object o) {
+                                        if ((Boolean) o) {
+                                            prefs.edit().putString(RetrofitActivity.API_URL_PREF_KEY, RetrofitActivity.LOCAL_DEVELOPMENT_URL).apply();
+                                            final EditTextPreference fakeIDPref = new EditTextPreference(getActivity());
+                                            fakeIDPref.setKey(getResources().getString(R.string.local_development_mode_fake_id_pref_key));
+                                            fakeIDPref.setTitle(getActivity().getResources().getString(R.string.local_development_fake_id));
+                                            fakeIDPref.setSummary(prefs.getString(getResources().getString(R.string.local_development_mode_fake_id_pref_key), ""));
+                                            fakeIDPref.setOnPreferenceChangeListener(fakeIDChanged);
+                                            ((PreferenceCategory) findPreference("development_prefs")).addPreference(fakeIDPref);
+                                        } else {
+                                            prefs.edit().putString(RetrofitActivity.API_URL_PREF_KEY, RetrofitActivity.DEFAULT_URL).apply();
+                                            removeFakeIDPref();
+                                        }
+                                        retrofitActivity().performLogin();
+                                        return true;
                                     }
-                                    retrofitActivity().performLogin();
-                                    return true;
+                                });
+
+
+                                if (!prefs.getBoolean(getResources().getString(R.string.local_development_mode_pref_key), false)) {
+                                    removeFakeIDPref();
+                                } else {
+                                    findPreference(getResources().getString(R.string.local_development_mode_fake_id_pref_key))
+                                            .setSummary(prefs.getString(getResources().getString(R.string.local_development_mode_fake_id_pref_key), ""));
                                 }
-                            });
-
-
-                            if (!prefs.getBoolean(getResources().getString(R.string.local_development_mode_pref_key), false)) {
-                                removeFakeIDPref();
-                            } else {
-                                findPreference(getResources().getString(R.string.local_development_mode_fake_id_pref_key))
-                                        .setSummary(prefs.getString(getResources().getString(R.string.local_development_mode_fake_id_pref_key), ""));
                             }
-                        }
-                    }, getResources().getString(R.string.loading_settings));
+                        }, getResources().getString(R.string.loading_settings));
+            }
         }
 
         private void removeFakeIDPref() {
