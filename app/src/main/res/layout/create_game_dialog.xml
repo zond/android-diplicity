@@ -57,7 +57,7 @@
             android:layout_height="wrap_content">
 
             <android.support.design.widget.TextInputEditText
-                android:hint="@string/phase_length_in_minutes"
+                android:hint="@string/phase_length_in_minutes_1440_24h"
                 android:id="@+id/phase_length"
                 android:inputType="number"
                 android:textColor="?android:attr/textColorPrimary"
@@ -72,7 +72,7 @@
             android:layout_height="wrap_content">
 
             <android.support.design.widget.TextInputEditText
-                android:hint="@string/min_rating"
+                android:hint="@string/min_rating_high_is_skilled"
                 android:id="@+id/min_rating"
                 android:inputType="numberDecimal"
                 android:textColor="?android:attr/textColorPrimary"
@@ -87,7 +87,7 @@
             android:layout_height="wrap_content">
 
             <android.support.design.widget.TextInputEditText
-                android:hint="@string/max_rating"
+                android:hint="@string/max_rating_low_is_weak_players"
                 android:id="@+id/max_rating"
                 android:inputType="numberDecimal"
                 android:layout_width="match_parent"
@@ -102,7 +102,7 @@
             android:layout_height="wrap_content">
 
             <android.support.design.widget.TextInputEditText
-                android:hint="@string/min_reliability"
+                android:hint="@string/min_reliability_higher_is_less_nmr"
                 android:id="@+id/min_reliability"
                 android:textColor="?android:attr/textColorPrimary"
                 android:inputType="numberDecimal"
@@ -117,7 +117,7 @@
             android:layout_height="wrap_content">
 
             <android.support.design.widget.TextInputEditText
-                android:hint="@string/min_quickness"
+                android:hint="@string/min_quickness_higher_is_faster"
                 android:id="@+id/min_quickness"
                 android:inputType="numberDecimal"
                 android:layout_width="match_parent"
@@ -132,7 +132,7 @@
             android:layout_height="wrap_content">
 
             <android.support.design.widget.TextInputEditText
-                android:hint="@string/max_hated"
+                android:hint="@string/max_hated_low_is_unbanned"
                 android:id="@+id/max_hated"
                 android:inputType="numberDecimal"
                 android:textColor="?android:attr/textColorPrimary"
@@ -147,7 +147,7 @@
             android:layout_height="wrap_content">
 
             <android.support.design.widget.TextInputEditText
-                android:hint="@string/max_hater"
+                android:hint="@string/max_hater_low_is_patient"
                 android:id="@+id/max_hater"
                 android:textColor="?android:attr/textColorPrimary"
                 android:inputType="numberDecimal"

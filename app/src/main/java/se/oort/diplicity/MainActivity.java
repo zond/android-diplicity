@@ -7,11 +7,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TextInputEditText;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDelegate;
+import android.support.v7.util.SortedList;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -83,6 +85,21 @@ public class MainActivity extends RetrofitActivity {
     public static final String GAME_STATE_KEY = "game_state";
 
     private static Pattern viewGamePattern = Pattern.compile("/Game/(.*)");
+
+    private class SpinnerVariantElement implements Comparable<SpinnerVariantElement>{
+        public String name;
+        public Integer players;
+        public String toString() {
+            if (players == null) {
+                return name;
+            } else {
+                return getResources().getString(R.string.name_x_players, name, players);
+            }
+        }
+        public int compareTo(SpinnerVariantElement other) {
+            return name.compareTo(other.name);
+        }
+    }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -160,28 +177,34 @@ public class MainActivity extends RetrofitActivity {
                             }
                         };
                         final Spinner variants = ((Spinner) dialog.findViewById(R.id.variants));
-                        List<String> variantNames = new ArrayList<String>();
+                        final List<SpinnerVariantElement> variantNames = new ArrayList<>();
                         for (SingleContainer<VariantService.Variant> variantContainer : getVariants().Properties) {
-                            variantNames.add(variantContainer.Properties.Name);
+                            SpinnerVariantElement el = new SpinnerVariantElement();
+                            el.name = variantContainer.Properties.Name;
+                            if (variantContainer.Properties.Nations != null) {
+                                el.players = variantContainer.Properties.Nations.size();
+                            }
+                            variantNames.add(el);
                         }
                         int classical = 0;
                         Collections.sort(variantNames);
                         for (int i = 0; i < variantNames.size(); i++) {
-                            if (variantNames.get(i).equals("Classical")) {
+                            if (variantNames.get(i).name.equals("Classical")) {
                                 classical = i;
                             }
                         }
-                        ArrayAdapter<String> variantAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, variantNames);
+                        ArrayAdapter<SpinnerVariantElement> variantAdapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_item, variantNames);
                         variants.setAdapter(variantAdapter);
                         variantAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         variants.setSelection(classical);
+                        ((TextInputEditText) dialog.findViewById(R.id.phase_length)).setText("1440");
 
                         ((FloatingActionButton) dialog.findViewById(R.id.create_game_button)).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
                                 final Game game = new Game();
                                 game.Desc = ((EditText) dialog.findViewById(R.id.desc)).getText().toString();
-                                game.Variant = variants.getSelectedItem().toString();
+                                game.Variant = variantNames.get(variants.getSelectedItemPosition()).name;
                                 try {
                                     game.PhaseLengthMinutes = Long.parseLong(((EditText) dialog.findViewById(R.id.phase_length)).getText().toString());
                                 } catch (NumberFormatException e) {
