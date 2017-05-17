@@ -196,4 +196,5 @@
     <string name="chat">Chat</string>
     <string name="source_code">Source code</string>
     <string name="use_map_to_add_orders">Use the map to add orders.</string>
+    <string name="x_of_y_players">%1$s/%2$s players</string>
 </resources>

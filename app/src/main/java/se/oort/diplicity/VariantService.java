@@ -12,6 +12,7 @@ import se.oort.diplicity.apigen.SingleContainer;
 public interface VariantService {
     class Variant implements Serializable {
         String Name;
+        List<String> Nations;
     }
     class Phase implements Serializable {
     }

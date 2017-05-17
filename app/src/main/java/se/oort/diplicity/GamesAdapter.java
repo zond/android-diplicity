@@ -157,7 +157,17 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             }
 
             if (!game.Properties.Started) {
-                state.setText(ctx.getResources().getQuantityString(R.plurals.player, game.Properties.NMembers.intValue(), game.Properties.NMembers));
+                VariantService.Variant variant = null;
+                for (SingleContainer<VariantService.Variant> var : retrofitActivity.getVariants().Properties) {
+                    if (var.Properties.Name.equals(game.Properties.Variant)) {
+                        variant = var.Properties;
+                    }
+                }
+                if (variant == null) {
+                    state.setText(ctx.getResources().getQuantityString(R.plurals.player, game.Properties.NMembers.intValue(), game.Properties.NMembers));
+                } else {
+                    state.setText(retrofitActivity.getResources().getString(R.string.x_of_y_players, game.Properties.NMembers.intValue(), variant.Nations.size()));
+                }
             } else if (game.Properties.NewestPhaseMeta.size() > 0) {
                 PhaseMeta phaseMeta = game.Properties.NewestPhaseMeta.get(0);
                 state.setText(ctx.getResources().getString(R.string.season_year_type, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type));
