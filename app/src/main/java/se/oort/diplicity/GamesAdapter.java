@@ -163,7 +163,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                         variant = var.Properties;
                     }
                 }
-                if (variant == null) {
+                if (variant == null || variant.Nations == null) {
                     state.setText(ctx.getResources().getQuantityString(R.plurals.player, game.Properties.NMembers.intValue(), game.Properties.NMembers));
                 } else {
                     state.setText(retrofitActivity.getResources().getString(R.string.x_of_y_players, game.Properties.NMembers.intValue(), variant.Nations.size()));
