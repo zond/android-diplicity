@@ -197,7 +197,7 @@
     <string name="source_code">Source code</string>
     <string name="use_map_to_add_orders">Use the map to add orders.</string>
     <string name="x_of_y_players">%1$s/%2$s players</string>
-    <string name="phase_length_in_minutes_1440_24h">Phase length in minutes (1440 is 24h)</string>
+    <string name="phase_length_in_minutes_1440_24h">Phase length in minutes (1440 = 24h)</string>
     <string name="min_reliability_higher_is_less_nmr">Minimum reliability (high = active players)</string>
     <string name="min_quickness_higher_is_faster">Minimum quickness (high = fast games)</string>
     <string name="name_x_players">%1$s, %2$s players</string>
