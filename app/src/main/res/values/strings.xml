@@ -204,5 +204,5 @@
     <string name="min_rating_high_is_skilled">Minimum rating (high = strong players)</string>
     <string name="max_rating_low_is_weak_players">Maximum rating (low = weak players)</string>
     <string name="max_hated_low_is_unbanned">Maximum hated (low = unbanned players)</string>
-    <string name="max_hater_low_is_patient">Maximum hated (low = patient players)</string>
+    <string name="max_hater_low_is_patient">Maximum hater (low = patient players)</string>
 </resources>
