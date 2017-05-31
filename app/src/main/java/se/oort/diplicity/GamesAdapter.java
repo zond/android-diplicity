@@ -109,7 +109,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                 rating.setVisibility(View.GONE);
                 ratingLabel.setVisibility(View.GONE);
             }
-            if (game.Properties.MinRating != 0) {
+            if (game.Properties.MinReliability != 0) {
                 minReliability.setText(retrofitActivity.toString(game.Properties.MinReliability));
                 minReliability.setVisibility(View.VISIBLE);
                 minReliabilityLabel.setVisibility(View.VISIBLE);
