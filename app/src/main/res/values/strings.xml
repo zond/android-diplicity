@@ -50,6 +50,7 @@
     <string name="more">more</string>
     <string name="phase_length_in_minutes">Phase length in minutes</string>
     <string name="variant">Variant</string>
+    <string name="variant_label">&lt;b&gt;Variant:&lt;/b&gt; %s</string>
     <string name="description">Description</string>
     <string name="create_game">Create game</string>
     <string name="creating_game">Creating game</string>

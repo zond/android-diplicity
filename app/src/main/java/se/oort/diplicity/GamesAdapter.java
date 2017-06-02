@@ -1,9 +1,9 @@
 package se.oort.diplicity;
 
-import android.graphics.Color;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +25,8 @@ import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.game.GameActivity;
 
 public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAdapter.ViewHolder> {
+    /** Lower case name of the classical variant. Games of this variant are displayed slightly differently in the listings. */
+    public static final String CLASSICAL = "classical";
     private RetrofitActivity retrofitActivity;
     private Set<Integer> expandedItems = Collections.synchronizedSet(new HashSet<Integer>());
     public class ViewHolder extends RecycleAdapter<SingleContainer<Game>, GamesAdapter.ViewHolder>.ViewHolder {
@@ -142,7 +144,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                 maxHaterLabel.setVisibility(View.GONE);
             }
 
-            variant.setText(game.Properties.Variant);
+            variant.setText(makeVariantText(game.Properties.Variant));
 
             deadline.setText(App.minutesToDuration(game.Properties.PhaseLengthMinutes.intValue()));
 
@@ -300,6 +302,22 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             } else {
                 editMembershipButton.setVisibility(View.GONE);
             }
+        }
+
+        /**
+         * Create the text to display in the variant field. This will add the word "Variant" before everything except classical games,
+         * to try to highlight to users when they are not joining a standard game.
+         *
+         * @param variantName The name of the variant.
+         */
+        private Spanned makeVariantText(String variantName) {
+            String sourceString;
+            if (variantName.equalsIgnoreCase(CLASSICAL)) {
+                sourceString = variantName;
+            } else {
+                sourceString = ctx.getResources().getString(R.string.variant_label, variantName);
+            }
+            return Html.fromHtml(sourceString);
         }
     }
     public GamesAdapter(RetrofitActivity activity, List<SingleContainer<Game>> games) {
