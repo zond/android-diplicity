@@ -58,10 +58,13 @@ import se.oort.diplicity.apigen.UserStats;
 
 public class MainActivity extends RetrofitActivity {
 
-    private RecyclerView contentList;
-    private EndlessRecyclerViewScrollListener scrollListener;
+    private final Random random = new Random();
 
+    private RecyclerView contentList;
+
+    private EndlessRecyclerViewScrollListener scrollListener;
     private List<String> nextCursorContainer = new ArrayList<String>(Arrays.asList(new String[]{""}));
+
     private Callable<String> nextCursor = new Callable<String>() {
         @Override
         public String call() throws Exception {
@@ -70,15 +73,13 @@ public class MainActivity extends RetrofitActivity {
     };
 
     private List<Sendable<String>> loadMoreProcContainer = new ArrayList<>();
-
     private GamesAdapter gamesAdapter = new GamesAdapter(this, new ArrayList<SingleContainer<Game>>());
-    private UserStatsAdapter userStatsAdapter = new UserStatsAdapter(this, new ArrayList<SingleContainer<UserStats>>());
 
+    private UserStatsAdapter userStatsAdapter = new UserStatsAdapter(this, new ArrayList<SingleContainer<UserStats>>());
     private List<List<Map<String, String>>> navigationChildGroups;
     private List<Map<String, String>> navigationRootGroups;
-    private FloatingActionButton addGameButton;
 
-    private Random random = new Random();
+    private FloatingActionButton addGameButton;
 
     public static final String FINISHED = "finished";
     public static final String STARTED = "started";
@@ -196,7 +197,9 @@ public class MainActivity extends RetrofitActivity {
                 final EditText gameNameView = (EditText) dialog.findViewById(R.id.desc);
 
                 View.OnFocusChangeListener gameNameListener = new View.OnFocusChangeListener() {
+                    private final int key = random.nextInt(Integer.MAX_VALUE);
                     private boolean generatedName = true;
+
                     @Override
                     public void onFocusChange(View view, boolean b) {
                         if (view.equals(gameNameView)) {
@@ -208,11 +211,11 @@ public class MainActivity extends RetrofitActivity {
                             long phaseLength = Long.parseLong(phaseLengthView.getText().toString());
                             String battle;
                             if (phaseLength < 24 * 60) {
-                                battle = "Sprint";
+                                battle = getKeyedString(R.array.blitz);
                             } else if (phaseLength <= 48 * 60) {
-                                battle = "Battle";
+                                battle = getKeyedString(R.array.battle);
                             } else {
-                                battle = "War";
+                                battle = getKeyedString(R.array.war);
                             }
                             String calculatedName = battle;
                             if (view.equals(gameNameView)) {
@@ -222,6 +225,10 @@ public class MainActivity extends RetrofitActivity {
                                 gameNameView.setText(calculatedName);
                             }
                         }
+                    }
+
+                    private String getKeyedString(int arrayId) {
+                        return getResources().getStringArray(arrayId)[key % getResources().getStringArray(arrayId).length];
                     }
                 };
                 gameNameView.setOnFocusChangeListener(gameNameListener);

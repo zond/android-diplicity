@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="blitz">
+        <item>@string/blitz0</item>
+        <item>@string/blitz1</item>
+        <item>@string/blitz2</item>
+        <item>@string/blitz3</item>
+        <item>@string/blitz4</item>
+        <item>@string/blitz5</item>
+        <item>@string/blitz6</item>
+        <item>@string/blitz7</item>
+        <item>@string/blitz8</item>
+        <item>@string/blitz9</item>
+        <item>@string/blitz10</item>
+        <item>@string/blitz11</item>
+        <item>@string/blitz12</item>
+        <item>@string/blitz13</item>
+    </string-array>
+    <string-array name="battle">
+        <item>@string/battle0</item>
+        <item>@string/battle1</item>
+        <item>@string/battle2</item>
+        <item>@string/battle3</item>
+        <item>@string/battle4</item>
+        <item>@string/battle5</item>
+        <item>@string/battle6</item>
+        <item>@string/battle7</item>
+        <item>@string/battle8</item>
+        <item>@string/battle9</item>
+        <item>@string/battle10</item>
+        <item>@string/battle11</item>
+    </string-array>
+    <string-array name="war">
+        <item>@string/war0</item>
+        <item>@string/war1</item>
+        <item>@string/war2</item>
+        <item>@string/war3</item>
+        <item>@string/war4</item>
+        <item>@string/war5</item>
+        <item>@string/war6</item>
+        <item>@string/war7</item>
+        <item>@string/war8</item>
+        <item>@string/war9</item>
+    </string-array>
+
+    <string name="blitz0">Blitz</string>
+    <string name="blitz1">Dash</string>
+    <string name="blitz2">Sprint</string>
+    <string name="blitz3">Bash</string>
+    <string name="blitz4">Strike</string>
+    <string name="blitz5">Punch</string>
+    <string name="blitz6">Ruck</string>
+    <string name="blitz7">Quibble</string>
+    <string name="blitz8">Blast</string>
+    <string name="blitz9">Clash</string>
+    <string name="blitz10">Fracas</string>
+    <string name="blitz11">Scuffle</string>
+    <string name="blitz12">Shoot-out</string>
+    <string name="blitz13">Scrap</string>
+
+    <string name="battle0">Battle</string>
+    <string name="battle1">Fight</string>
+    <string name="battle2">Quest</string>
+    <string name="battle3">Rampage</string>
+    <string name="battle4">Contest</string>
+    <string name="battle5">Fight</string>
+    <string name="battle6">Game</string>
+    <string name="battle7">Skirmish</string>
+    <string name="battle8">Encounter</string>
+    <string name="battle9">Confrontation</string>
+    <string name="battle10">Combat</string>
+    <string name="battle11">Melee</string>
+
+    <string name="war0">War</string>
+    <string name="war1">Struggle</string>
+    <string name="war2">Siege</string>
+    <string name="war3">Campaign</string>
+    <string name="war4">Crusade</string>
+    <string name="war5">Aeon</string>
+    <string name="war6">Competition</string>
+    <string name="war7">Labour</string>
+    <string name="war8">Feud</string>
+    <string name="war9">Endeavor</string>
+</resources>
