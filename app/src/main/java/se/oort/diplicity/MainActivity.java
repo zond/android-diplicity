@@ -234,7 +234,8 @@ public class MainActivity extends RetrofitActivity {
                             } else {
                                 adjective = getKeyedString(R.array.other);
                             }
-                            String calculatedName = getResources().getString(R.string.game_name_template, battle, adjective, "Prize");
+                            String prize = getKeyedString(R.array.prize);
+                            String calculatedName = getResources().getString(R.string.game_name_template, battle, adjective, prize);
                             if (view.equals(gameNameView)) {
                                 String enteredName = gameNameView.getText().toString();
                                 generatedName = (enteredName.isEmpty() || enteredName.equals(calculatedName));

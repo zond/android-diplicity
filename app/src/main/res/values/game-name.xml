@@ -102,6 +102,48 @@
         <item>@string/other9</item>
     </string-array>
 
+    <string-array name="prize">
+        <item>@string/prize0</item>
+        <item>@string/prize1</item>
+        <item>@string/prize2</item>
+        <item>@string/prize3</item>
+        <item>@string/prize4</item>
+        <item>@string/prize5</item>
+        <item>@string/prize6</item>
+        <item>@string/prize7</item>
+        <item>@string/prize8</item>
+        <item>@string/prize9</item>
+        <item>@string/prize10</item>
+        <item>@string/prize11</item>
+        <item>@string/prize12</item>
+        <item>@string/prize13</item>
+        <item>@string/prize14</item>
+        <item>@string/prize15</item>
+        <item>@string/prize16</item>
+        <item>@string/prize17</item>
+        <item>@string/prize18</item>
+        <item>@string/prize19</item>
+        <item>@string/prize20</item>
+        <item>@string/prize21</item>
+        <item>@string/prize22</item>
+        <item>@string/prize23</item>
+        <item>@string/prize24</item>
+        <item>@string/prize25</item>
+        <item>@string/prize26</item>
+        <item>@string/prize27</item>
+        <item>@string/prize28</item>
+        <item>@string/prize29</item>
+        <item>@string/prize30</item>
+        <item>@string/prize31</item>
+        <item>@string/prize32</item>
+        <item>@string/prize33</item>
+        <item>@string/prize34</item>
+        <item>@string/prize35</item>
+        <item>@string/prize36</item>
+        <item>@string/prize37</item>
+        <item>@string/prize38</item>
+    </string-array>
+
     <string name="game_name_template">The %1$s for the %2$s %3$s</string>
 
     <string name="blitz0">Blitz</string>
@@ -193,4 +235,44 @@
     <string name="other7">White</string>
     <string name="other8">Black</string>
     <string name="other9">Brown</string>
+
+    <string name="prize0">Prize</string>
+    <string name="prize1">Trophy</string>
+    <string name="prize2">Award</string>
+    <string name="prize3">Treasure</string>
+    <string name="prize4">Prize</string>
+    <string name="prize5">Medal</string>
+    <string name="prize6">Cup</string>
+    <string name="prize7">Record</string>
+    <string name="prize8">Crown</string>
+    <string name="prize9">Sceptre</string>
+    <string name="prize10">Monument</string>
+    <string name="prize11">Statue</string>
+    <string name="prize12">Castle</string>
+    <string name="prize13">Reward</string>
+    <string name="prize14">Jewel</string>
+    <string name="prize15">Diamond</string>
+    <string name="prize16">Necklace</string>
+    <string name="prize17">Ring</string>
+    <string name="prize18">Ribbon</string>
+    <string name="prize19">Star</string>
+    <string name="prize20">Booty</string>
+    <string name="prize21">Title</string>
+    <string name="prize22">Wreath</string>
+    <string name="prize23">Garland</string>
+    <string name="prize24">Bounty</string>
+    <string name="prize25">Laurel</string>
+    <string name="prize26">Loot</string>
+    <string name="prize27">Ship</string>
+    <string name="prize28">Grail</string>
+    <string name="prize29">Kingdom</string>
+    <string name="prize30">Province</string>
+    <string name="prize31">Region</string>
+    <string name="prize32">Territory</string>
+    <string name="prize33">Cake</string>
+    <string name="prize34">Banana</string>
+    <string name="prize35">Sheep</string>
+    <string name="prize36">Herring</string>
+    <string name="prize37">Boot</string>
+    <string name="prize38">Spoon</string>
 </resources>
