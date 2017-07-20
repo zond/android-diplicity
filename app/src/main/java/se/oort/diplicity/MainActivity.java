@@ -119,216 +119,228 @@ public class MainActivity extends RetrofitActivity {
         addGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.create_game_dialog).show();
-            final Returner<Game, Boolean> validateGame = new Returner<Game, Boolean>() {
-                @Override
-                public Boolean Return(Game g) {
-                if (g.PhaseLengthMinutes == null)
-                    g.PhaseLengthMinutes = 30l * 24l * 60l;
-                if (g.PhaseLengthMinutes > 30 * 24 * 60) {
-                    Toast.makeText(MainActivity.this, R.string.phase_length_must_be_less_than_30_days, Toast.LENGTH_LONG).show();
-                    return false;
-                }
-                if (g.MinRating == null)
-                    g.MinRating = 0.0;
-                if (g.MinRating != 0.0 && g.MinRating > 1000) {
-                    Toast.makeText(MainActivity.this, getResources().getString(R.string.minimum_rating_must_be_below_your_rating_x, "1000"), Toast.LENGTH_LONG).show();
-                    return false;
-                }
-                if (g.MaxRating == null)
-                    g.MaxRating = 0.0;
-                if (g.MaxRating != 0.0 && g.MaxRating < 1000) {
-                    Toast.makeText(MainActivity.this, getResources().getString(R.string.maximum_rating_must_be_above_your_rating_x, "1000"), Toast.LENGTH_LONG).show();
-                    return false;
-                }
-                if (g.MinReliability == null)
-                    g.MinReliability = 0.0;
-                if (g.MinReliability != 0.0 && g.MinReliability > 100) {
-                    Toast.makeText(MainActivity.this, getResources().getString(R.string.minimum_reliability_must_be_below_your_reliability_x, "100"), Toast.LENGTH_LONG).show();
-                    return false;
-                }
-                if (g.MinQuickness == null)
-                    g.MinQuickness = 0.0;
-                if (g.MinQuickness != 0.0 && g.MinQuickness > 100) {
-                    Toast.makeText(MainActivity.this, getResources().getString(R.string.minimum_quickness_must_be_below_your_quickness_x, "100"), Toast.LENGTH_LONG).show();
-                    return false;
-                }
-                if (g.MaxHated == null)
-                    g.MaxHated = 0.0;
-                if (g.MaxHated != 0.0 && g.MaxHated < 0) {
-                    Toast.makeText(MainActivity.this, getResources().getString(R.string.maximum_hated_must_be_above_your_hated_x, "0"), Toast.LENGTH_LONG).show();
-                    return false;
-                }
-                if (g.MaxHater == null)
-                    g.MaxHater = 0.0;
-                if (g.MaxHater != 0.0 && g.MaxHater < 0) {
-                    Toast.makeText(MainActivity.this, getResources().getString(R.string.maximum_hater_must_be_above_your_hater_x, "0"), Toast.LENGTH_LONG).show();
-                    return false;
-                }
-                return true;
-                }
-            };
-            final Spinner variants = ((Spinner) dialog.findViewById(R.id.variants));
-            final List<SpinnerVariantElement> variantNames = new ArrayList<>();
-            for (String variant : Arrays.asList("Classical", "Fleet Rome")) {
-                SpinnerVariantElement el = new SpinnerVariantElement();
-                el.name = variant;
-                el.players = 7;
-                variantNames.add(el);
-            }
-            int classical = 0;
-            Collections.sort(variantNames);
-            for (int i = 0; i < variantNames.size(); i++) {
-                if (variantNames.get(i).name.equals("Classical")) {
-                    classical = i;
-                }
-            }
-            ArrayAdapter<SpinnerVariantElement> variantAdapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_item, variantNames);
-            variants.setAdapter(variantAdapter);
-            variantAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            variants.setSelection(classical);
-
-                final EditText gameNameView = (EditText) dialog.findViewById(R.id.desc);
-                final EditText phaseLengthView = (EditText) dialog.findViewById(R.id.phase_length);
-                final EditText minRatingView = (EditText) dialog.findViewById(R.id.min_rating);
-                final EditText maxRatingView = (EditText) dialog.findViewById(R.id.max_rating);
-                final EditText minReliabilityView = (EditText) dialog.findViewById(R.id.min_reliability);
-                final EditText minQuicknessView = (EditText) dialog.findViewById(R.id.min_quickness);
-                final EditText maxHatedView = (EditText) dialog.findViewById(R.id.max_hated);
-                final EditText maxHaterView = (EditText) dialog.findViewById(R.id.max_hater);
-
-                View.OnFocusChangeListener gameNameListener = new View.OnFocusChangeListener() {
-                    private final int key = random.nextInt(Integer.MAX_VALUE);
-                    private boolean generatedName = true;
-
+                handleReq(userStatsService.UserStatsLoad(getLoggedInUser().Id), new Sendable<SingleContainer<UserStats>>() {
                     @Override
-                    public void onFocusChange(View view, boolean b) {
-                        if (view.equals(gameNameView)) {
-                            if (gameNameView.getText().toString().isEmpty()) {
-                                generatedName = true;
-                            }
-                        }
-                        if (generatedName) {
-                            long phaseLength = Long.parseLong(phaseLengthView.getText().toString());
-                            String battle;
-                            if (phaseLength < 24 * 60) {
-                                battle = getKeyedString(R.array.blitz);
-                            } else if (phaseLength <= 48 * 60) {
-                                battle = getKeyedString(R.array.battle);
-                            } else {
-                                battle = getKeyedString(R.array.war);
-                            }
-                            String adjective;
-                            if (getDoubleValue(minRatingView, 0) > 1400) {
-                                adjective = getKeyedString(R.array.quality);
-                            } else if (getDoubleValue(maxRatingView, 2000) < 1000) {
-                                adjective = getKeyedString(R.array.fun);
-                            } else if (getDoubleValue(minReliabilityView, 0) > 10) {
-                                adjective = getKeyedString(R.array.reliable);
-                            } else if (getDoubleValue(minQuicknessView, 0) > 10) {
-                                adjective = getKeyedString(R.array.fast);
-                            } else if (getDoubleValue(maxHatedView, 100) < 10) {
-                                adjective = getKeyedString(R.array.pleasant);
-                            } else if (getDoubleValue(maxHaterView, 100) < 10) {
-                                adjective = getKeyedString(R.array.patient);
-                            } else {
-                                adjective = getKeyedString(R.array.other);
-                            }
-                            String prize = getKeyedString(R.array.prize);
-                            String calculatedName = getResources().getString(R.string.game_name_template, battle, adjective, prize);
-                            if (view.equals(gameNameView)) {
-                                String enteredName = gameNameView.getText().toString();
-                                generatedName = (enteredName.isEmpty() || enteredName.equals(calculatedName));
-                            } else {
-                                gameNameView.setText(calculatedName);
-                            }
-                        }
-                    }
+                    public void send(SingleContainer<UserStats> userStatsSingleContainer) {
+                        final List<UserStats> statsContainer = new ArrayList<>();
+                        statsContainer.add(userStatsSingleContainer.Properties);
 
-                    private double getDoubleValue(EditText editText, int def) {
-                        try {
-                            return Double.parseDouble(editText.getText().toString());
-                        } catch (NumberFormatException e) {
-                            return def;
-                        }
-                    }
-
-                    private String getKeyedString(int arrayId) {
-                        return getResources().getStringArray(arrayId)[key % getResources().getStringArray(arrayId).length];
-                    }
-                };
-
-                phaseLengthView.setText("1440");
-
-                gameNameView.setOnFocusChangeListener(gameNameListener);
-                phaseLengthView.setOnFocusChangeListener(gameNameListener);
-                minRatingView.setOnFocusChangeListener(gameNameListener);
-                maxRatingView.setOnFocusChangeListener(gameNameListener);
-                minReliabilityView.setOnFocusChangeListener(gameNameListener);
-                minQuicknessView.setOnFocusChangeListener(gameNameListener);
-                maxHatedView.setOnFocusChangeListener(gameNameListener);
-                maxHaterView.setOnFocusChangeListener(gameNameListener);
-
-            ((FloatingActionButton) dialog.findViewById(R.id.create_game_button)).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    final Game game = new Game();
-                    game.Desc = gameNameView.getText().toString();
-                    game.Variant = variantNames.get(variants.getSelectedItemPosition()).name;
-                    try {
-                        game.PhaseLengthMinutes = Long.parseLong(phaseLengthView.getText().toString());
-                    } catch (NumberFormatException e) {
-                    }
-                    try {
-                        game.MinRating = Double.parseDouble(minRatingView.getText().toString());
-                    } catch (NumberFormatException e) {
-                    }
-                    try {
-                        game.MaxRating = Double.parseDouble(maxRatingView.getText().toString());
-                    } catch (NumberFormatException e) {
-                    }
-                    try {
-                        game.MinReliability = Double.parseDouble(minReliabilityView.getText().toString());
-                    } catch (NumberFormatException e) {
-                    }
-                    try {
-                        game.MinQuickness = Double.parseDouble(minQuicknessView.getText().toString());
-                    } catch (NumberFormatException e) {
-                    }
-                    try {
-                        game.MaxHated = Double.parseDouble(maxHatedView.getText().toString());
-                    } catch (NumberFormatException e) {
-                    }
-                    try {
-                        game.MaxHater = Double.parseDouble(maxHaterView.getText().toString());
-                    } catch (NumberFormatException e) {
-                    }
-                    if (validateGame.Return(game)) {
-                        handleReq(gameService.GameCreate(game), new Sendable<SingleContainer<Game>>() {
+                        final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.create_game_dialog).show();
+                        final Returner<Game, Boolean> validateGame = new Returner<Game, Boolean>() {
                             @Override
-                            public void send(SingleContainer<Game> gameSingleContainer) {
-                                if (nextCursorContainer.get(0).length() == 0) {
-                                    findViewById(R.id.empty_view).setVisibility(View.GONE);
-                                    contentList.setVisibility(View.VISIBLE);
-                                    gamesAdapter.items.add(gameSingleContainer);
-                                    gamesAdapter.notifyDataSetChanged();
+                            public Boolean Return(Game g) {
+                                if (g.PhaseLengthMinutes == null)
+                                    g.PhaseLengthMinutes = 30l * 24l * 60l;
+                                if (g.PhaseLengthMinutes > 30 * 24 * 60) {
+                                    Toast.makeText(MainActivity.this, R.string.phase_length_must_be_less_than_30_days, Toast.LENGTH_LONG).show();
+                                    return false;
                                 }
-                                dialog.dismiss();
+                                UserStats us = statsContainer.get(0);
+                                if (g.MinRating == null)
+                                    g.MinRating = 0.0;
+                                if (g.MinRating != 0.0 && g.MinRating > us.Glicko.PracticalRating) {
+                                    Toast.makeText(MainActivity.this, getResources().getString(R.string.minimum_rating_must_be_below_your_rating_x, us.Glicko.PracticalRating), Toast.LENGTH_LONG).show();
+                                    return false;
+                                }
+                                if (g.MaxRating == null)
+                                    g.MaxRating = 0.0;
+                                if (g.MaxRating != 0.0 && g.MaxRating < us.Glicko.PracticalRating) {
+                                    Toast.makeText(MainActivity.this, getResources().getString(R.string.maximum_rating_must_be_above_your_rating_x, us.Glicko.PracticalRating), Toast.LENGTH_LONG).show();
+                                    return false;
+                                }
+                                if (g.MinReliability == null)
+                                    g.MinReliability = 0.0;
+                                if (g.MinReliability != 0.0 && g.MinReliability > us.Reliability) {
+                                    Toast.makeText(MainActivity.this, getResources().getString(R.string.minimum_reliability_must_be_below_your_reliability_x, us.Reliability), Toast.LENGTH_LONG).show();
+                                    return false;
+                                }
+                                if (g.MinQuickness == null)
+                                    g.MinQuickness = 0.0;
+                                if (g.MinQuickness != 0.0 && g.MinQuickness > us.Quickness) {
+                                    Toast.makeText(MainActivity.this, getResources().getString(R.string.minimum_quickness_must_be_below_your_quickness_x, us.Quickness), Toast.LENGTH_LONG).show();
+                                    return false;
+                                }
+                                if (g.MaxHated == null)
+                                    g.MaxHated = 0.0;
+                                if (g.MaxHated != 0.0 && g.MaxHated < us.Hated) {
+                                    Toast.makeText(MainActivity.this, getResources().getString(R.string.maximum_hated_must_be_above_your_hated_x, us.Hated), Toast.LENGTH_LONG).show();
+                                    return false;
+                                }
+                                if (g.MaxHater == null)
+                                    g.MaxHater = 0.0;
+                                if (g.MaxHater != 0.0 && g.MaxHater < us.Hater) {
+                                    Toast.makeText(MainActivity.this, getResources().getString(R.string.maximum_hater_must_be_above_your_hater_x, us.Hater), Toast.LENGTH_LONG).show();
+                                    return false;
+                                }
+                                return true;
                             }
-                        }, new ErrorHandler(412, new Sendable<HttpException>() {
+                        };
+                        final Spinner variants = ((Spinner) dialog.findViewById(R.id.variants));
+                        final List<SpinnerVariantElement> variantNames = new ArrayList<>();
+                        for (SingleContainer<VariantService.Variant> variantContainer : getVariants().Properties) {
+                            SpinnerVariantElement el = new SpinnerVariantElement();
+                            el.name = variantContainer.Properties.Name;
+                            if (variantContainer.Properties.Nations != null) {
+                                el.players = variantContainer.Properties.Nations.size();
+                            }
+                            variantNames.add(el);
+                        }
+                        int classical = 0;
+                        Collections.sort(variantNames);
+                        for (int i = 0; i < variantNames.size(); i++) {
+                            if (variantNames.get(i).name.equals("Classical")) {
+                                classical = i;
+                            }
+                        }
+                        ArrayAdapter<SpinnerVariantElement> variantAdapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_item, variantNames);
+                        variants.setAdapter(variantAdapter);
+                        variantAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        variants.setSelection(classical);
+
+                        final EditText gameNameView = (EditText) dialog.findViewById(R.id.desc);
+                        final EditText phaseLengthView = (EditText) dialog.findViewById(R.id.phase_length);
+                        final EditText minRatingView = (EditText) dialog.findViewById(R.id.min_rating);
+                        final EditText maxRatingView = (EditText) dialog.findViewById(R.id.max_rating);
+                        final EditText minReliabilityView = (EditText) dialog.findViewById(R.id.min_reliability);
+                        final EditText minQuicknessView = (EditText) dialog.findViewById(R.id.min_quickness);
+                        final EditText maxHatedView = (EditText) dialog.findViewById(R.id.max_hated);
+                        final EditText maxHaterView = (EditText) dialog.findViewById(R.id.max_hater);
+
+                        View.OnFocusChangeListener gameNameListener = new View.OnFocusChangeListener() {
+                            private final int key = random.nextInt(Integer.MAX_VALUE);
+                            private boolean generatedName = true;
+
                             @Override
-                            public void send(HttpException e) {
-                                handleReq(userStatsService.UserStatsLoad(getLoggedInUser().Id), new Sendable<SingleContainer<UserStats>>() {
-                                    @Override
-                                    public void send(SingleContainer<UserStats> userStatsSingleContainer) {
-                                        validateGame.Return(game);
+                            public void onFocusChange(View view, boolean b) {
+                                if (view.equals(gameNameView)) {
+                                    if (gameNameView.getText().toString().isEmpty()) {
+                                        generatedName = true;
                                     }
-                                }, getResources().getString(R.string.creating_game));
+                                }
+                                if (generatedName) {
+                                    long phaseLength = Long.parseLong(phaseLengthView.getText().toString());
+                                    String battle;
+                                    if (phaseLength < 24 * 60) {
+                                        battle = getKeyedString(R.array.blitz);
+                                    } else if (phaseLength <= 48 * 60) {
+                                        battle = getKeyedString(R.array.battle);
+                                    } else {
+                                        battle = getKeyedString(R.array.war);
+                                    }
+                                    String adjective;
+                                    if (getDoubleValue(minRatingView, 0) > 1400) {
+                                        adjective = getKeyedString(R.array.quality);
+                                    } else if (getDoubleValue(maxRatingView, 2000) < 1000) {
+                                        adjective = getKeyedString(R.array.fun);
+                                    } else if (getDoubleValue(minReliabilityView, 0) > 10) {
+                                        adjective = getKeyedString(R.array.reliable);
+                                    } else if (getDoubleValue(minQuicknessView, 0) > 10) {
+                                        adjective = getKeyedString(R.array.fast);
+                                    } else if (getDoubleValue(maxHatedView, 100) < 10) {
+                                        adjective = getKeyedString(R.array.pleasant);
+                                    } else if (getDoubleValue(maxHaterView, 100) < 10) {
+                                        adjective = getKeyedString(R.array.patient);
+                                    } else {
+                                        adjective = getKeyedString(R.array.other);
+                                    }
+                                    String prize = getKeyedString(R.array.prize);
+                                    String calculatedName = getResources().getString(R.string.game_name_template, battle, adjective, prize);
+                                    if (view.equals(gameNameView)) {
+                                        String enteredName = gameNameView.getText().toString();
+                                        generatedName = (enteredName.isEmpty() || enteredName.equals(calculatedName));
+                                    } else {
+                                        gameNameView.setText(calculatedName);
+                                    }
+                                }
                             }
-                        }), getResources().getString(R.string.creating_game));
+
+                            private double getDoubleValue(EditText editText, int def) {
+                                try {
+                                    return Double.parseDouble(editText.getText().toString());
+                                } catch (NumberFormatException e) {
+                                    return def;
+                                }
+                            }
+
+                            private String getKeyedString(int arrayId) {
+                                return getResources().getStringArray(arrayId)[key % getResources().getStringArray(arrayId).length];
+                            }
+                        };
+
+                        phaseLengthView.setText("1440");
+
+                        gameNameView.setOnFocusChangeListener(gameNameListener);
+                        phaseLengthView.setOnFocusChangeListener(gameNameListener);
+                        minRatingView.setOnFocusChangeListener(gameNameListener);
+                        maxRatingView.setOnFocusChangeListener(gameNameListener);
+                        minReliabilityView.setOnFocusChangeListener(gameNameListener);
+                        minQuicknessView.setOnFocusChangeListener(gameNameListener);
+                        maxHatedView.setOnFocusChangeListener(gameNameListener);
+                        maxHaterView.setOnFocusChangeListener(gameNameListener);
+
+                        ((FloatingActionButton) dialog.findViewById(R.id.create_game_button)).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                final Game game = new Game();
+                                game.Desc = gameNameView.getText().toString();
+                                game.Variant = variantNames.get(variants.getSelectedItemPosition()).name;
+                                try {
+                                    game.PhaseLengthMinutes = Long.parseLong(phaseLengthView.getText().toString());
+                                } catch (NumberFormatException e) {
+                                }
+                                try {
+                                    game.MinRating = Double.parseDouble(minRatingView.getText().toString());
+                                } catch (NumberFormatException e) {
+                                }
+                                try {
+                                    game.MaxRating = Double.parseDouble(maxRatingView.getText().toString());
+                                } catch (NumberFormatException e) {
+                                }
+                                try {
+                                    game.MinReliability = Double.parseDouble(minReliabilityView.getText().toString());
+                                } catch (NumberFormatException e) {
+                                }
+                                try {
+                                    game.MinQuickness = Double.parseDouble(minQuicknessView.getText().toString());
+                                } catch (NumberFormatException e) {
+                                }
+                                try {
+                                    game.MaxHated = Double.parseDouble(maxHatedView.getText().toString());
+                                } catch (NumberFormatException e) {
+                                }
+                                try {
+                                    game.MaxHater = Double.parseDouble(maxHaterView.getText().toString());
+                                } catch (NumberFormatException e) {
+                                }
+                                if (validateGame.Return(game)) {
+                                    handleReq(gameService.GameCreate(game), new Sendable<SingleContainer<Game>>() {
+                                        @Override
+                                        public void send(SingleContainer<Game> gameSingleContainer) {
+                                            if (nextCursorContainer.get(0).length() == 0) {
+                                                findViewById(R.id.empty_view).setVisibility(View.GONE);
+                                                contentList.setVisibility(View.VISIBLE);
+                                                gamesAdapter.items.add(gameSingleContainer);
+                                                gamesAdapter.notifyDataSetChanged();
+                                            }
+                                            dialog.dismiss();
+                                        }
+                                    }, new ErrorHandler(412, new Sendable<HttpException>() {
+                                        @Override
+                                        public void send(HttpException e) {
+                                            handleReq(userStatsService.UserStatsLoad(getLoggedInUser().Id), new Sendable<SingleContainer<UserStats>>() {
+                                                @Override
+                                                public void send(SingleContainer<UserStats> userStatsSingleContainer) {
+                                                    statsContainer.set(0, userStatsSingleContainer.Properties);
+                                                    validateGame.Return(game);
+                                                }
+                                            }, getResources().getString(R.string.creating_game));
+                                        }
+                                    }), getResources().getString(R.string.creating_game));
+                                }
+                            }
+                        });
                     }
-                }
-            });
+                }, getResources().getString(R.string.loading_user_stats));
             }
         });
 
