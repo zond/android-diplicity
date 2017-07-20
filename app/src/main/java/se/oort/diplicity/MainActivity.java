@@ -40,6 +40,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -76,6 +77,8 @@ public class MainActivity extends RetrofitActivity {
     private List<List<Map<String, String>>> navigationChildGroups;
     private List<Map<String, String>> navigationRootGroups;
     private FloatingActionButton addGameButton;
+
+    private Random random = new Random();
 
     public static final String FINISHED = "finished";
     public static final String STARTED = "started";
@@ -188,16 +191,51 @@ public class MainActivity extends RetrofitActivity {
             variants.setAdapter(variantAdapter);
             variantAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             variants.setSelection(classical);
-            ((TextInputEditText) dialog.findViewById(R.id.phase_length)).setText("1440");
+
+                final EditText phaseLengthView = (EditText) dialog.findViewById(R.id.phase_length);
+                final EditText gameNameView = (EditText) dialog.findViewById(R.id.desc);
+
+                View.OnFocusChangeListener gameNameListener = new View.OnFocusChangeListener() {
+                    private boolean generatedName = true;
+                    @Override
+                    public void onFocusChange(View view, boolean b) {
+                        if (view.equals(gameNameView)) {
+                            if (gameNameView.getText().toString().isEmpty()) {
+                                generatedName = true;
+                            }
+                        }
+                        if (generatedName) {
+                            long phaseLength = Long.parseLong(phaseLengthView.getText().toString());
+                            String battle;
+                            if (phaseLength < 24 * 60) {
+                                battle = "Sprint";
+                            } else if (phaseLength <= 48 * 60) {
+                                battle = "Battle";
+                            } else {
+                                battle = "War";
+                            }
+                            String calculatedName = battle;
+                            if (view.equals(gameNameView)) {
+                                String enteredName = gameNameView.getText().toString();
+                                generatedName = (enteredName.isEmpty() || enteredName.equals(calculatedName));
+                            } else {
+                                gameNameView.setText(calculatedName);
+                            }
+                        }
+                    }
+                };
+                gameNameView.setOnFocusChangeListener(gameNameListener);
+                phaseLengthView.setText("1440");
+                phaseLengthView.setOnFocusChangeListener(gameNameListener);
 
             ((FloatingActionButton) dialog.findViewById(R.id.create_game_button)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     final Game game = new Game();
-                    game.Desc = ((EditText) dialog.findViewById(R.id.desc)).getText().toString();
+                    game.Desc = gameNameView.getText().toString();
                     game.Variant = variantNames.get(variants.getSelectedItemPosition()).name;
                     try {
-                        game.PhaseLengthMinutes = Long.parseLong(((EditText) dialog.findViewById(R.id.phase_length)).getText().toString());
+                        game.PhaseLengthMinutes = Long.parseLong(phaseLengthView.getText().toString());
                     } catch (NumberFormatException e) {
                     }
                     try {
