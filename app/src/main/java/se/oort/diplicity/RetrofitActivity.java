@@ -288,6 +288,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     }
 
     protected void performLogin() {
+        recreateServices();
         observe(JoinObservable.when(JoinObservable
                 .from(rootService.GetRoot())
                 .and(variantService.GetVariants())
