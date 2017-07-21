@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="blitz">
+        <item>@string/blitz0</item>
+        <item>@string/blitz1</item>
+        <item>@string/blitz2</item>
+        <item>@string/blitz3</item>
+        <item>@string/blitz4</item>
+        <item>@string/blitz5</item>
+        <item>@string/blitz6</item>
+        <item>@string/blitz7</item>
+        <item>@string/blitz8</item>
+        <item>@string/blitz9</item>
+        <item>@string/blitz10</item>
+        <item>@string/blitz11</item>
+        <item>@string/blitz12</item>
+        <item>@string/blitz13</item>
+    </string-array>
+    <string-array name="battle">
+        <item>@string/battle0</item>
+        <item>@string/battle1</item>
+        <item>@string/battle2</item>
+        <item>@string/battle3</item>
+        <item>@string/battle4</item>
+        <item>@string/battle5</item>
+        <item>@string/battle6</item>
+        <item>@string/battle7</item>
+        <item>@string/battle8</item>
+        <item>@string/battle9</item>
+        <item>@string/battle10</item>
+        <item>@string/battle11</item>
+    </string-array>
+    <string-array name="war">
+        <item>@string/war0</item>
+        <item>@string/war1</item>
+        <item>@string/war2</item>
+        <item>@string/war3</item>
+        <item>@string/war4</item>
+        <item>@string/war5</item>
+        <item>@string/war6</item>
+        <item>@string/war7</item>
+        <item>@string/war8</item>
+        <item>@string/war9</item>
+    </string-array>
+
+    <string-array name="fun">
+        <item>@string/fun0</item>
+        <item>@string/fun1</item>
+        <item>@string/fun2</item>
+        <item>@string/fun3</item>
+    </string-array>
+    <string-array name="quality">
+        <item>@string/quality0</item>
+        <item>@string/quality1</item>
+        <item>@string/quality2</item>
+        <item>@string/quality3</item>
+        <item>@string/quality4</item>
+        <item>@string/quality5</item>
+    </string-array>
+    <string-array name="reliable">
+        <item>@string/reliable0</item>
+        <item>@string/reliable1</item>
+        <item>@string/reliable2</item>
+        <item>@string/reliable3</item>
+        <item>@string/reliable4</item>
+        <item>@string/reliable5</item>
+        <item>@string/reliable6</item>
+    </string-array>
+    <string-array name="fast">
+        <item>@string/fast0</item>
+        <item>@string/fast1</item>
+        <item>@string/fast2</item>
+        <item>@string/fast3</item>
+        <item>@string/fast4</item>
+        <item>@string/fast5</item>
+        <item>@string/fast6</item>
+        <item>@string/fast7</item>
+    </string-array>
+    <string-array name="pleasant">
+        <item>@string/pleasant0</item>
+        <item>@string/pleasant1</item>
+        <item>@string/pleasant2</item>
+        <item>@string/pleasant3</item>
+    </string-array>
+    <string-array name="patient">
+        <item>@string/patient0</item>
+        <item>@string/patient1</item>
+        <item>@string/patient2</item>
+        <item>@string/patient3</item>
+        <item>@string/patient4</item>
+    </string-array>
+    <string-array name="other">
+        <item>@string/other0</item>
+        <item>@string/other1</item>
+        <item>@string/other2</item>
+        <item>@string/other3</item>
+        <item>@string/other4</item>
+        <item>@string/other5</item>
+        <item>@string/other6</item>
+        <item>@string/other7</item>
+        <item>@string/other8</item>
+        <item>@string/other9</item>
+    </string-array>
+
+    <string-array name="prize">
+        <item>@string/prize0</item>
+        <item>@string/prize1</item>
+        <item>@string/prize2</item>
+        <item>@string/prize3</item>
+        <item>@string/prize4</item>
+        <item>@string/prize5</item>
+        <item>@string/prize6</item>
+        <item>@string/prize7</item>
+        <item>@string/prize8</item>
+        <item>@string/prize9</item>
+        <item>@string/prize10</item>
+        <item>@string/prize11</item>
+        <item>@string/prize12</item>
+        <item>@string/prize13</item>
+        <item>@string/prize14</item>
+        <item>@string/prize15</item>
+        <item>@string/prize16</item>
+        <item>@string/prize17</item>
+        <item>@string/prize18</item>
+        <item>@string/prize19</item>
+        <item>@string/prize20</item>
+        <item>@string/prize21</item>
+        <item>@string/prize22</item>
+        <item>@string/prize23</item>
+        <item>@string/prize24</item>
+        <item>@string/prize25</item>
+        <item>@string/prize26</item>
+        <item>@string/prize27</item>
+        <item>@string/prize28</item>
+        <item>@string/prize29</item>
+        <item>@string/prize30</item>
+        <item>@string/prize31</item>
+        <item>@string/prize32</item>
+        <item>@string/prize33</item>
+        <item>@string/prize34</item>
+        <item>@string/prize35</item>
+        <item>@string/prize36</item>
+        <item>@string/prize37</item>
+        <item>@string/prize38</item>
+    </string-array>
+
+    <string name="game_name_template">The %1$s for the %2$s %3$s</string>
+
+    <string name="blitz0">Blitz</string>
+    <string name="blitz1">Dash</string>
+    <string name="blitz2">Sprint</string>
+    <string name="blitz3">Bash</string>
+    <string name="blitz4">Strike</string>
+    <string name="blitz5">Punch</string>
+    <string name="blitz6">Ruck</string>
+    <string name="blitz7">Quibble</string>
+    <string name="blitz8">Blast</string>
+    <string name="blitz9">Clash</string>
+    <string name="blitz10">Fracas</string>
+    <string name="blitz11">Scuffle</string>
+    <string name="blitz12">Shoot-out</string>
+    <string name="blitz13">Scrap</string>
+
+    <string name="battle0">Battle</string>
+    <string name="battle1">Fight</string>
+    <string name="battle2">Quest</string>
+    <string name="battle3">Rampage</string>
+    <string name="battle4">Contest</string>
+    <string name="battle5">Fight</string>
+    <string name="battle6">Game</string>
+    <string name="battle7">Skirmish</string>
+    <string name="battle8">Encounter</string>
+    <string name="battle9">Confrontation</string>
+    <string name="battle10">Combat</string>
+    <string name="battle11">Melee</string>
+
+    <string name="war0">War</string>
+    <string name="war1">Struggle</string>
+    <string name="war2">Siege</string>
+    <string name="war3">Campaign</string>
+    <string name="war4">Crusade</string>
+    <string name="war5">Aeon</string>
+    <string name="war6">Competition</string>
+    <string name="war7">Labour</string>
+    <string name="war8">Feud</string>
+    <string name="war9">Endeavor</string>
+
+    <string name="fun0">Fun</string>
+    <string name="fun1">Entertaining</string>
+    <string name="fun2">Amusing</string>
+    <string name="fun3">Pleasing</string>
+
+    <string name="quality0">Quality</string>
+    <string name="quality1">Fine</string>
+    <string name="quality2">Golden</string>
+    <string name="quality3">Superb</string>
+    <string name="quality4">Brilliant</string>
+    <string name="quality5">Great</string>
+
+    <string name="reliable0">Reliable</string>
+    <string name="reliable1">Dependable</string>
+    <string name="reliable2">Trusty</string>
+    <string name="reliable3">Faithful</string>
+    <string name="reliable4">Loyal</string>
+    <string name="reliable5">Dedicated</string>
+    <string name="reliable6">Committed</string>
+
+    <string name="fast0">Fast</string>
+    <string name="fast1">Speedy</string>
+    <string name="fast2">Quick</string>
+    <string name="fast3">Rapid</string>
+    <string name="fast4">Swift</string>
+    <string name="fast5">Brisk</string>
+    <string name="fast6">Nimble</string>
+    <string name="fast7">Hasty</string>
+
+    <string name="pleasant0">Pleasant</string>
+    <string name="pleasant1">Enjoyable</string>
+    <string name="pleasant2">Agreeable</string>
+    <string name="pleasant3">Affable</string>
+
+    <string name="patient0">Patient</string>
+    <string name="patient1">Tolerant</string>
+    <string name="patient2">Composed</string>
+    <string name="patient3">Forgiving</string>
+    <string name="patient4">Kind</string>
+
+    <string name="other0">Red</string>
+    <string name="other1">Orange</string>
+    <string name="other2">Yellow</string>
+    <string name="other3">Green</string>
+    <string name="other4">Blue</string>
+    <string name="other5">Purple</string>
+    <string name="other6">Pink</string>
+    <string name="other7">White</string>
+    <string name="other8">Black</string>
+    <string name="other9">Brown</string>
+
+    <string name="prize0">Prize</string>
+    <string name="prize1">Trophy</string>
+    <string name="prize2">Award</string>
+    <string name="prize3">Treasure</string>
+    <string name="prize4">Prize</string>
+    <string name="prize5">Medal</string>
+    <string name="prize6">Cup</string>
+    <string name="prize7">Record</string>
+    <string name="prize8">Crown</string>
+    <string name="prize9">Sceptre</string>
+    <string name="prize10">Monument</string>
+    <string name="prize11">Statue</string>
+    <string name="prize12">Castle</string>
+    <string name="prize13">Reward</string>
+    <string name="prize14">Jewel</string>
+    <string name="prize15">Diamond</string>
+    <string name="prize16">Necklace</string>
+    <string name="prize17">Ring</string>
+    <string name="prize18">Ribbon</string>
+    <string name="prize19">Star</string>
+    <string name="prize20">Booty</string>
+    <string name="prize21">Title</string>
+    <string name="prize22">Wreath</string>
+    <string name="prize23">Garland</string>
+    <string name="prize24">Bounty</string>
+    <string name="prize25">Laurel</string>
+    <string name="prize26">Loot</string>
+    <string name="prize27">Ship</string>
+    <string name="prize28">Grail</string>
+    <string name="prize29">Kingdom</string>
+    <string name="prize30">Province</string>
+    <string name="prize31">Region</string>
+    <string name="prize32">Territory</string>
+    <string name="prize33">Cake</string>
+    <string name="prize34">Banana</string>
+    <string name="prize35">Sheep</string>
+    <string name="prize36">Herring</string>
+    <string name="prize37">Boot</string>
+    <string name="prize38">Spoon</string>
+</resources>

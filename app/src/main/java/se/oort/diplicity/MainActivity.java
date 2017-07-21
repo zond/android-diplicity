@@ -1,24 +1,19 @@
 package se.oort.diplicity;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.TextInputEditText;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.util.SortedList;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,6 +35,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,10 +53,13 @@ import se.oort.diplicity.apigen.UserStats;
 
 public class MainActivity extends RetrofitActivity {
 
-    private RecyclerView contentList;
-    private EndlessRecyclerViewScrollListener scrollListener;
+    private final Random random = new Random();
 
+    private RecyclerView contentList;
+
+    private EndlessRecyclerViewScrollListener scrollListener;
     private List<String> nextCursorContainer = new ArrayList<String>(Arrays.asList(new String[]{""}));
+
     private Callable<String> nextCursor = new Callable<String>() {
         @Override
         public String call() throws Exception {
@@ -69,12 +68,12 @@ public class MainActivity extends RetrofitActivity {
     };
 
     private List<Sendable<String>> loadMoreProcContainer = new ArrayList<>();
-
     private GamesAdapter gamesAdapter = new GamesAdapter(this, new ArrayList<SingleContainer<Game>>());
-    private UserStatsAdapter userStatsAdapter = new UserStatsAdapter(this, new ArrayList<SingleContainer<UserStats>>());
 
+    private UserStatsAdapter userStatsAdapter = new UserStatsAdapter(this, new ArrayList<SingleContainer<UserStats>>());
     private List<List<Map<String, String>>> navigationChildGroups;
     private List<Map<String, String>> navigationRootGroups;
+
     private FloatingActionButton addGameButton;
 
     public static final String FINISHED = "finished";
@@ -197,40 +196,120 @@ public class MainActivity extends RetrofitActivity {
                         variants.setAdapter(variantAdapter);
                         variantAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         variants.setSelection(classical);
-                        ((TextInputEditText) dialog.findViewById(R.id.phase_length)).setText("1440");
+
+                        final EditText gameNameView = (EditText) dialog.findViewById(R.id.desc);
+                        final EditText phaseLengthView = (EditText) dialog.findViewById(R.id.phase_length);
+                        final EditText minRatingView = (EditText) dialog.findViewById(R.id.min_rating);
+                        final EditText maxRatingView = (EditText) dialog.findViewById(R.id.max_rating);
+                        final EditText minReliabilityView = (EditText) dialog.findViewById(R.id.min_reliability);
+                        final EditText minQuicknessView = (EditText) dialog.findViewById(R.id.min_quickness);
+                        final EditText maxHatedView = (EditText) dialog.findViewById(R.id.max_hated);
+                        final EditText maxHaterView = (EditText) dialog.findViewById(R.id.max_hater);
+
+                        View.OnFocusChangeListener gameNameListener = new View.OnFocusChangeListener() {
+                            private final int key = random.nextInt(Integer.MAX_VALUE);
+                            private boolean generatedName = true;
+
+                            @Override
+                            public void onFocusChange(View view, boolean b) {
+                                if (view.equals(gameNameView)) {
+                                    if (gameNameView.getText().toString().isEmpty()) {
+                                        generatedName = true;
+                                    }
+                                }
+                                if (generatedName) {
+                                    long phaseLength = Long.parseLong(phaseLengthView.getText().toString());
+                                    String battle;
+                                    if (phaseLength < 24 * 60) {
+                                        battle = getKeyedString(R.array.blitz);
+                                    } else if (phaseLength <= 48 * 60) {
+                                        battle = getKeyedString(R.array.battle);
+                                    } else {
+                                        battle = getKeyedString(R.array.war);
+                                    }
+                                    String adjective;
+                                    if (getDoubleValue(minRatingView, 0) > 1400) {
+                                        adjective = getKeyedString(R.array.quality);
+                                    } else if (getDoubleValue(maxRatingView, 2000) < 1000) {
+                                        adjective = getKeyedString(R.array.fun);
+                                    } else if (getDoubleValue(minReliabilityView, 0) > 10) {
+                                        adjective = getKeyedString(R.array.reliable);
+                                    } else if (getDoubleValue(minQuicknessView, 0) > 10) {
+                                        adjective = getKeyedString(R.array.fast);
+                                    } else if (getDoubleValue(maxHatedView, 100) < 10) {
+                                        adjective = getKeyedString(R.array.pleasant);
+                                    } else if (getDoubleValue(maxHaterView, 100) < 10) {
+                                        adjective = getKeyedString(R.array.patient);
+                                    } else {
+                                        adjective = getKeyedString(R.array.other);
+                                    }
+                                    String prize = getKeyedString(R.array.prize);
+                                    String calculatedName = getResources().getString(R.string.game_name_template, battle, adjective, prize);
+                                    if (view.equals(gameNameView)) {
+                                        String enteredName = gameNameView.getText().toString();
+                                        generatedName = (enteredName.isEmpty() || enteredName.equals(calculatedName));
+                                    } else {
+                                        gameNameView.setText(calculatedName);
+                                    }
+                                }
+                            }
+
+                            private double getDoubleValue(EditText editText, int def) {
+                                try {
+                                    return Double.parseDouble(editText.getText().toString());
+                                } catch (NumberFormatException e) {
+                                    return def;
+                                }
+                            }
+
+                            private String getKeyedString(int arrayId) {
+                                return getResources().getStringArray(arrayId)[key % getResources().getStringArray(arrayId).length];
+                            }
+                        };
+
+                        phaseLengthView.setText("1440");
+
+                        gameNameView.setOnFocusChangeListener(gameNameListener);
+                        phaseLengthView.setOnFocusChangeListener(gameNameListener);
+                        minRatingView.setOnFocusChangeListener(gameNameListener);
+                        maxRatingView.setOnFocusChangeListener(gameNameListener);
+                        minReliabilityView.setOnFocusChangeListener(gameNameListener);
+                        minQuicknessView.setOnFocusChangeListener(gameNameListener);
+                        maxHatedView.setOnFocusChangeListener(gameNameListener);
+                        maxHaterView.setOnFocusChangeListener(gameNameListener);
 
                         ((FloatingActionButton) dialog.findViewById(R.id.create_game_button)).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
                                 final Game game = new Game();
-                                game.Desc = ((EditText) dialog.findViewById(R.id.desc)).getText().toString();
+                                game.Desc = gameNameView.getText().toString();
                                 game.Variant = variantNames.get(variants.getSelectedItemPosition()).name;
                                 try {
-                                    game.PhaseLengthMinutes = Long.parseLong(((EditText) dialog.findViewById(R.id.phase_length)).getText().toString());
+                                    game.PhaseLengthMinutes = Long.parseLong(phaseLengthView.getText().toString());
                                 } catch (NumberFormatException e) {
                                 }
                                 try {
-                                    game.MinRating = Double.parseDouble(((EditText) dialog.findViewById(R.id.min_rating)).getText().toString());
+                                    game.MinRating = Double.parseDouble(minRatingView.getText().toString());
                                 } catch (NumberFormatException e) {
                                 }
                                 try {
-                                    game.MaxRating = Double.parseDouble(((EditText) dialog.findViewById(R.id.max_rating)).getText().toString());
+                                    game.MaxRating = Double.parseDouble(maxRatingView.getText().toString());
                                 } catch (NumberFormatException e) {
                                 }
                                 try {
-                                    game.MinReliability = Double.parseDouble(((EditText) dialog.findViewById(R.id.min_reliability)).getText().toString());
+                                    game.MinReliability = Double.parseDouble(minReliabilityView.getText().toString());
                                 } catch (NumberFormatException e) {
                                 }
                                 try {
-                                    game.MinQuickness = Double.parseDouble(((EditText) dialog.findViewById(R.id.min_quickness)).getText().toString());
+                                    game.MinQuickness = Double.parseDouble(minQuicknessView.getText().toString());
                                 } catch (NumberFormatException e) {
                                 }
                                 try {
-                                    game.MaxHated = Double.parseDouble(((EditText) dialog.findViewById(R.id.max_hated)).getText().toString());
+                                    game.MaxHated = Double.parseDouble(maxHatedView.getText().toString());
                                 } catch (NumberFormatException e) {
                                 }
                                 try {
-                                    game.MaxHater = Double.parseDouble(((EditText) dialog.findViewById(R.id.max_hater)).getText().toString());
+                                    game.MaxHater = Double.parseDouble(maxHaterView.getText().toString());
                                 } catch (NumberFormatException e) {
                                 }
                                 if (validateGame.Return(game)) {
