@@ -309,10 +309,7 @@ public class MainActivity extends RetrofitActivity {
                                 final Game game = new Game();
                                 game.Desc = gameNameView.getText().toString();
                                 game.Variant = variantNames.get(variants.getSelectedItemPosition()).name;
-                                try {
-                                    game.PhaseLengthMinutes = getPhaseLengthMinutes(phaseLengthView, phaseLengthUnitsSpinner);
-                                } catch (NumberFormatException e) {
-                                }
+                                game.PhaseLengthMinutes = getPhaseLengthMinutes(phaseLengthView, phaseLengthUnitsSpinner);
                                 try {
                                     game.MinRating = Double.parseDouble(minRatingView.getText().toString());
                                 } catch (NumberFormatException e) {
