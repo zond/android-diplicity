@@ -14,11 +14,14 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
@@ -52,6 +55,8 @@ import se.oort.diplicity.apigen.User;
 import se.oort.diplicity.apigen.UserStats;
 
 public class MainActivity extends RetrofitActivity {
+    private static final long HOUR_IN_MINUTES = 60;
+    private static final long DAY_IN_MINUTES = 24 * HOUR_IN_MINUTES;
 
     private final Random random = new Random();
 
@@ -130,8 +135,8 @@ public class MainActivity extends RetrofitActivity {
                             @Override
                             public Boolean Return(Game g) {
                                 if (g.PhaseLengthMinutes == null)
-                                    g.PhaseLengthMinutes = 30l * 24l * 60l;
-                                if (g.PhaseLengthMinutes > 30 * 24 * 60) {
+                                    g.PhaseLengthMinutes = DAY_IN_MINUTES;
+                                if (g.PhaseLengthMinutes > 30 * DAY_IN_MINUTES) {
                                     Toast.makeText(MainActivity.this, R.string.phase_length_must_be_less_than_30_days, Toast.LENGTH_LONG).show();
                                     return false;
                                 }
@@ -199,6 +204,7 @@ public class MainActivity extends RetrofitActivity {
 
                         final EditText gameNameView = (EditText) dialog.findViewById(R.id.desc);
                         final EditText phaseLengthView = (EditText) dialog.findViewById(R.id.phase_length);
+                        final Spinner phaseLengthUnitsSpinner = (Spinner) dialog.findViewById(R.id.phase_length_units);
                         final EditText minRatingView = (EditText) dialog.findViewById(R.id.min_rating);
                         final EditText maxRatingView = (EditText) dialog.findViewById(R.id.max_rating);
                         final EditText minReliabilityView = (EditText) dialog.findViewById(R.id.min_reliability);
@@ -206,7 +212,7 @@ public class MainActivity extends RetrofitActivity {
                         final EditText maxHatedView = (EditText) dialog.findViewById(R.id.max_hated);
                         final EditText maxHaterView = (EditText) dialog.findViewById(R.id.max_hater);
 
-                        View.OnFocusChangeListener gameNameListener = new View.OnFocusChangeListener() {
+                        final View.OnFocusChangeListener gameNameListener = new View.OnFocusChangeListener() {
                             private final int key = random.nextInt(Integer.MAX_VALUE);
                             private boolean generatedName = true;
 
@@ -218,11 +224,11 @@ public class MainActivity extends RetrofitActivity {
                                     }
                                 }
                                 if (generatedName) {
-                                    long phaseLength = Long.parseLong(phaseLengthView.getText().toString());
+                                    long phaseLength = getPhaseLengthMinutes(phaseLengthView, phaseLengthUnitsSpinner);
                                     String battle;
-                                    if (phaseLength < 24 * 60) {
+                                    if (phaseLength < DAY_IN_MINUTES) {
                                         battle = getKeyedString(R.array.blitz);
-                                    } else if (phaseLength <= 48 * 60) {
+                                    } else if (phaseLength <= 2 * DAY_IN_MINUTES) {
                                         battle = getKeyedString(R.array.battle);
                                     } else {
                                         battle = getKeyedString(R.array.war);
@@ -267,6 +273,23 @@ public class MainActivity extends RetrofitActivity {
                             }
                         };
 
+                        AdapterView.OnItemSelectedListener phaseLengthUnitsListener = new AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                gameNameListener.onFocusChange(view, false);
+                            }
+
+                            @Override
+                            public void onNothingSelected(AdapterView<?> parent) {
+                                parent.setSelection(0);
+                            }
+                        };
+
+                        setDefaultPhaseLength(phaseLengthView);
+                        if(phaseLengthView.requestFocus()) {
+                            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                        }
+
                         phaseLengthView.setText("1440");
 
                         gameNameView.setOnFocusChangeListener(gameNameListener);
@@ -278,6 +301,8 @@ public class MainActivity extends RetrofitActivity {
                         maxHatedView.setOnFocusChangeListener(gameNameListener);
                         maxHaterView.setOnFocusChangeListener(gameNameListener);
 
+                        phaseLengthUnitsSpinner.setOnItemSelectedListener(phaseLengthUnitsListener);
+
                         ((FloatingActionButton) dialog.findViewById(R.id.create_game_button)).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -285,7 +310,7 @@ public class MainActivity extends RetrofitActivity {
                                 game.Desc = gameNameView.getText().toString();
                                 game.Variant = variantNames.get(variants.getSelectedItemPosition()).name;
                                 try {
-                                    game.PhaseLengthMinutes = Long.parseLong(phaseLengthView.getText().toString());
+                                    game.PhaseLengthMinutes = getPhaseLengthMinutes(phaseLengthView, phaseLengthUnitsSpinner);
                                 } catch (NumberFormatException e) {
                                 }
                                 try {
@@ -341,6 +366,47 @@ public class MainActivity extends RetrofitActivity {
                         });
                     }
                 }, getResources().getString(R.string.loading_user_stats));
+            }
+
+            /**
+             * Determine the current user entered phase length.
+             *
+             * @param phaseLengthView The view containing the selected quantity.
+             * @param phaseLengthUnitsView The spiner containing the selected units.
+             * @return The selected phase length in minutes.
+             */
+            private long getPhaseLengthMinutes(EditText phaseLengthView, Spinner phaseLengthUnitsView) {
+                // Get the quantity entered
+                long quantity;
+                try {
+                    quantity = Long.valueOf(phaseLengthView.getText().toString());
+                } catch (NumberFormatException e) {
+                    setDefaultPhaseLength(phaseLengthView);
+                    quantity = Long.valueOf(phaseLengthView.getText().toString());
+                }
+                long phaseLength;
+                switch (phaseLengthUnitsView.getSelectedItemPosition()) {
+                    case 0:
+                        // Days
+                        phaseLength = quantity * DAY_IN_MINUTES;
+                        break;
+                    case 1:
+                        // Hours
+                        phaseLength = quantity * HOUR_IN_MINUTES;
+                        break;
+                    case 2:
+                        // Minutes
+                        phaseLength = quantity;
+                        break;
+                    default:
+                        Log.e("Diplicity", "Programmer error: Unexpected phase length units selected");
+                        throw new IllegalStateException("Programmer error: Unexpected phase length units selected");
+                }
+                return phaseLength;
+            }
+
+            private void setDefaultPhaseLength(EditText phaseLengthView) {
+                phaseLengthView.setText("1");
             }
         });
 
