@@ -20,7 +20,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -33,7 +32,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -54,6 +52,8 @@ import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.apigen.User;
 import se.oort.diplicity.apigen.UserStats;
 
+import static java.util.Arrays.asList;
+
 public class MainActivity extends RetrofitActivity {
     private static final long HOUR_IN_MINUTES = 60;
     private static final long DAY_IN_MINUTES = 24 * HOUR_IN_MINUTES;
@@ -63,7 +63,7 @@ public class MainActivity extends RetrofitActivity {
     private RecyclerView contentList;
 
     private EndlessRecyclerViewScrollListener scrollListener;
-    private List<String> nextCursorContainer = new ArrayList<String>(Arrays.asList(new String[]{""}));
+    private List<String> nextCursorContainer = new ArrayList<String>(asList(new String[]{""}));
 
     private Callable<String> nextCursor = new Callable<String>() {
         @Override
@@ -285,12 +285,7 @@ public class MainActivity extends RetrofitActivity {
                             }
                         };
 
-                        setDefaultPhaseLength(phaseLengthView);
-                        if(phaseLengthView.requestFocus()) {
-                            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-                        }
-
-                        phaseLengthView.setText("1440");
+                        setDefaultPhaseLength(phaseLengthView, phaseLengthUnitsSpinner);
 
                         gameNameView.setOnFocusChangeListener(gameNameListener);
                         phaseLengthView.setOnFocusChangeListener(gameNameListener);
@@ -378,32 +373,35 @@ public class MainActivity extends RetrofitActivity {
                 try {
                     quantity = Long.valueOf(phaseLengthView.getText().toString());
                 } catch (NumberFormatException e) {
-                    setDefaultPhaseLength(phaseLengthView);
+                    setDefaultPhaseLength(phaseLengthView, phaseLengthUnitsView);
                     quantity = Long.valueOf(phaseLengthView.getText().toString());
                 }
+                // Use the quantity and the selected unit to find the phase length.
                 long phaseLength;
-                switch (phaseLengthUnitsView.getSelectedItemPosition()) {
-                    case 0:
-                        // Days
-                        phaseLength = quantity * DAY_IN_MINUTES;
-                        break;
-                    case 1:
-                        // Hours
-                        phaseLength = quantity * HOUR_IN_MINUTES;
-                        break;
-                    case 2:
-                        // Minutes
-                        phaseLength = quantity;
-                        break;
-                    default:
-                        Log.e("Diplicity", "Programmer error: Unexpected phase length units selected");
-                        throw new IllegalStateException("Programmer error: Unexpected phase length units selected");
+                int selectedItem = phaseLengthUnitsView.getSelectedItemPosition();
+                if (selectedItem == getIndexOfUnit(R.string._day_s)) {
+                    phaseLength = quantity * DAY_IN_MINUTES;
+                } else if (selectedItem == getIndexOfUnit(R.string._hour_s)) {
+                    phaseLength = quantity * HOUR_IN_MINUTES;
+                } else if (selectedItem == getIndexOfUnit(R.string._minute_s)) {
+                    phaseLength = quantity;
+                } else {
+                    Log.e("Diplicity", "Programmer error: Unexpected phase length units selected");
+                    throw new IllegalStateException("Programmer error: Unexpected phase length units selected");
                 }
                 return phaseLength;
             }
 
-            private void setDefaultPhaseLength(EditText phaseLengthView) {
+            /** Set the phase length to the default of one day. */
+            private void setDefaultPhaseLength(EditText phaseLengthView, Spinner phaseLengthUnitsView) {
                 phaseLengthView.setText("1");
+                phaseLengthUnitsView.setSelection(getIndexOfUnit(R.string._day_s));
+            }
+
+            /** Get the index of the given unit string resource in the array list used by the units spinner. */
+            private int getIndexOfUnit(int unitString) {
+                List<String> unitLabels = asList(getResources().getStringArray(R.array.phaseLengthUnits));
+                return unitLabels.indexOf(getResources().getString(unitString));
             }
         });
 
