@@ -14,11 +14,13 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
@@ -30,7 +32,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -51,14 +52,18 @@ import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.apigen.User;
 import se.oort.diplicity.apigen.UserStats;
 
+import static java.util.Arrays.asList;
+
 public class MainActivity extends RetrofitActivity {
+    private static final long HOUR_IN_MINUTES = 60;
+    private static final long DAY_IN_MINUTES = 24 * HOUR_IN_MINUTES;
 
     private final Random random = new Random();
 
     private RecyclerView contentList;
 
     private EndlessRecyclerViewScrollListener scrollListener;
-    private List<String> nextCursorContainer = new ArrayList<String>(Arrays.asList(new String[]{""}));
+    private List<String> nextCursorContainer = new ArrayList<String>(asList(new String[]{""}));
 
     private Callable<String> nextCursor = new Callable<String>() {
         @Override
@@ -130,8 +135,8 @@ public class MainActivity extends RetrofitActivity {
                             @Override
                             public Boolean Return(Game g) {
                                 if (g.PhaseLengthMinutes == null)
-                                    g.PhaseLengthMinutes = 30l * 24l * 60l;
-                                if (g.PhaseLengthMinutes > 30 * 24 * 60) {
+                                    g.PhaseLengthMinutes = DAY_IN_MINUTES;
+                                if (g.PhaseLengthMinutes > 30 * DAY_IN_MINUTES) {
                                     Toast.makeText(MainActivity.this, R.string.phase_length_must_be_less_than_30_days, Toast.LENGTH_LONG).show();
                                     return false;
                                 }
@@ -199,6 +204,7 @@ public class MainActivity extends RetrofitActivity {
 
                         final EditText gameNameView = (EditText) dialog.findViewById(R.id.desc);
                         final EditText phaseLengthView = (EditText) dialog.findViewById(R.id.phase_length);
+                        final Spinner phaseLengthUnitsSpinner = (Spinner) dialog.findViewById(R.id.phase_length_units);
                         final EditText minRatingView = (EditText) dialog.findViewById(R.id.min_rating);
                         final EditText maxRatingView = (EditText) dialog.findViewById(R.id.max_rating);
                         final EditText minReliabilityView = (EditText) dialog.findViewById(R.id.min_reliability);
@@ -206,7 +212,7 @@ public class MainActivity extends RetrofitActivity {
                         final EditText maxHatedView = (EditText) dialog.findViewById(R.id.max_hated);
                         final EditText maxHaterView = (EditText) dialog.findViewById(R.id.max_hater);
 
-                        View.OnFocusChangeListener gameNameListener = new View.OnFocusChangeListener() {
+                        final View.OnFocusChangeListener gameNameListener = new View.OnFocusChangeListener() {
                             private final int key = random.nextInt(Integer.MAX_VALUE);
                             private boolean generatedName = true;
 
@@ -218,11 +224,11 @@ public class MainActivity extends RetrofitActivity {
                                     }
                                 }
                                 if (generatedName) {
-                                    long phaseLength = Long.parseLong(phaseLengthView.getText().toString());
+                                    long phaseLength = getPhaseLengthMinutes(phaseLengthView, phaseLengthUnitsSpinner);
                                     String battle;
-                                    if (phaseLength < 24 * 60) {
+                                    if (phaseLength < DAY_IN_MINUTES) {
                                         battle = getKeyedString(R.array.blitz);
-                                    } else if (phaseLength <= 48 * 60) {
+                                    } else if (phaseLength <= 2 * DAY_IN_MINUTES) {
                                         battle = getKeyedString(R.array.battle);
                                     } else {
                                         battle = getKeyedString(R.array.war);
@@ -267,7 +273,19 @@ public class MainActivity extends RetrofitActivity {
                             }
                         };
 
-                        phaseLengthView.setText("1440");
+                        AdapterView.OnItemSelectedListener phaseLengthUnitsListener = new AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                gameNameListener.onFocusChange(view, false);
+                            }
+
+                            @Override
+                            public void onNothingSelected(AdapterView<?> parent) {
+                                parent.setSelection(0);
+                            }
+                        };
+
+                        setDefaultPhaseLength(phaseLengthView, phaseLengthUnitsSpinner);
 
                         gameNameView.setOnFocusChangeListener(gameNameListener);
                         phaseLengthView.setOnFocusChangeListener(gameNameListener);
@@ -278,16 +296,15 @@ public class MainActivity extends RetrofitActivity {
                         maxHatedView.setOnFocusChangeListener(gameNameListener);
                         maxHaterView.setOnFocusChangeListener(gameNameListener);
 
+                        phaseLengthUnitsSpinner.setOnItemSelectedListener(phaseLengthUnitsListener);
+
                         ((FloatingActionButton) dialog.findViewById(R.id.create_game_button)).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
                                 final Game game = new Game();
                                 game.Desc = gameNameView.getText().toString();
                                 game.Variant = variantNames.get(variants.getSelectedItemPosition()).name;
-                                try {
-                                    game.PhaseLengthMinutes = Long.parseLong(phaseLengthView.getText().toString());
-                                } catch (NumberFormatException e) {
-                                }
+                                game.PhaseLengthMinutes = getPhaseLengthMinutes(phaseLengthView, phaseLengthUnitsSpinner);
                                 try {
                                     game.MinRating = Double.parseDouble(minRatingView.getText().toString());
                                 } catch (NumberFormatException e) {
@@ -341,6 +358,50 @@ public class MainActivity extends RetrofitActivity {
                         });
                     }
                 }, getResources().getString(R.string.loading_user_stats));
+            }
+
+            /**
+             * Determine the current user entered phase length.
+             *
+             * @param phaseLengthView The view containing the selected quantity.
+             * @param phaseLengthUnitsView The spiner containing the selected units.
+             * @return The selected phase length in minutes.
+             */
+            private long getPhaseLengthMinutes(EditText phaseLengthView, Spinner phaseLengthUnitsView) {
+                // Get the quantity entered
+                long quantity;
+                try {
+                    quantity = Long.valueOf(phaseLengthView.getText().toString());
+                } catch (NumberFormatException e) {
+                    setDefaultPhaseLength(phaseLengthView, phaseLengthUnitsView);
+                    quantity = Long.valueOf(phaseLengthView.getText().toString());
+                }
+                // Use the quantity and the selected unit to find the phase length.
+                long phaseLength;
+                int selectedItem = phaseLengthUnitsView.getSelectedItemPosition();
+                if (selectedItem == getIndexOfUnit(R.string._day_s)) {
+                    phaseLength = quantity * DAY_IN_MINUTES;
+                } else if (selectedItem == getIndexOfUnit(R.string._hour_s)) {
+                    phaseLength = quantity * HOUR_IN_MINUTES;
+                } else if (selectedItem == getIndexOfUnit(R.string._minute_s)) {
+                    phaseLength = quantity;
+                } else {
+                    Log.e("Diplicity", "Programmer error: Unexpected phase length units selected");
+                    throw new IllegalStateException("Programmer error: Unexpected phase length units selected");
+                }
+                return phaseLength;
+            }
+
+            /** Set the phase length to the default of one day. */
+            private void setDefaultPhaseLength(EditText phaseLengthView, Spinner phaseLengthUnitsView) {
+                phaseLengthView.setText("1");
+                phaseLengthUnitsView.setSelection(getIndexOfUnit(R.string._day_s));
+            }
+
+            /** Get the index of the given unit string resource in the array list used by the units spinner. */
+            private int getIndexOfUnit(int unitString) {
+                List<String> unitLabels = asList(getResources().getStringArray(R.array.phaseLengthUnits));
+                return unitLabels.indexOf(getResources().getString(unitString));
             }
         });
 

@@ -51,20 +51,37 @@
 
         </LinearLayout>
 
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/phase_length_layout"
+        <LinearLayout
+            android:layout_margin="5dp"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <android.support.design.widget.TextInputEditText
-                android:hint="@string/phase_length_in_minutes_1440_24h"
-                android:id="@+id/phase_length"
-                android:inputType="number"
-                android:textColor="?android:attr/textColorPrimary"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/phase_length_layout"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content">
 
-        </android.support.design.widget.TextInputLayout>
+                <android.support.design.widget.TextInputEditText
+                    android:hint="@string/phase_length"
+                    android:id="@+id/phase_length"
+                    android:inputType="number"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <Spinner
+                android:id="@+id/phase_length_units"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:entries="@array/phaseLengthUnits"
+                android:layout_gravity="center_vertical"/>
+
+        </LinearLayout>
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/min_rating_label"

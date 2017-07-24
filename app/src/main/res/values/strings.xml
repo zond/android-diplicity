@@ -198,7 +198,7 @@
     <string name="source_code">Source code</string>
     <string name="use_map_to_add_orders">Use the map to add orders.</string>
     <string name="x_of_y_players">%1$s/%2$s players</string>
-    <string name="phase_length_in_minutes_1440_24h">Phase length in minutes (1440 = 24h)</string>
+    <string name="phase_length">Phase length</string>
     <string name="min_reliability_higher_is_less_nmr">Minimum reliability (high = active players)</string>
     <string name="min_quickness_higher_is_faster">Minimum quickness (high = fast games)</string>
     <string name="name_x_players">%1$s, %2$s players</string>
@@ -206,4 +206,12 @@
     <string name="max_rating_low_is_weak_players">Maximum rating (low = weak players)</string>
     <string name="max_hated_low_is_unbanned">Maximum hated (low = unbanned players)</string>
     <string name="max_hater_low_is_patient">Maximum hater (low = patient players)</string>
+    <string-array name="phaseLengthUnits">
+        <item>@string/_day_s</item>
+        <item>@string/_hour_s</item>
+        <item>@string/_minute_s</item>
+    </string-array>
+    <string name="_day_s">day(s)</string>
+    <string name="_hour_s">hour(s)</string>
+    <string name="_minute_s">minute(s)</string>
 </resources>
