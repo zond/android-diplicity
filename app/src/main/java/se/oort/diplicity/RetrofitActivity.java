@@ -545,7 +545,8 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     }
 
     public User getLoggedInUser() {
-        if (loggedInUser == null) {
+        // Check that the cached user isn't null or empty.
+        if (loggedInUser == null || loggedInUser.Id == null) {
             try {
                 loggedInUser = new Gson().fromJson(prefs.getString(LOGGED_IN_USER_PREF_KEY, "{}"), User.class);
             } catch (JsonSyntaxException e) {
