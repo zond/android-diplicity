@@ -13,6 +13,14 @@ public interface VariantService {
     class Variant implements Serializable {
         String Name;
         List<String> Nations;
+        /** Who the version was created by (or the empty string if no creator information is known). */
+        String CreatedBy;
+        /** Version of the variant (or the empty string if no version information is known). */
+        String Version;
+        /** A short description summarising the variant. */
+        String Description;
+        /** The rules of the variant (in particular where they differ from classical). */
+        String Rules;
     }
     class Phase implements Serializable {
     }

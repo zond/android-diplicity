@@ -331,7 +331,8 @@ public class GameActivity extends RetrofitActivity
                 R.id.phase_results_view,
                 R.id.game_results_view,
                 R.id.phase_state_view,
-                R.id.game_state_view
+                R.id.game_state_view,
+                R.id.variant_info_view
         }) {
             if (viewID == toShow) {
                 findViewById(viewID).setVisibility(View.VISIBLE);
@@ -665,6 +666,13 @@ public class GameActivity extends RetrofitActivity
                         }
                     }
                 }, getResources().getString(R.string.loading_game_settings));
+    }
+
+    public void showVariantInfo() {
+        hideAllExcept(R.id.variant_info_view);
+
+        final TextView variantName = (TextView) findViewById(R.id.variant_info_name);
+        variantName.setText("TODO!");
     }
 
     public void showPhaseStates() {
@@ -1098,6 +1106,8 @@ public class GameActivity extends RetrofitActivity
             showPhaseStates();
         } else if (id == R.id.nav_game_settings) {
             showGameStates();
+        } else if (id == R.id.nav_variant_info) {
+            showVariantInfo();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
