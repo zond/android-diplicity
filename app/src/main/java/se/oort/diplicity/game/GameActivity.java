@@ -672,7 +672,18 @@ public class GameActivity extends RetrofitActivity
         hideAllExcept(R.id.variant_info_view);
 
         final TextView variantName = (TextView) findViewById(R.id.variant_info_name);
-        variantName.setText("TODO!");
+        variantName.setText(game.Variant);
+
+        MultiContainer<VariantService.Variant> variants = getVariants();
+        for (SingleContainer<VariantService.Variant> sc : variants.Properties) {
+            VariantService.Variant variant = sc.Properties;
+            if (variant.Name.equals(game.Variant)) {
+                ((TextView) findViewById(R.id.variant_info_created_by)).setText(variant.CreatedBy);
+                ((TextView) findViewById(R.id.variant_info_version)).setText(variant.Version);
+                ((TextView) findViewById(R.id.variant_info_description)).setText(variant.Description);
+                ((TextView) findViewById(R.id.variant_info_rules)).setText(variant.Rules);
+            }
+        }
     }
 
     public void showPhaseStates() {
