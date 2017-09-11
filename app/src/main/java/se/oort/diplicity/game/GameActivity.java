@@ -331,7 +331,8 @@ public class GameActivity extends RetrofitActivity
                 R.id.phase_results_view,
                 R.id.game_results_view,
                 R.id.phase_state_view,
-                R.id.game_state_view
+                R.id.game_state_view,
+                R.id.variant_info_view
         }) {
             if (viewID == toShow) {
                 findViewById(viewID).setVisibility(View.VISIBLE);
@@ -665,6 +666,42 @@ public class GameActivity extends RetrofitActivity
                         }
                     }
                 }, getResources().getString(R.string.loading_game_settings));
+    }
+
+    public void showVariantInfo() {
+        hideAllExcept(R.id.variant_info_view);
+
+        final TextView variantName = (TextView) findViewById(R.id.variant_info_name);
+        variantName.setText(game.Variant);
+
+        MultiContainer<VariantService.Variant> variants = getVariants();
+        for (SingleContainer<VariantService.Variant> sc : variants.Properties) {
+            VariantService.Variant variant = sc.Properties;
+            if (variant.Name.equals(game.Variant)) {
+                setTextAndLabel(variant.CreatedBy, R.id.variant_info_created_by, R.id.variant_info_created_by_label);
+                setTextAndLabel(variant.Version, R.id.variant_info_version, R.id.variant_info_version_label);
+                setTextAndLabel(variant.Description, R.id.variant_info_description, R.id.variant_info_description_label);
+                setTextAndLabel(variant.Rules, R.id.variant_info_rules, R.id.variant_info_rules_label);
+            }
+        }
+    }
+
+    /**
+     * Display some text with its label if the text is not null or the empty string (otherwise hide both fields).
+     *
+     * @param text The text to display.
+     * @param textField The id of the field to put the text into.
+     * @param labelField The id of the label field.
+     */
+    private void setTextAndLabel(String text, int textField, int labelField) {
+        if (text == null || text.isEmpty()) {
+            findViewById(labelField).setVisibility(View.GONE);
+            findViewById(textField).setVisibility(View.GONE);
+        } else {
+            findViewById(labelField).setVisibility(View.VISIBLE);
+            findViewById(textField).setVisibility(View.VISIBLE);
+            ((TextView) findViewById(textField)).setText(text);
+        }
     }
 
     public void showPhaseStates() {
@@ -1098,6 +1135,8 @@ public class GameActivity extends RetrofitActivity
             showPhaseStates();
         } else if (id == R.id.nav_game_settings) {
             showGameStates();
+        } else if (id == R.id.nav_variant_info) {
+            showVariantInfo();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

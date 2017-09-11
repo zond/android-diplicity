@@ -34,6 +34,10 @@
             android:id="@+id/nav_game_settings"
             android:icon="@drawable/ic_settings_black_24dp"
             android:title="@string/game_settings" />
+        <item
+            android:id="@+id/nav_variant_info"
+            android:icon="@drawable/ic_info_black_24dp"
+            android:title="@string/variant_info" />
     </group>
 
 </menu>

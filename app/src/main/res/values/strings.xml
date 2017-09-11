@@ -103,6 +103,12 @@
     <string name="loading_game_result">Loading game result</string>
     <string name="phase_settings">Phase settings</string>
     <string name="game_settings">Game settings</string>
+    <string name="variant_info">Variant information</string>
+    <string name="variant_name">Name:</string>
+    <string name="variant_author">Author:</string>
+    <string name="variant_version">Version:</string>
+    <string name="variant_description">Description:</string>
+    <string name="variant_rules">Rules:</string>
     <string name="_scs">%s SCs</string>
     <string name="_points">%s points</string>
     <string name="loading_phase_settings">Loading phase settings</string>
