@@ -242,9 +242,24 @@
                 android:layout_height="match_parent">
 
                 <TextView
+                    android:padding="5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/variant_name"
+                    android:textColor="?android:attr/textColorPrimary" />
+
+                <TextView
                     android:id="@+id/variant_info_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/variant_info_created_by_label"
+                    android:padding="5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/variant_author"
+                    android:textColor="?android:attr/textColorPrimary" />
 
                 <TextView
                     android:id="@+id/variant_info_created_by"
@@ -252,14 +267,38 @@
                     android:layout_height="wrap_content" />
 
                 <TextView
+                    android:id="@+id/variant_info_version_label"
+                    android:padding="5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/variant_version"
+                    android:textColor="?android:attr/textColorPrimary" />
+
+                <TextView
                     android:id="@+id/variant_info_version"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
                 <TextView
+                    android:id="@+id/variant_info_description_label"
+                    android:padding="5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/variant_description"
+                    android:textColor="?android:attr/textColorPrimary" />
+
+                <TextView
                     android:id="@+id/variant_info_description"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/variant_info_rules_label"
+                    android:padding="5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/variant_rules"
+                    android:textColor="?android:attr/textColorPrimary" />
 
                 <TextView
                     android:id="@+id/variant_info_rules"

@@ -678,11 +678,29 @@ public class GameActivity extends RetrofitActivity
         for (SingleContainer<VariantService.Variant> sc : variants.Properties) {
             VariantService.Variant variant = sc.Properties;
             if (variant.Name.equals(game.Variant)) {
-                ((TextView) findViewById(R.id.variant_info_created_by)).setText(variant.CreatedBy);
-                ((TextView) findViewById(R.id.variant_info_version)).setText(variant.Version);
-                ((TextView) findViewById(R.id.variant_info_description)).setText(variant.Description);
-                ((TextView) findViewById(R.id.variant_info_rules)).setText(variant.Rules);
+                setTextAndLabel(variant.CreatedBy, R.id.variant_info_created_by, R.id.variant_info_created_by_label);
+                setTextAndLabel(variant.Version, R.id.variant_info_version, R.id.variant_info_version_label);
+                setTextAndLabel(variant.Description, R.id.variant_info_description, R.id.variant_info_description_label);
+                setTextAndLabel(variant.Rules, R.id.variant_info_rules, R.id.variant_info_rules_label);
             }
+        }
+    }
+
+    /**
+     * Display some text with its label if the text is not null or the empty string (otherwise hide both fields).
+     *
+     * @param text The text to display.
+     * @param textField The id of the field to put the text into.
+     * @param labelField The id of the label field.
+     */
+    private void setTextAndLabel(String text, int textField, int labelField) {
+        if (text == null || text.isEmpty()) {
+            findViewById(labelField).setVisibility(View.GONE);
+            findViewById(textField).setVisibility(View.GONE);
+        } else {
+            findViewById(labelField).setVisibility(View.VISIBLE);
+            findViewById(textField).setVisibility(View.VISIBLE);
+            ((TextView) findViewById(textField)).setText(text);
         }
     }
 
