@@ -864,7 +864,7 @@ public class MainActivity extends RetrofitActivity {
                             }
                             if (other != null) {
                                 final User finalOther = other;
-                                ((UserView) convertView.findViewById(R.id.other_user)).setUser(MainActivity.this, other);
+                                ((UserView) convertView.findViewById(R.id.other_user)).setUser(MainActivity.this, other, true);
                                 if (ban.Properties.OwnerIds.contains(getLoggedInUser().Id)) {
                                     LayoutInflater inflater = (LayoutInflater) MainActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                                     FloatingActionButton button = (FloatingActionButton) inflater.inflate(R.layout.clear_button, null);

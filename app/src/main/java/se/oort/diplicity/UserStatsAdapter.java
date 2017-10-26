@@ -29,7 +29,7 @@ public class UserStatsAdapter extends RecycleAdapter<SingleContainer<UserStats>,
         }
         @Override
         public void bind(SingleContainer<UserStats> user, int pos) {
-            userView.setUser(retrofitActivity, user.Properties.User);
+            userView.setUser(retrofitActivity, user.Properties.User, true);
             if (emitter != null) {
                 sortLabel.setText(emitter.emit(user.Properties));
             }

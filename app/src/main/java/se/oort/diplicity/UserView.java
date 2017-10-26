@@ -44,7 +44,7 @@ public class UserView extends FrameLayout {
 
     private static void setupUserDialog(final RetrofitActivity retrofitActivity, AlertDialog dialog, final SingleContainer<UserStats> userStats, final SingleContainer<Ban> ban) {
         ((UserStatsTable) dialog.findViewById(R.id.user_stats)).setUserStats(retrofitActivity, userStats.Properties);
-        ((UserView) dialog.findViewById(R.id.user)).setUser(retrofitActivity, userStats.Properties.User);
+        ((UserView) dialog.findViewById(R.id.user)).setUser(retrofitActivity, userStats.Properties.User, true);
         final CheckBox bannedCheckBox = (CheckBox) dialog.findViewById(R.id.banned);
         if (userStats.Properties.UserId.equals(retrofitActivity.getLoggedInUser().Id)) {
             bannedCheckBox.setVisibility(GONE);
@@ -202,12 +202,17 @@ public class UserView extends FrameLayout {
         };
     }
 
-    public void setUser(RetrofitActivity retrofitActivity, User user) {
-        setMember(retrofitActivity, null, null, user);
+    public void setUser(RetrofitActivity retrofitActivity, User user, boolean withName) {
+        setMember(retrofitActivity, null, null, user, withName);
     }
 
-    public void setMember(RetrofitActivity retrofitActivity, Game game, Member member, User user) {
-        ((TextView) findViewById(R.id.name)).setText(user.Name);
+    public void setMember(RetrofitActivity retrofitActivity, Game game, Member member, User user, boolean withName) {
+        if (withName) {
+            ((TextView) findViewById(R.id.name)).setText(user.Name);
+            findViewById(R.id.name).setVisibility(VISIBLE);
+        } else {
+            findViewById(R.id.name).setVisibility(GONE);
+        }
         ImageView avatar = (ImageView) findViewById(R.id.avatar);
         retrofitActivity.populateImage(avatar, user.Picture, 36, 36);
         avatar.setOnClickListener(getAvatarClickListener(retrofitActivity, game, member, user));

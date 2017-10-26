@@ -598,7 +598,7 @@ public class GameActivity extends RetrofitActivity
                             playerSide.setLayoutParams(params);
                             playerSide.setOrientation(LinearLayout.VERTICAL);
                             UserView user = new UserView(GameActivity.this, null);
-                            user.setUser(GameActivity.this, thisMember.User);
+                            user.setUser(GameActivity.this, thisMember.User, true);
                             user.setLayoutParams(linearParams);
                             playerSide.addView(user);
                             TextView nation = new TextView(GameActivity.this);

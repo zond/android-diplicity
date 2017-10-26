@@ -66,7 +66,7 @@ public class MemberTable extends TableLayout {
                             TableRow.LayoutParams.WRAP_CONTENT, 1.0f);
             setMargins(userParams);
             userView.setLayoutParams(userParams);
-            userView.setMember(retrofitActivity, game, member, member.User);
+            userView.setMember(retrofitActivity, game, member, member.User, this.phaseStates == null);
             tableRow.addView(userView);
 
             if (member.Nation != null && !member.Nation.equals("")) {
