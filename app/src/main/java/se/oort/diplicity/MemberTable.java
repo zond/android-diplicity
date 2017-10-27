@@ -105,11 +105,12 @@ public class MemberTable extends TableLayout {
                 if (foundState != null) {
                     final PhaseState finalFoundState = foundState;
                     final CheckBox onProbation = new CheckBox(retrofitActivity);
-                    CheckBox readyToResolve = new CheckBox(retrofitActivity);
+                    final CheckBox readyToResolve = new CheckBox(retrofitActivity);
                     readyToResolve.setText(R.string.rdy);
                     readyToResolve.setLayoutParams(wrapContentParams);
                     readyToResolve.setChecked(finalFoundState.ReadyToResolve);
                     if (!foundState.NoOrders && !phaseMeta.Resolved && retrofitActivity.getLoggedInUser().Id.equals(member.User.Id)) {
+                        final Game finalGame = game;
                         readyToResolve.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                             @Override
                             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -119,6 +120,9 @@ public class MemberTable extends TableLayout {
                                         new Sendable<SingleContainer<PhaseState>>() {
                                             @Override
                                             public void send(SingleContainer<PhaseState> phaseStateSingleContainer) {
+                                                if (readyToResolve.isChecked()) {
+                                                    Alarm.Alert.fromGame(finalGame, member).turnOff(retrofitActivity);
+                                                }
                                                 onProbation.setChecked(false);
                                             }
                                         }, getResources().getString(R.string.updating_phase_state));
