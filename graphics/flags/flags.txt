@@ -1,0 +1,30 @@
+Flags sourced from https://en.wikipedia.org/wiki/Timeline_of_national_flags
+Attribute the authors like so 
+
+Britain: Public Domain, https://en.wikipedia.org/w/index.php?curid=23473560
+Germany: Public Domain, https://commons.wikimedia.org/w/index.php?curid=503938
+    war: Public Domain, https://commons.wikimedia.org/w/index.php?curid=2463955
+Austria: Public Domain, https://commons.wikimedia.org/w/index.php?curid=32119865 
+Hapsburgs: Public Domain, https://commons.wikimedia.org/w/index.php?curid=567872
+A-H war flag:
+
+bigdecimal (1.2.8)
+bundler (1.15.1)
+did_you_mean (1.0.0)
+ffi (1.9.10)
+io-console (0.4.5)
+json (1.8.3)
+listen (3.0.3)
+minitest (5.10.3)
+molinillo (0.5.0)
+net-http-persistent (2.9.4)
+net-telnet (0.1.1)
+power_assert (0.2.7)
+psych (2.1.0)
+rake (12.0.0)
+rb-inotify (0.9.7)
+rdoc (4.2.1)
+sass (3.4.23)
+test-unit (3.2.5)
+thor (0.19.4)
+
