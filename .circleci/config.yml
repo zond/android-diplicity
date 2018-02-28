@@ -1,0 +1,34 @@
+version: 2
+
+jobs:
+  build:
+    environment:
+      KEYSTORE: ${HOME}/${CIRCLE_PROJECT_REPONAME}/signing.keystore
+      KEY_ALIAS: release
+
+    machine: true
+
+    steps:
+      - checkout
+
+      - run:
+          name: dependencies
+          command: |
+            ./circle/download_keystore.sh
+            echo y | android update sdk --no-ui --all --filter "android-25"
+            echo y | android update sdk --no-ui --all --filter "build-tools-25.0.2"
+            echo y | android update sdk --no-ui --all --filter "extra-android-m2repository"
+            echo y | android update sdk --no-ui --all --filter "extra-google-m2repository"
+
+      - run:
+          name: test
+          command: |
+            git fetch --unshallow
+            ./gradlew assembleRelease
+            cp -r app/build/outputs $CIRCLE_ARTIFACTS
+
+      - deploy:
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              ./circle/create_release.sh
+            fi
