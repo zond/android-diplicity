@@ -140,7 +140,18 @@ public class PreferenceActivity extends RetrofitActivity {
                                         return true;
                                     }
                                 });
-
+                                final CheckBoxPreference zoomButtonPreference = (CheckBoxPreference) findPreference(getResources().getString(R.string.zoom_buttons_pref_key));
+                                zoomButtonPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                                    @Override
+                                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                                        if ((Boolean) newValue) {
+                                            prefs.edit().putBoolean(RetrofitActivity.ZOOM_BUTTONS_PREF_KEY, true).apply();
+                                        } else {
+                                            prefs.edit().putBoolean(RetrofitActivity.ZOOM_BUTTONS_PREF_KEY, false).apply();
+                                        }
+                                        return true;
+                                    }
+                                });
 
                                 if (!prefs.getBoolean(getResources().getString(R.string.local_development_mode_pref_key), false)) {
                                     removeFakeIDPref();

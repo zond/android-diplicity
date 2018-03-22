@@ -1,12 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 26
     defaultConfig {
         applicationId "se.oort.diplicity"
         minSdkVersion 15
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode gitVersionCode.toInteger()
         versionName gitVersionName
         multiDexEnabled true
@@ -35,23 +34,22 @@ android {
 }
 
 dependencies {
-    compile 'com.google.android.gms:play-services-auth:10.0.1'
-    compile 'com.google.android.gms:play-services:10.0.1'
-    compile 'com.google.firebase:firebase-crash:10.0.1'
-    compile 'com.google.firebase:firebase-core:10.0.1'
-    compile 'com.google.firebase:firebase-messaging:10.0.1'
-    compile 'com.google.code.gson:gson:2.6.2'
+    compile 'com.google.android.gms:play-services-auth:12.0.0'
+    compile 'com.google.firebase:firebase-crash:12.0.0'
+    compile 'com.google.firebase:firebase-core:12.0.0'
+    compile 'com.google.firebase:firebase-messaging:12.0.0'
+    compile 'com.google.code.gson:gson:2.8.0'
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
     compile 'io.reactivex:rxjava:1.1.6'
     compile 'io.reactivex:rxjava-joins:0.22.0'
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
-    compile 'com.android.support:appcompat-v7:25.1.0'
-    compile 'com.android.support:design:25.1.0'
-    compile "com.android.support:gridlayout-v7:25.1.0"
-    compile 'com.android.support:recyclerview-v7:25.1.0'
-    compile 'com.android.support:multidex:1.0.1'
+    compile 'com.android.support:appcompat-v7:26.1.0'
+    compile 'com.android.support:design:26.1.0'
+    compile "com.android.support:gridlayout-v7:26.1.0"
+    compile 'com.android.support:recyclerview-v7:26.1.0'
+    compile 'com.android.support:multidex:1.0.3'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
 

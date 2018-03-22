@@ -111,6 +111,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     public static final String VARIANTS_PREF_KEY = "variants_pref_key";
     public static final String FCM_REPLACE_TOKEN_PREF_KEY = "fcm_replace_token_pref_key";
     public static final String INITIAL_FCM_SETUP_DONE_PREF_KEY = "initial_fcm_setup_done_pref_key";
+    public static final String ZOOM_BUTTONS_PREF_KEY = "zoom_buttons_pref_key";
 
     // default urls
     static final String DEFAULT_URL = "https://diplicity-engine.appspot.com/";

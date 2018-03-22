@@ -220,4 +220,8 @@
     <string name="_day_s">day(s)</string>
     <string name="_hour_s">hour(s)</string>
     <string name="_minute_s">minute(s)</string>
+    <string name="zoom_buttons">Zoom buttons</string>
+    <string name="display_zoom_buttons_in_map_view">Display zoom buttons in map view</string>
+    <string name="zoom_buttons_pref_key">zoom_buttons_pref_key</string>
+    <string name="_interface">Interface</string>
 </resources>

@@ -1,8 +1,10 @@
 package se.oort.diplicity.game;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -71,12 +73,15 @@ public class MapView extends FrameLayout {
             }
         }
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(retrofitActivity);
+
         final WebView webView = (WebView) findViewById(R.id.web_view);
         webView.getSettings().setLoadWithOverviewMode(true);
         webView.getSettings().setUseWideViewPort(true);
         webView.setBackgroundColor(Color.TRANSPARENT);
         webView.getSettings().setBuiltInZoomControls(true);
         webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setDisplayZoomControls(prefs.getBoolean(RetrofitActivity.ZOOM_BUTTONS_PREF_KEY, false));
         webView.setBackgroundColor(Color.parseColor("#212121"));
 
         webView.setWebViewClient(new WebViewClient() {
