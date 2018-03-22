@@ -747,6 +747,7 @@ public class GameActivity extends RetrofitActivity
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                         Gson gson = new Gson();
                         phaseMeta = gson.fromJson(gson.toJson(phases.get(i).phase), PhaseMeta.class);
+                        currentView = R.id.nav_map;
                         showMap();
                     }
                 });
