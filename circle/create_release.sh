@@ -3,7 +3,7 @@
 echo 'Will create release...'
 pwd
 
-APK_PATH="app/build/outputs/apk/app-release.apk"
+APK_PATH="app/release/app-release.apk"
 APK_VERSION_LINE=`/usr/local/android-sdk-linux/build-tools/26.0.2/aapt dump badging ${APK_PATH}`
 APK_VERSION_CODE=`echo ${APK_VERSION_LINE} | sed -e "s/.*versionCode='\([^']\+\)'.*/\1/"`
 APK_VERSION_NAME=`echo ${APK_VERSION_LINE} | sed -e "s/.*versionName='\([^']\+\)'.*/\1/"`
