@@ -1,10 +1,10 @@
 dependencies:
   pre:
     - ./circle/download_keystore.sh
-    - sdkmanager --install 'platforms;android-26'
-    - sdkmanager --install 'build-tools;26.0.3'
-    - sdkmanager --install 'extras;android;m2repository'
-    - sdkmanager --install 'extras;google;m2repository'
+    - echo y | android update sdk --no-ui --all --filter "android-26"
+    - echo y | android update sdk --no-ui --all --filter "build-tools-26.0.3"
+    - echo y | android update sdk --no-ui --all --filter "extra-android-m2repository"
+    - echo y | android update sdk --no-ui --all --filter "extra-google-m2repository"
 
 test:
   override:
