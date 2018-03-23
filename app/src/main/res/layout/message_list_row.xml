@@ -32,6 +32,7 @@
 
     <EditText
         android:inputType="none"
+        android:editable="false"
         android:textIsSelectable="true"
         android:textSize="16sp"
         android:background="@android:color/transparent"
