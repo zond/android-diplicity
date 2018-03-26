@@ -177,7 +177,6 @@ public class PressActivity extends RetrofitActivity {
                             Member author = App.getMemberByNation(game, message.Sender);
 
                             TextView body = (TextView) row.findViewById(R.id.body);
-                            body.setTextIsSelectable(true);
                             body.setText(message.Body);
                             Linkify.addLinks(body, Linkify.ALL);
                             ((TextView) row.findViewById(R.id.at)).setText(message.Age.createdAt().toString());

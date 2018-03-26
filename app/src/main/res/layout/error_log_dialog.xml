@@ -6,6 +6,7 @@
 
     <EditText android:id="@+id/error_log"
         android:inputType="none"
+        android:editable="false"
         android:textIsSelectable="true"
         android:textSize="8sp"
         android:background="@android:color/transparent"
