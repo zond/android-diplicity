@@ -286,6 +286,8 @@ public class MainActivity extends RetrofitActivity {
                         };
 
                         setDefaultPhaseLength(phaseLengthView, phaseLengthUnitsSpinner);
+                        setDefaultMinReliability(minReliabilityView, statsContainer.get(0));
+                        setDefaultMinQuickness(minQuicknessView, statsContainer.get(0));
 
                         gameNameView.setOnFocusChangeListener(gameNameListener);
                         phaseLengthView.setOnFocusChangeListener(gameNameListener);
@@ -396,6 +398,22 @@ public class MainActivity extends RetrofitActivity {
             private void setDefaultPhaseLength(EditText phaseLengthView, Spinner phaseLengthUnitsView) {
                 phaseLengthView.setText("1");
                 phaseLengthUnitsView.setSelection(getIndexOfUnit(R.string._day_s));
+            }
+
+            private void setDefaultMinReliability(EditText minReliabilityView, UserStats userStats) {
+                if (userStats.Reliability > 10) {
+                    minReliabilityView.setText("10");
+                } else {
+                    minReliabilityView.setText("" + userStats.Reliability.intValue());
+                }
+            }
+
+            private void setDefaultMinQuickness(EditText minQuicknessView, UserStats userStats) {
+                if (userStats.Quickness > 10) {
+                    minQuicknessView.setText("10");
+                } else {
+                    minQuicknessView.setText("" + userStats.Quickness.intValue());
+                }
             }
 
             /** Get the index of the given unit string resource in the array list used by the units spinner. */
