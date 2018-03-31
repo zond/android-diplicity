@@ -117,6 +117,9 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     static final String DEFAULT_URL = "https://diplicity-engine.appspot.com/";
     static final String LOCAL_DEVELOPMENT_URL = "http://localhost:8080/";
 
+    // API level
+    static final int DIPLICITY_API_LEVEL = 1;
+
     // services
     public GameService gameService;
     public UserStatsService userStatsService;
@@ -432,7 +435,8 @@ public abstract class RetrofitActivity extends AppCompatActivity {
             @Override
             public Response intercept(Chain chain) throws IOException {
                 Request toIssue = chain.request().newBuilder()
-                        .addHeader("Accept", "application/json; charset=UTF-8").build();
+                        .addHeader("Accept", "application/json; charset=UTF-8")
+                        .addHeader("X-Diplicity-API-Level", "" + DIPLICITY_API_LEVEL).build();
                 if (getLocalDevelopmentMode() && !getLocalDevelopmentModeFakeID().equals("")) {
                     HttpUrl url = toIssue.url().newBuilder().addQueryParameter("fake-id", getLocalDevelopmentModeFakeID()).build();
                     toIssue = toIssue.newBuilder().url(url).build();
