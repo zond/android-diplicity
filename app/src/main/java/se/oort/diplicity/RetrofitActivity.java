@@ -118,7 +118,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     static final String LOCAL_DEVELOPMENT_URL = "http://localhost:8080/";
 
     // API level
-    static final int DIPLICITY_API_LEVEL = 1;
+    static final int DIPLICITY_API_LEVEL = 2;
 
     // services
     public GameService gameService;
