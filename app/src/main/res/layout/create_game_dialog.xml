@@ -21,6 +21,7 @@
 
             <android.support.design.widget.TextInputEditText
                 android:hint="@string/description"
+                android:importantForAutofill="noExcludeDescendants"
                 android:id="@+id/desc"
                 android:inputType="textAutoCorrect|textAutoComplete"
                 android:textColor="?android:attr/textColorPrimary"
@@ -65,6 +66,7 @@
 
                 <android.support.design.widget.TextInputEditText
                     android:hint="@string/phase_length"
+                    android:importantForAutofill="noExcludeDescendants"
                     android:id="@+id/phase_length"
                     android:inputType="number"
                     android:textColor="?android:attr/textColorPrimary"
@@ -90,6 +92,7 @@
 
             <android.support.design.widget.TextInputEditText
                 android:hint="@string/min_rating_high_is_skilled"
+                android:importantForAutofill="noExcludeDescendants"
                 android:id="@+id/min_rating"
                 android:inputType="numberDecimal"
                 android:textColor="?android:attr/textColorPrimary"
@@ -105,6 +108,7 @@
 
             <android.support.design.widget.TextInputEditText
                 android:hint="@string/max_rating_low_is_weak_players"
+                android:importantForAutofill="noExcludeDescendants"
                 android:id="@+id/max_rating"
                 android:inputType="numberDecimal"
                 android:layout_width="match_parent"
@@ -120,6 +124,7 @@
 
             <android.support.design.widget.TextInputEditText
                 android:hint="@string/min_reliability_higher_is_less_nmr"
+                android:importantForAutofill="noExcludeDescendants"
                 android:id="@+id/min_reliability"
                 android:textColor="?android:attr/textColorPrimary"
                 android:inputType="numberDecimal"
@@ -135,6 +140,7 @@
 
             <android.support.design.widget.TextInputEditText
                 android:hint="@string/min_quickness_higher_is_faster"
+                android:importantForAutofill="noExcludeDescendants"
                 android:id="@+id/min_quickness"
                 android:inputType="numberDecimal"
                 android:layout_width="match_parent"
@@ -150,6 +156,7 @@
 
             <android.support.design.widget.TextInputEditText
                 android:hint="@string/max_hated_low_is_unbanned"
+                android:importantForAutofill="noExcludeDescendants"
                 android:id="@+id/max_hated"
                 android:inputType="numberDecimal"
                 android:textColor="?android:attr/textColorPrimary"
@@ -165,6 +172,7 @@
 
             <android.support.design.widget.TextInputEditText
                 android:hint="@string/max_hater_low_is_patient"
+                android:importantForAutofill="noExcludeDescendants"
                 android:id="@+id/max_hater"
                 android:textColor="?android:attr/textColorPrimary"
                 android:inputType="numberDecimal"

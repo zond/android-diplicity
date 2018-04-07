@@ -13,6 +13,7 @@
         android:textAppearance="@android:style/Widget.TextView"
         android:layout_margin="3dp"
         android:hint="@string/no_errors_logged"
+        android:importantForAutofill="noExcludeDescendants"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
