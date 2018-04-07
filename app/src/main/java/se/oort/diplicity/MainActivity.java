@@ -781,7 +781,7 @@ public class MainActivity extends RetrofitActivity {
                     }
                 }
                 ((TextView) findViewById(R.id.content_title)).setVisibility(View.VISIBLE);
-                if (container.Properties.isEmpty()) {
+                if (adapter.items.isEmpty()) {
                     findViewById(R.id.empty_view).setVisibility(View.VISIBLE);
                     contentList.setVisibility(View.GONE);
                 } else {
