@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
+import java.text.DateFormat;
 import java.util.Date;
 
 import se.oort.diplicity.App;
@@ -171,6 +172,7 @@ public class PressActivity extends RetrofitActivity {
                     @Override
                     public void send(final MultiContainer<Message> messageMultiContainer) {
                         ((LinearLayout) findViewById(R.id.press_messages)).removeAllViews();
+                        DateFormat format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
                         for (int i = 0; i < messageMultiContainer.Properties.size(); i++) {
                             Message message = messageMultiContainer.Properties.get(messageMultiContainer.Properties.size() - i - 1).Properties;
                             View row = getLayoutInflater().inflate(R.layout.message_list_row, (ViewGroup) findViewById(R.id.press_layout), false);
@@ -179,7 +181,7 @@ public class PressActivity extends RetrofitActivity {
                             TextView body = (TextView) row.findViewById(R.id.body);
                             body.setText(message.Body);
                             Linkify.addLinks(body, Linkify.ALL);
-                            ((TextView) row.findViewById(R.id.at)).setText(message.Age.createdAt().toString());
+                            ((TextView) row.findViewById(R.id.at)).setText(format.format(message.Age.createdAt()));
                             ((TextView) row.findViewById(R.id.sender)).setText(getResources().getString(R.string.x_, message.Sender));
                             if (author != null) {
                                 ImageView avatar = (ImageView) row.findViewById(R.id.avatar);
