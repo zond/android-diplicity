@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.text.DateFormat;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -40,6 +41,11 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
         FloatingActionButton joinLeaveButton;
         ImageView alertIcon, readyIcon;
         TextView unreadMessages;
+        TextView createdAt;
+        TextView startedAt;
+        TextView startedAtLabel;
+        TextView finishedAt;
+        TextView finishedAtLabel;
 
         public ViewHolder(View view) {
             super(view);
@@ -64,6 +70,11 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             maxHatedLabel = (TextView) view.findViewById(R.id.max_hated_label);
             maxHaterLabel = (TextView) view.findViewById(R.id.max_hater_label);
             joinLeaveButton = (FloatingActionButton) view.findViewById(R.id.join_leave_button);
+            createdAt = (TextView) view.findViewById(R.id.created_at);
+            startedAt = (TextView) view.findViewById(R.id.started_at);
+            startedAtLabel = (TextView) view.findViewById(R.id.started_at_label);
+            finishedAt = (TextView) view.findViewById(R.id.finished_at);
+            finishedAtLabel = (TextView) view.findViewById(R.id.finished_at_label);
         }
         @Override
         public void bind(final SingleContainer<Game> game, final int pos) {
@@ -142,6 +153,20 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             } else {
                 maxHater.setVisibility(View.GONE);
                 maxHaterLabel.setVisibility(View.GONE);
+            }
+            DateFormat format = DateFormat.getDateInstance(DateFormat.SHORT);
+            createdAt.setText(format.format(game.Properties.CreatedAgo.deadlineAt()));
+            if (game.Properties.Started) {
+                startedAt.setText(format.format(game.Properties.StartedAgo.deadlineAt()));
+            } else {
+                startedAt.setVisibility(View.GONE);
+                startedAtLabel.setVisibility(View.GONE);
+            }
+            if (game.Properties.Finished) {
+                finishedAt.setText(format.format(game.Properties.FinishedAgo.deadlineAt()));
+            } else {
+                finishedAt.setVisibility(View.GONE);
+                finishedAtLabel.setVisibility(View.GONE);
             }
 
             variant.setText(makeVariantText(game.Properties.Variant));

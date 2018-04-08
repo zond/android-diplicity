@@ -224,4 +224,7 @@
     <string name="display_zoom_buttons_in_map_view">Display zoom buttons in map view</string>
     <string name="zoom_buttons_pref_key">zoom_buttons_pref_key</string>
     <string name="_interface">Interface</string>
+    <string name="created_at">Created at</string>
+    <string name="started_at">Started at</string>
+    <string name="finished_at">Finished at</string>
 </resources>

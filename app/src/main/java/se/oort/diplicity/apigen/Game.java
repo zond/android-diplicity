@@ -22,5 +22,9 @@ public class Game implements java.io.Serializable {
   public java.util.List<Ban> ActiveBans;
   public java.util.List<String> FailedRequirements;
   public java.util.Date CreatedAt;
+  public Ticker CreatedAgo;
+  public java.util.Date StartedAt;
+  public Ticker StartedAgo;
   public java.util.Date FinishedAt;
+  public Ticker FinishedAgo;
 }
