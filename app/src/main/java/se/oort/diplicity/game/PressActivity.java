@@ -2,7 +2,6 @@ package se.oort.diplicity.game;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
@@ -12,7 +11,6 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.util.Linkify;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -21,9 +19,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 
 import se.oort.diplicity.App;
@@ -54,6 +52,8 @@ public class PressActivity extends RetrofitActivity {
     public Member member;
     public Game game;
     public MultiContainer<Phase> phases;
+
+    public static final DateFormat timeFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
 
     public static Intent startPressIntent(Context context, Game game, ChannelService.Channel channel, Member member, MultiContainer<Phase> phases) {
         Intent intent = new Intent(context, PressActivity.class);
@@ -170,6 +170,14 @@ public class PressActivity extends RetrofitActivity {
         Toast.makeText(this, R.string.all_press_becomes_public, Toast.LENGTH_SHORT).show();
     }
 
+    private void pushPhaseChange(ArrayList<SingleContainer<Phase>> phaseList) {
+        Phase phase = phaseList.get(0).Properties;
+        phaseList.remove(0);
+        TextView phaseChange = new TextView(PressActivity.this);
+        phaseChange.setText(getResources().getString(R.string.season_year_type_created, phase.Season, phase.Year, phase.Type, timeFormat.format(phase.CreatedAgo.deadlineAt())));
+        ((LinearLayout) findViewById(R.id.press_messages)).addView(phaseChange);
+    }
+
     private void loadMessages(boolean withProgress) {
         String message = null;
         if (withProgress) {
@@ -181,16 +189,27 @@ public class PressActivity extends RetrofitActivity {
                     @Override
                     public void send(final MultiContainer<Message> messageMultiContainer) {
                         ((LinearLayout) findViewById(R.id.press_messages)).removeAllViews();
-                        DateFormat format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
+                        ArrayList<SingleContainer<Phase>> phaseList = new ArrayList<SingleContainer<Phase>>(phases.Properties);
+                        phaseList.sort(new Comparator<SingleContainer<Phase>>() {
+                            @Override
+                            public int compare(SingleContainer<Phase> o1, SingleContainer<Phase> o2) {
+                                return new Long(o1.Properties.CreatedAt.getTime()).compareTo(new Long(o2.Properties.CreatedAt.getTime()));
+                            }
+                        });
                         for (int i = 0; i < messageMultiContainer.Properties.size(); i++) {
                             Message message = messageMultiContainer.Properties.get(messageMultiContainer.Properties.size() - i - 1).Properties;
+
+                            while (phaseList.size() > 0 && phaseList.get(0).Properties.CreatedAt.getTime() < message.CreatedAt.getTime()) {
+                                pushPhaseChange(phaseList);
+                            }
+
                             View row = getLayoutInflater().inflate(R.layout.message_list_row, (ViewGroup) findViewById(R.id.press_layout), false);
                             Member author = App.getMemberByNation(game, message.Sender);
 
                             TextView body = (TextView) row.findViewById(R.id.body);
                             body.setText(message.Body);
                             Linkify.addLinks(body, Linkify.ALL);
-                            ((TextView) row.findViewById(R.id.at)).setText(format.format(message.Age.createdAt()));
+                            ((TextView) row.findViewById(R.id.at)).setText(timeFormat.format(message.Age.createdAt()));
                             ((TextView) row.findViewById(R.id.sender)).setText(getResources().getString(R.string.x_, message.Sender));
                             if (author != null) {
                                 ImageView avatar = (ImageView) row.findViewById(R.id.avatar);
@@ -199,6 +218,9 @@ public class PressActivity extends RetrofitActivity {
                             }
 
                             ((LinearLayout) findViewById(R.id.press_messages)).addView(row);
+                        }
+                        while (!phaseList.isEmpty()) {
+                            pushPhaseChange(phaseList);
                         }
                         final NestedScrollView pressScroll = (NestedScrollView) findViewById(R.id.press_scroll);
                         pressScroll.post(new Runnable() {
