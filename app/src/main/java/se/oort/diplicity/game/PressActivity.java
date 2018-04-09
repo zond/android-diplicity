@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 
@@ -190,7 +191,7 @@ public class PressActivity extends RetrofitActivity {
                     public void send(final MultiContainer<Message> messageMultiContainer) {
                         ((LinearLayout) findViewById(R.id.press_messages)).removeAllViews();
                         ArrayList<SingleContainer<Phase>> phaseList = new ArrayList<SingleContainer<Phase>>(phases.Properties);
-                        phaseList.sort(new Comparator<SingleContainer<Phase>>() {
+                        Collections.sort(phaseList, new Comparator<SingleContainer<Phase>>() {
                             @Override
                             public int compare(SingleContainer<Phase> o1, SingleContainer<Phase> o2) {
                                 return new Long(o1.Properties.CreatedAt.getTime()).compareTo(new Long(o2.Properties.CreatedAt.getTime()));
