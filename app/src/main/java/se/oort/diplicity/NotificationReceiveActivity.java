@@ -11,8 +11,13 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import rx.functions.Func2;
+import rx.observables.JoinObservable;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Member;
+import se.oort.diplicity.apigen.MultiContainer;
+import se.oort.diplicity.apigen.Order;
+import se.oort.diplicity.apigen.Phase;
 import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.game.GameActivity;
 import se.oort.diplicity.game.PressActivity;
@@ -64,32 +69,36 @@ public class NotificationReceiveActivity extends RetrofitActivity {
         if (message != null) {
             if (message.type.equals("message")) {
                 handleReq(
-                        gameService.GameLoad(message.message.GameID),
-                        new Sendable<SingleContainer<Game>>() {
-                            @Override
-                            public void send(SingleContainer<Game> gameSingleContainer) {
-                                Member member = getLoggedInMember(gameSingleContainer.Properties);
-                                if (member != null) {
-                                    Intent mainIntent = new Intent(NotificationReceiveActivity.this, MainActivity.class);
-                                    mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-                                    Intent gameIntent = GameActivity.startGameIntent(NotificationReceiveActivity.this, gameSingleContainer.Properties, gameSingleContainer.Properties.NewestPhaseMeta.get(0));
-                                    ChannelService.Channel channel = new ChannelService.Channel();
-                                    channel.GameID = message.message.GameID;
-                                    channel.Members = message.message.ChannelMembers;
-                                    Intent pressIntent = PressActivity.startPressIntent(NotificationReceiveActivity.this, gameSingleContainer.Properties, channel, member);
-                                    if (android.os.Build.VERSION.SDK_INT > 15) {
-                                        TaskStackBuilder.create(NotificationReceiveActivity.this)
-                                                .addNextIntent(mainIntent)
-                                                .addNextIntent(gameIntent)
-                                                .addNextIntent(pressIntent).startActivities();
-                                    } else {
-                                        startActivity(pressIntent);
+                        JoinObservable.when(JoinObservable
+                                .from(gameService.GameLoad(message.message.GameID))
+                                .and(phaseService.ListPhases(message.message.GameID))
+                                .then(new Func2<SingleContainer<Game>, MultiContainer<Phase>, Object>() {
+                                    @Override
+                                    public Object call(SingleContainer<Game> gameSingleContainer, MultiContainer<Phase> phaseMultiContainer) {
+                                        Member member = getLoggedInMember(gameSingleContainer.Properties);
+                                        if (member != null) {
+                                            Intent mainIntent = new Intent(NotificationReceiveActivity.this, MainActivity.class);
+                                            mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                                            Intent gameIntent = GameActivity.startGameIntent(NotificationReceiveActivity.this, gameSingleContainer.Properties, gameSingleContainer.Properties.NewestPhaseMeta.get(0));
+                                            ChannelService.Channel channel = new ChannelService.Channel();
+                                            channel.GameID = message.message.GameID;
+                                            channel.Members = message.message.ChannelMembers;
+                                            Intent pressIntent = PressActivity.startPressIntent(NotificationReceiveActivity.this, gameSingleContainer.Properties, channel, member, phaseMultiContainer);
+                                            if (android.os.Build.VERSION.SDK_INT > 15) {
+                                                TaskStackBuilder.create(NotificationReceiveActivity.this)
+                                                        .addNextIntent(mainIntent)
+                                                        .addNextIntent(gameIntent)
+                                                        .addNextIntent(pressIntent).startActivities();
+                                            } else {
+                                                startActivity(pressIntent);
+                                            }
+                                        }
+                                        finish();
+                                        return null;
                                     }
-                                }
-                                finish();
-
-                            }
-                        }, getResources().getString(R.string.loading_state));
+                                })).toObservable(),
+                        null,
+                        getResources().getString(R.string.loading_state));
             } else if (message.type.equals("phase")) {
                 startGameActivity(message.gameID);
             } else {

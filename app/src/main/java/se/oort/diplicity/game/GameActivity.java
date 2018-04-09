@@ -32,6 +32,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -477,8 +478,9 @@ public class GameActivity extends RetrofitActivity
         public PhaseElement(Phase phase) {
             this.phase = phase;
         }
+        private DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
         public String toString() {
-            return getResources().getString(R.string.season_year_type, phase.Season, phase.Year, phase.Type);
+            return getResources().getString(R.string.season_year_type_created, phase.Season, phase.Year, phase.Type, format.format(phase.CreatedAgo.deadlineAt()));
         }
     }
 
@@ -509,7 +511,7 @@ public class GameActivity extends RetrofitActivity
                             .setTitle(R.string.members)
                             .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialogInterface, int j) {
+                        public void onClick(final DialogInterface dialogInterface, int j) {
                             List<String> channelMembers = new ArrayList<String>();
                             for (int i = 0; i < checked.length; i++) {
                                 if (checked[i]) {
@@ -518,11 +520,16 @@ public class GameActivity extends RetrofitActivity
                             }
                             channelMembers.add(member.Nation);
                             Collections.sort(channelMembers);
-                            ChannelService.Channel channel = new ChannelService.Channel();
+                            final ChannelService.Channel channel = new ChannelService.Channel();
                             channel.GameID = game.ID;
                             channel.Members = channelMembers;
-                            PressActivity.startPressActivity(GameActivity.this, game, channel, member);
-                            dialogInterface.dismiss();
+                            withPhases(false, new Sendable<MultiContainer<Phase>>() {
+                                @Override
+                                public void send(MultiContainer<Phase> phaseMultiContainer) {
+                                    PressActivity.startPressActivity(GameActivity.this, game, channel, member, phaseMultiContainer);
+                                    dialogInterface.dismiss();
+                                }
+                            });
                         }
                     }).show();
 
@@ -540,8 +547,13 @@ public class GameActivity extends RetrofitActivity
                         for (SingleContainer<ChannelService.Channel> channelSingleContainer : channelMultiContainer.Properties) {
                             channels.add(channelSingleContainer.Properties);
                         }
-                        ChannelTable channelTable = (ChannelTable) findViewById(R.id.press_channel_table);
-                        channelTable.setChannels(GameActivity.this, game, member, channels);
+                        final ChannelTable channelTable = (ChannelTable) findViewById(R.id.press_channel_table);
+                        withPhases(false, new Sendable<MultiContainer<Phase>>() {
+                            @Override
+                            public void send(MultiContainer<Phase> phaseMultiContainer) {
+                                channelTable.setChannels(GameActivity.this, game, member, channels, phaseMultiContainer);
+                            }
+                        });
                     }
                 }, getResources().getString(R.string.loading_channels));
     }
@@ -732,9 +744,25 @@ public class GameActivity extends RetrofitActivity
                 }, getResources().getString(R.string.loading_phase_settings));
     }
 
+    public void withPhases(boolean loadPhases, final Sendable<MultiContainer<Phase>> handler) {
+        if (loadPhases || phases == null) {
+            handleReq(
+                    phaseService.ListPhases(game.ID),
+                    new Sendable<MultiContainer<Phase>>() {
+                        @Override
+                        public void send(MultiContainer<Phase> phaseMultiContainer) {
+                            phases = phaseMultiContainer;
+                            handler.send(phaseMultiContainer);
+                        }
+                    }, getResources().getString(R.string.loading_phases));
+        } else {
+            handler.send(phases);
+        }
+    }
+
     public void showPhases(boolean loadPhases) {
         hideAllExcept(R.id.phases_view);
-        final Sendable<MultiContainer<Phase>> renderer = new Sendable<MultiContainer<Phase>>() {
+        withPhases(loadPhases, new Sendable<MultiContainer<Phase>>() {
             @Override
             public void send(MultiContainer<Phase> phaseMultiContainer) {
                 final List<PhaseElement> phases = new ArrayList<>();
@@ -753,20 +781,7 @@ public class GameActivity extends RetrofitActivity
                 });
                 phasesView.setAdapter(new ArrayAdapter<PhaseElement>(GameActivity.this, android.R.layout.simple_list_item_1, phases));
             }
-        };
-        if (loadPhases || phases == null) {
-            handleReq(
-                    phaseService.ListPhases(game.ID),
-                    new Sendable<MultiContainer<Phase>>() {
-                        @Override
-                        public void send(MultiContainer<Phase> phaseMultiContainer) {
-                            phases = phaseMultiContainer;
-                            renderer.send(phaseMultiContainer);
-                        }
-                    }, getResources().getString(R.string.loading_phases));
-        } else {
-            renderer.send(phases);
-        }
+        });
     }
 
     public void showGameResults() {

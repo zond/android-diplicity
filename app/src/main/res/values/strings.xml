@@ -28,6 +28,7 @@
     <string name="top_quick">Top quick</string>
     <string name="top_hater">Top hater</string>
     <string name="season_year_type">%1$s %2$s, %3$s</string>
+    <string name="season_year_type_created">%1$s %2$s, %3$s - %4$s</string>
     <string name="x_players">%s players</string>
     <string name="rating">Rating</string>
     <string name="min_rating">Minimum rating</string>

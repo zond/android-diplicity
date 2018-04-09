@@ -287,7 +287,6 @@ public class MainActivity extends RetrofitActivity {
 
                         setDefaultPhaseLength(phaseLengthView, phaseLengthUnitsSpinner);
                         setDefaultMinReliability(minReliabilityView, statsContainer.get(0));
-                        setDefaultMinQuickness(minQuicknessView, statsContainer.get(0));
 
                         gameNameView.setOnFocusChangeListener(gameNameListener);
                         phaseLengthView.setOnFocusChangeListener(gameNameListener);
@@ -405,14 +404,6 @@ public class MainActivity extends RetrofitActivity {
                     minReliabilityView.setText("10");
                 } else {
                     minReliabilityView.setText("" + userStats.Reliability.intValue());
-                }
-            }
-
-            private void setDefaultMinQuickness(EditText minQuicknessView, UserStats userStats) {
-                if (userStats.Quickness > 10) {
-                    minQuicknessView.setText("10");
-                } else {
-                    minQuicknessView.setText("" + userStats.Quickness.intValue());
                 }
             }
 

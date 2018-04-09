@@ -37,6 +37,7 @@ import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Member;
 import se.oort.diplicity.apigen.Message;
 import se.oort.diplicity.apigen.MultiContainer;
+import se.oort.diplicity.apigen.Phase;
 import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.apigen.Ticker;
 
@@ -45,24 +46,29 @@ public class PressActivity extends RetrofitActivity {
     public static final String SERIALIZED_CHANNEL_KEY = "serialized_channel";
     public static final String SERIALIZED_MEMBER_KEY = "serialized_member";
     public static final String SERIALIZED_GAME_KEY = "serialized_game";
+    public static final String SERIALIZED_PHASES_KEY = "serialized_phases";
 
     public static final String MESSAGE_DRAFT_KEY = "message_draft";
 
     public ChannelService.Channel channel;
     public Member member;
     public Game game;
+    public MultiContainer<Phase> phases;
 
-    public static Intent startPressIntent(Context context, Game game, ChannelService.Channel channel, Member member) {
+    public static Intent startPressIntent(Context context, Game game, ChannelService.Channel channel, Member member, MultiContainer<Phase> phases) {
         Intent intent = new Intent(context, PressActivity.class);
         intent.putExtra(PressActivity.SERIALIZED_CHANNEL_KEY, serialize(channel));
-        intent.putExtra(PressActivity.SERIALIZED_MEMBER_KEY, serialize(member));
+        if (member != null) {
+            intent.putExtra(PressActivity.SERIALIZED_MEMBER_KEY, serialize(member));
+        }
         intent.putExtra(PressActivity.SERIALIZED_GAME_KEY, serialize(game));
+        intent.putExtra(PressActivity.SERIALIZED_PHASES_KEY, serialize(phases));
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
         return intent;
     }
 
-    public static void startPressActivity(Context context, Game game, ChannelService.Channel channel, Member member) {
-        context.startActivity(startPressIntent(context, game, channel, member));
+    public static void startPressActivity(Context context, Game game, ChannelService.Channel channel, Member member, MultiContainer<Phase> phases) {
+        context.startActivity(startPressIntent(context, game, channel, member, phases));
     }
 
     @Override
@@ -107,6 +113,9 @@ public class PressActivity extends RetrofitActivity {
 
         byte[] serializedGame = getIntent().getByteArrayExtra(SERIALIZED_GAME_KEY);
         game = (Game) unserialize(serializedGame);
+
+        byte[] serializedPhases = getIntent().getByteArrayExtra(SERIALIZED_PHASES_KEY);
+        phases = (MultiContainer<Phase>) unserialize(serializedPhases);
 
         ((TextView) findViewById(R.id.multi_line_title)).setText(TextUtils.join(", ", channel.Members));
 

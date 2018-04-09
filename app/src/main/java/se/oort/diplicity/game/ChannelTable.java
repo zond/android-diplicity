@@ -19,6 +19,8 @@ import se.oort.diplicity.R;
 import se.oort.diplicity.RetrofitActivity;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Member;
+import se.oort.diplicity.apigen.MultiContainer;
+import se.oort.diplicity.apigen.Phase;
 
 public class ChannelTable extends TableLayout {
     private AttributeSet attributeSet;
@@ -42,7 +44,8 @@ public class ChannelTable extends TableLayout {
     public void setChannels(final RetrofitActivity retrofitActivity,
                             final Game game,
                             final Member member,
-                            List<ChannelService.Channel> channels) {
+                            List<ChannelService.Channel> channels,
+                            final MultiContainer<Phase> phases) {
         removeAllViews();
         for (final ChannelService.Channel channel : channels) {
             TableRow tableRow = new TableRow(retrofitActivity);
@@ -77,14 +80,7 @@ public class ChannelTable extends TableLayout {
             button.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(retrofitActivity, PressActivity.class);
-                    intent.putExtra(PressActivity.SERIALIZED_CHANNEL_KEY, RetrofitActivity.serialize(channel));
-                    intent.putExtra(PressActivity.SERIALIZED_GAME_KEY, RetrofitActivity.serialize(game));
-                    if (member != null) {
-                        intent.putExtra(PressActivity.SERIALIZED_MEMBER_KEY, RetrofitActivity.serialize(member));
-                    }
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-                    retrofitActivity.startActivity(intent);
+                    PressActivity.startPressActivity(getContext(), game, channel, member, phases);
                 }
             });
             button.setLayoutParams(wrapContentParams);
