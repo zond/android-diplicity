@@ -2,8 +2,10 @@ package se.oort.diplicity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -81,12 +83,15 @@ public class MainActivity extends RetrofitActivity {
 
     private FloatingActionButton addGameButton;
 
+    private SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
     public static final String FINISHED = "finished";
     public static final String STARTED = "started";
     public static final String STAGING = "staging";
     public static final String ACTION_VIEW_USER_GAMES = "view_user_games";
     public static final String SERIALIZED_USER_KEY = "serialized_user";
     public static final String GAME_STATE_KEY = "game_state";
+    public static final String HAS_JOINED_GAME_KEY = "has_joined_game";
 
     private static Pattern viewGamePattern = Pattern.compile("/Game/(.*)");
 
@@ -334,6 +339,7 @@ public class MainActivity extends RetrofitActivity {
                                     handleReq(gameService.GameCreate(game), new Sendable<SingleContainer<Game>>() {
                                         @Override
                                         public void send(SingleContainer<Game> gameSingleContainer) {
+                                            prefs.edit().putBoolean(HAS_JOINED_GAME_KEY, true).apply();
                                             if (nextCursorContainer.get(0).length() == 0) {
                                                 findViewById(R.id.empty_view).setVisibility(View.GONE);
                                                 contentList.setVisibility(View.VISIBLE);
@@ -435,7 +441,13 @@ public class MainActivity extends RetrofitActivity {
         loadMoreProcContainer.add(null);
 
         if (!ACTION_VIEW_USER_GAMES.equals(getIntent().getAction()) && !Intent.ACTION_VIEW.equals(getIntent().getAction()))
-            navigateTo(0, 0);
+            if (prefs.getBoolean(HAS_JOINED_GAME_KEY, false)) {
+                // My started.
+                navigateTo(0, 0);
+            } else {
+                // Open.
+                navigateTo(0, 3);
+            }
     }
 
     @Override

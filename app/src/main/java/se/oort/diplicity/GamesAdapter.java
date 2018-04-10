@@ -1,5 +1,7 @@
 package se.oort.diplicity;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.text.Html;
@@ -30,6 +32,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
     public static final String CLASSICAL = "classical";
     private RetrofitActivity retrofitActivity;
     private Set<Integer> expandedItems = Collections.synchronizedSet(new HashSet<Integer>());
+
     public class ViewHolder extends RecycleAdapter<SingleContainer<Game>, GamesAdapter.ViewHolder>.ViewHolder {
         TextView desc, variant, deadline, state, rating,
                 minReliability, minQuickness, maxHated, maxHater,
@@ -270,6 +273,8 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                                 new Sendable<SingleContainer<Member>>() {
                                     @Override
                                     public void send(SingleContainer<Member> memberSingleContainer) {
+                                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(retrofitActivity);
+                                        prefs.edit().putBoolean(MainActivity.HAS_JOINED_GAME_KEY, true).apply();
                                         retrofitActivity.handleReq(retrofitActivity.gameService.GameLoad(game.Properties.ID),
                                                 new Sendable<SingleContainer<Game>>() {
                                                     @Override
