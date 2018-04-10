@@ -4,6 +4,10 @@
 
 An Android client for the [diplicity](https://github.com/zond/diplicity) dippy service.
 
+## Forum
+
+Discussions about this game happen at [https://groups.google.com/forum/#!forum/diplicity-talk](https://groups.google.com/forum/#!forum/diplicity-talk).
+
 ## Install
 
 Go to the [release page](https://github.com/zond/android-diplicity/releases) to download the release you want.
