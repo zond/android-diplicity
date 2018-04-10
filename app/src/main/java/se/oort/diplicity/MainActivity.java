@@ -83,8 +83,6 @@ public class MainActivity extends RetrofitActivity {
 
     private FloatingActionButton addGameButton;
 
-    private SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
     public static final String FINISHED = "finished";
     public static final String STARTED = "started";
     public static final String STAGING = "staging";
@@ -339,6 +337,7 @@ public class MainActivity extends RetrofitActivity {
                                     handleReq(gameService.GameCreate(game), new Sendable<SingleContainer<Game>>() {
                                         @Override
                                         public void send(SingleContainer<Game> gameSingleContainer) {
+                                            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
                                             prefs.edit().putBoolean(HAS_JOINED_GAME_KEY, true).apply();
                                             if (nextCursorContainer.get(0).length() == 0) {
                                                 findViewById(R.id.empty_view).setVisibility(View.GONE);
@@ -440,7 +439,8 @@ public class MainActivity extends RetrofitActivity {
 
         loadMoreProcContainer.add(null);
 
-        if (!ACTION_VIEW_USER_GAMES.equals(getIntent().getAction()) && !Intent.ACTION_VIEW.equals(getIntent().getAction()))
+        if (!ACTION_VIEW_USER_GAMES.equals(getIntent().getAction()) && !Intent.ACTION_VIEW.equals(getIntent().getAction())) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
             if (prefs.getBoolean(HAS_JOINED_GAME_KEY, false)) {
                 // My started.
                 navigateTo(0, 0);
@@ -448,6 +448,7 @@ public class MainActivity extends RetrofitActivity {
                 // Open.
                 navigateTo(0, 3);
             }
+        }
     }
 
     @Override
