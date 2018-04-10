@@ -40,6 +40,20 @@
             android:layout_height="wrap_content"/>
 
         <ScrollView
+            android:id="@+id/phase_status_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/phase_status_inner_view"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_height="wrap_content">
+            </LinearLayout>
+
+        </ScrollView>
+
+        <ScrollView
             android:id="@+id/phase_results_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">

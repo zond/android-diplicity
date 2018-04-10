@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:focusable="true"
+    android:clickable="true"
+    android:animateLayoutChanges="true"
+    android:layout_marginBottom="3dp"
+    android:background="?android:attr/selectableItemBackground"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_alignParentTop="true"
+        android:textAppearance="?attr/textAppearanceListItem"
+        android:id="@+id/nation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="?android:attr/textColorPrimary" />
+
+    <TextView
+        android:inputType="none"
+        android:editable="false"
+        android:textIsSelectable="true"
+        android:textSize="16sp"
+        android:background="@android:color/transparent"
+        android:textAppearance="@android:style/Widget.TextView"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_toEndOf="@id/nation"
+        android:layout_toRightOf="@id/nation"
+        android:id="@+id/sc_count"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="?android:attr/textColorPrimary" />
+
+    <TextView
+        android:inputType="none"
+        android:editable="false"
+        android:textIsSelectable="true"
+        android:textSize="16sp"
+        android:background="@android:color/transparent"
+        android:textAppearance="@android:style/Widget.TextView"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_toEndOf="@id/sc_count"
+        android:layout_toRightOf="@id/sc_count"
+        android:id="@+id/unit_count"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="?android:attr/textColorPrimary" />
+
+    <TextView
+        android:inputType="none"
+        android:editable="false"
+        android:textIsSelectable="true"
+        android:textSize="16sp"
+        android:background="@android:color/transparent"
+        android:textAppearance="@android:style/Widget.TextView"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_toEndOf="@id/unit_count"
+        android:layout_toRightOf="@id/unit_count"
+        android:id="@+id/unit_delta"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="?android:attr/textColorPrimary" />
+</RelativeLayout>
