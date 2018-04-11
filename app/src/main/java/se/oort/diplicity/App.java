@@ -7,7 +7,8 @@ import android.preference.PreferenceManager;
 import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 
-import com.google.firebase.crash.FirebaseCrash;
+import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.CrashlyticsInitProvider;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import io.fabric.sdk.android.services.common.Crash;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Member;
 
@@ -67,7 +69,7 @@ public class App extends MultiDexApplication {
     public static void firebaseCrashReport(String msg) {
         errorLog.append(new Date().toString() + ": " + msg + "\n");
         if (!BuildConfig.DEBUG) {
-            FirebaseCrash.report(new RuntimeException(msg));
+            Crashlytics.log(msg);
         }
         Log.e("Diplicity", msg);
     }
@@ -81,7 +83,8 @@ public class App extends MultiDexApplication {
         printWriter.close();
         errorLog.append(stringWriter.toString() + "\n");
         if (!BuildConfig.DEBUG) {
-            FirebaseCrash.report(new RuntimeException(msg, e));
+            Crashlytics.log(msg);
+            Crashlytics.logException(e);
         }
         Log.e("Diplicity", msg, e);
     }
