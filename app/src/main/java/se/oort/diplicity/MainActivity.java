@@ -214,6 +214,8 @@ public class MainActivity extends RetrofitActivity {
                         final EditText minQuicknessView = (EditText) dialog.findViewById(R.id.min_quickness);
                         final EditText maxHatedView = (EditText) dialog.findViewById(R.id.max_hated);
                         final EditText maxHaterView = (EditText) dialog.findViewById(R.id.max_hater);
+                        final List<Boolean> noMergeContainer = new ArrayList<Boolean>();
+                        noMergeContainer.add(Boolean.FALSE);
 
                         final View.OnFocusChangeListener gameNameListener = new View.OnFocusChangeListener() {
                             private final int key = random.nextInt(Integer.MAX_VALUE);
@@ -227,6 +229,7 @@ public class MainActivity extends RetrofitActivity {
                                     }
                                 }
                                 if (generatedName) {
+                                    noMergeContainer.set(0, Boolean.FALSE);
                                     long phaseLength = getPhaseLengthMinutes(phaseLengthView, phaseLengthUnitsSpinner);
                                     String battle;
                                     if (phaseLength < DAY_IN_MINUTES) {
@@ -260,6 +263,8 @@ public class MainActivity extends RetrofitActivity {
                                     } else {
                                         gameNameView.setText(calculatedName);
                                     }
+                                } else {
+                                    noMergeContainer.set(0, Boolean.TRUE);
                                 }
                             }
 
@@ -309,6 +314,7 @@ public class MainActivity extends RetrofitActivity {
                                 game.Desc = gameNameView.getText().toString();
                                 game.Variant = variantNames.get(variants.getSelectedItemPosition()).name;
                                 game.PhaseLengthMinutes = getPhaseLengthMinutes(phaseLengthView, phaseLengthUnitsSpinner);
+                                game.NoMerge = noMergeContainer.get(0);
                                 try {
                                     game.MinRating = Double.parseDouble(minRatingView.getText().toString());
                                 } catch (NumberFormatException e) {
