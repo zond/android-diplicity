@@ -16,6 +16,8 @@ public class Game implements java.io.Serializable {
   public Double MaxRating;
   public Double MinReliability;
   public Double MinQuickness;
+  public Boolean Private;
+  public Boolean NoMerge;
   public Long NMembers;
   public java.util.List<Member> Members;
   public java.util.List<PhaseMeta> NewestPhaseMeta;

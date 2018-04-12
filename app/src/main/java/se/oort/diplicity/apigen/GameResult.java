@@ -15,5 +15,6 @@ public class GameResult implements java.io.Serializable {
   public java.util.List<String> AllUsers;
   public java.util.List<GameScore> Scores;
   public Boolean Rated;
+  public Boolean Private;
   public java.util.Date CreatedAt;
 }
