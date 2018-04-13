@@ -352,16 +352,22 @@ public class MainActivity extends RetrofitActivity {
                                             }
                                             dialog.dismiss();
                                         }
-                                    }, new ErrorHandler(412, new Sendable<HttpException>() {
+                                    }, new ErrorHandler(new int[]{412, 418}, new Sendable<HttpException>() {
                                         @Override
                                         public void send(HttpException e) {
-                                            handleReq(userStatsService.UserStatsLoad(getLoggedInUser().Id), new Sendable<SingleContainer<UserStats>>() {
-                                                @Override
-                                                public void send(SingleContainer<UserStats> userStatsSingleContainer) {
-                                                    statsContainer.set(0, userStatsSingleContainer.Properties);
-                                                    validateGame.Return(game);
-                                                }
-                                            }, getResources().getString(R.string.creating_game));
+                                            if (e.code() == 412) {
+                                                handleReq(userStatsService.UserStatsLoad(getLoggedInUser().Id), new Sendable<SingleContainer<UserStats>>() {
+                                                    @Override
+                                                    public void send(SingleContainer<UserStats> userStatsSingleContainer) {
+                                                        statsContainer.set(0, userStatsSingleContainer.Properties);
+                                                        validateGame.Return(game);
+                                                    }
+                                                }, getResources().getString(R.string.creating_game));
+                                            } else if (e.code() == 418) {
+                                                dialog.dismiss();
+                                                Toast.makeText(MainActivity.this, getResources().getString(R.string.you_were_added_to_another_game), Toast.LENGTH_LONG).show();
+                                                navigateTo(0,1);
+                                            }
                                         }
                                     }), getResources().getString(R.string.creating_game));
                                 }

@@ -240,7 +240,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                                                         GamesAdapter.this.items.set(pos, gameSingleContainer);
                                                         GamesAdapter.this.notifyDataSetChanged();
                                                     }
-                                                }, new RetrofitActivity.ErrorHandler(404, new Sendable<HttpException>() {
+                                                }, new RetrofitActivity.SingleErrorHandler(404, new Sendable<HttpException>() {
                                                     @Override
                                                     public void send(HttpException e) {
                                                         GamesAdapter.this.items.remove(pos);
