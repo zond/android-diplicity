@@ -228,8 +228,8 @@ public class MainActivity extends RetrofitActivity {
                                         generatedName = true;
                                     }
                                 }
+                                noMergeContainer.set(0, !generatedName);
                                 if (generatedName) {
-                                    noMergeContainer.set(0, Boolean.FALSE);
                                     long phaseLength = getPhaseLengthMinutes(phaseLengthView, phaseLengthUnitsSpinner);
                                     String battle;
                                     if (phaseLength < DAY_IN_MINUTES) {
@@ -260,11 +260,10 @@ public class MainActivity extends RetrofitActivity {
                                     if (view.equals(gameNameView)) {
                                         String enteredName = gameNameView.getText().toString();
                                         generatedName = (enteredName.isEmpty() || enteredName.equals(calculatedName));
+                                        noMergeContainer.set(0, !generatedName);
                                     } else {
                                         gameNameView.setText(calculatedName);
                                     }
-                                } else {
-                                    noMergeContainer.set(0, Boolean.TRUE);
                                 }
                             }
 
