@@ -832,8 +832,10 @@ public class MainActivity extends RetrofitActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            Intent i = new Intent(this, PreferenceActivity.class);
-            startActivity(i);
+            if (getLoggedInUser().Id != null) {
+                Intent i = new Intent(this, PreferenceActivity.class);
+                startActivity(i);
+            }
             return true;
         } else if (id == R.id.action_error_log) {
             AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.error_log_dialog).show();
@@ -868,13 +870,15 @@ public class MainActivity extends RetrofitActivity {
                 layout.setVisibility(View.VISIBLE);
             }
         } else if (id == R.id.action_bans) {
-            handleReq(
+            if (getLoggedInUser().Id != null) {
+                handleReq(
                     banService.ListBans(getLoggedInUser().Id),
                     new Sendable<MultiContainer<Ban>>() {
                         private RelativeLayout.LayoutParams wrapContentParams =
                                 new RelativeLayout.LayoutParams(
                                         RelativeLayout.LayoutParams.WRAP_CONTENT,
                                         RelativeLayout.LayoutParams.WRAP_CONTENT);
+
                         private void setMargins(RelativeLayout.LayoutParams params) {
                             int margin = getResources().getDimensionPixelSize(R.dimen.member_table_margin);
                             params.bottomMargin = margin;
@@ -882,6 +886,7 @@ public class MainActivity extends RetrofitActivity {
                             params.leftMargin = margin;
                             params.rightMargin = margin;
                         }
+
                         private void setupView(final AlertDialog dialog, final MultiContainer<Ban> banMultiContainer, final SingleContainer<Ban> ban, View convertView) {
                             User other = null;
                             for (User u : ban.Properties.Users) {
@@ -921,11 +926,13 @@ public class MainActivity extends RetrofitActivity {
                                 }
                             }
                         }
+
                         @Override
                         public void send(MultiContainer<Ban> banMultiContainer) {
                             AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.bans_dialog).show();
                             setupDialog(dialog, banMultiContainer);
                         }
+
                         private void setupDialog(AlertDialog dialog, MultiContainer<Ban> banMultiContainer) {
                             List<SingleContainer<Ban>> asBannerList = new ArrayList<>();
                             List<SingleContainer<Ban>> asBannedList = new ArrayList<>();
@@ -968,6 +975,7 @@ public class MainActivity extends RetrofitActivity {
                             }
                         }
                     }, getResources().getString(R.string.loading_bans));
+            }
         }
 
         return super.onOptionsItemSelected(item);
