@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
@@ -33,6 +34,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -214,6 +219,7 @@ public class MainActivity extends RetrofitActivity {
                         final EditText minQuicknessView = (EditText) dialog.findViewById(R.id.min_quickness);
                         final EditText maxHatedView = (EditText) dialog.findViewById(R.id.max_hated);
                         final EditText maxHaterView = (EditText) dialog.findViewById(R.id.max_hater);
+                        final CheckBox privateView = (CheckBox) dialog.findViewById(R.id._private);
                         final List<Boolean> noMergeContainer = new ArrayList<Boolean>();
                         noMergeContainer.add(Boolean.FALSE);
 
@@ -314,6 +320,7 @@ public class MainActivity extends RetrofitActivity {
                                 game.Variant = variantNames.get(variants.getSelectedItemPosition()).name;
                                 game.PhaseLengthMinutes = getPhaseLengthMinutes(phaseLengthView, phaseLengthUnitsSpinner);
                                 game.NoMerge = noMergeContainer.get(0);
+                                game.Private = privateView.isChecked();
                                 try {
                                     game.MinRating = Double.parseDouble(minRatingView.getText().toString());
                                 } catch (NumberFormatException e) {
@@ -510,6 +517,9 @@ public class MainActivity extends RetrofitActivity {
             add(new HashMap<String, String>() {{
                 put("CHILD_NAME", getResources().getString(R.string.finished));
             }});
+            add(new HashMap<String, String>() {{
+                put("CHILD_NAME", getResources().getString(R.string.lookup));
+            }});
         }};
         navigationChildGroups.add(childGroupForFirstGroupRow);
 
@@ -678,6 +688,27 @@ public class MainActivity extends RetrofitActivity {
                     }
                 });
                 displayItems(gameService.ListFinishedGames(null, null, null, null, null, null, null, null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
+                break;
+            case 6: // Lookup
+                final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.lookup_game_dialog).show();
+                addGameButton = (FloatingActionButton) dialog.findViewById(R.id.lookup_game_button);
+                addGameButton.setOnClickListener(new View.OnClickListener() {
+                                                     @Override
+                                                     public void onClick(View view) {
+                                                         String gameID = ((EditText) dialog.findViewById(R.id.game_id)).getText().toString();
+                                                         Uri uri = Uri.parse(gameID);
+                                                         Matcher m = viewGamePattern.matcher(uri.getPath());
+                                                         if (m.matches()) {
+                                                             gameID = m.group(1);
+                                                         }
+                                                         dialog.dismiss();
+                                                         displaySingleGame(gameID);
+                                                     }
+                });
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                if (drawer.isDrawerOpen(GravityCompat.START)) {
+                    drawer.closeDrawer(GravityCompat.START);
+                }
                 break;
             }
             break;
