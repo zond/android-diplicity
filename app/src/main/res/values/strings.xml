@@ -228,4 +228,5 @@
     <string name="created_at">Created at</string>
     <string name="started_at">Started at</string>
     <string name="finished_at">Finished at</string>
+    <string name="you_were_added_to_another_game">Your game was not created. Instead, you were added to another game with the exact same settings.</string>
 </resources>

@@ -42,6 +42,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -228,7 +229,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                         String msg = "Error " + progressMessage;
                         if (e instanceof HttpException) {
                             HttpException he = (HttpException) e;
-                            if (onError != null && onError.code == he.code()) {
+                            if (onError != null && onError.codes.contains(he.code())) {
                                 onError.handler.send(he);
                             } else {
                                 if (he.code() == 412) {
@@ -405,11 +406,20 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     }
 
     public static class ErrorHandler {
-        public int code;
+        public List<Integer> codes;
         public Sendable<HttpException> handler;
-        public ErrorHandler(int code, Sendable<HttpException> handler) {
-            this.code = code;
+        public ErrorHandler(int[] codes, Sendable<HttpException> handler) {
+            this.codes = new ArrayList<Integer>();
+            for (int i = 0; i < codes.length; i++) {
+                this.codes.add(new Integer(codes[i]));
+            }
             this.handler = handler;
+        }
+    }
+
+    public static class SingleErrorHandler extends ErrorHandler {
+        public SingleErrorHandler(int code, Sendable<HttpException> handler) {
+            super(new int[]{code}, handler);
         }
     }
 

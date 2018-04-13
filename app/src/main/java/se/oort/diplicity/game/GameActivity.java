@@ -906,7 +906,7 @@ public class GameActivity extends RetrofitActivity
                                 setVisibility(View.VISIBLE, R.id.ready_members, R.id.ready_members_label);
                             }
                         }
-                    }, new ErrorHandler(404, new Sendable<HttpException>() {
+                    }, new SingleErrorHandler(404, new Sendable<HttpException>() {
                         @Override
                         public void send(HttpException e) {
 
