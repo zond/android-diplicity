@@ -9,7 +9,6 @@ import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -42,19 +41,21 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
         RelativeLayout expanded;
         View.OnClickListener delegateClickListener;
         FloatingActionButton joinLeaveButton;
-        ImageView alertIcon, readyIcon;
+        TextView alertIcon;
+        TextView readyIcon;
         TextView unreadMessages;
         TextView createdAt;
         TextView startedAt;
         TextView startedAtLabel;
         TextView finishedAt;
         TextView finishedAtLabel;
+        TextView configIcons;
 
         public ViewHolder(View view) {
             super(view);
             unreadMessages = (TextView) view.findViewById(R.id.unread_messages_count);
-            alertIcon = (ImageView) view.findViewById(R.id.alert_icon);
-            readyIcon = (ImageView) view.findViewById(R.id.ready_icon);
+            alertIcon = (TextView) view.findViewById(R.id.alert_icon);
+            readyIcon = (TextView) view.findViewById(R.id.ready_icon);
             desc = (TextView) view.findViewById(R.id.desc);
             variant = (TextView) view.findViewById(R.id.variant);
             deadline = (TextView) view.findViewById(R.id.deadline);
@@ -78,6 +79,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             startedAtLabel = (TextView) view.findViewById(R.id.started_at_label);
             finishedAt = (TextView) view.findViewById(R.id.finished_at);
             finishedAtLabel = (TextView) view.findViewById(R.id.finished_at_label);
+            configIcons = (TextView) view.findViewById(R.id.game_config_icons);
         }
         @Override
         public void bind(final SingleContainer<Game> game, final int pos) {
@@ -96,10 +98,12 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             if (member != null && game.Properties.Started && !game.Properties.Finished) {
                 if (member.NewestPhaseState.OnProbation) {
                     alertIcon.setVisibility(View.VISIBLE);
+                    alertIcon.setText("⌛");
                     readyIcon.setVisibility(View.GONE);
                 } else if (member.NewestPhaseState.ReadyToResolve) {
                     alertIcon.setVisibility(View.GONE);
                     readyIcon.setVisibility(View.VISIBLE);
+                    readyIcon.setText("✅");
                 } else {
                     alertIcon.setVisibility(View.GONE);
                     readyIcon.setVisibility(View.GONE);
@@ -170,6 +174,23 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             } else {
                 finishedAt.setVisibility(View.GONE);
                 finishedAtLabel.setVisibility(View.GONE);
+            }
+
+            StringBuffer iconText = new StringBuffer();
+            if (game.Properties.MinQuickness != 0 || game.Properties.MinReliability != 0) {
+                iconText.append("\uD83D\uDD70");
+            }
+            if (game.Properties.MinRating != 0 || game.Properties.MaxRating != 0) {
+                iconText.append("\uD83E\uDD47");
+            }
+            if (game.Properties.MaxHated != 0 || game.Properties.MaxHater != 0) {
+                iconText.append("\uD83D\uDEB7");
+            }
+            if (iconText.length() > 0) {
+                configIcons.setVisibility(View.VISIBLE);
+                configIcons.setText(iconText.toString());
+            } else {
+                configIcons.setVisibility(View.GONE);
             }
 
             variant.setText(makeVariantText(game.Properties.Variant));
