@@ -231,4 +231,7 @@
     <string name="you_were_added_to_another_game">Your game was not created. Instead, you were added to another game with the exact same settings.</string>
     <string name="_private">Private</string>
     <string name="lookup">Lookup</string>
+    <string name="timer_requirements">Timer requirements</string>
+    <string name="rating_requirements">Rating requirements</string>
+    <string name="ban_requirements">Ban requirements</string>
 </resources>

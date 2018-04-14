@@ -9,6 +9,7 @@ import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -41,21 +42,23 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
         RelativeLayout expanded;
         View.OnClickListener delegateClickListener;
         FloatingActionButton joinLeaveButton;
-        TextView alertIcon;
-        TextView readyIcon;
+        ImageView alertIcon;
+        ImageView readyIcon;
         TextView unreadMessages;
         TextView createdAt;
         TextView startedAt;
         TextView startedAtLabel;
         TextView finishedAt;
         TextView finishedAtLabel;
-        TextView configIcons;
+        ImageView timerIcon;
+        ImageView starIcon;
+        ImageView barIcon;
 
         public ViewHolder(View view) {
             super(view);
             unreadMessages = (TextView) view.findViewById(R.id.unread_messages_count);
-            alertIcon = (TextView) view.findViewById(R.id.alert_icon);
-            readyIcon = (TextView) view.findViewById(R.id.ready_icon);
+            alertIcon = (ImageView) view.findViewById(R.id.alert_icon);
+            readyIcon = (ImageView) view.findViewById(R.id.ready_icon);
             desc = (TextView) view.findViewById(R.id.desc);
             variant = (TextView) view.findViewById(R.id.variant);
             deadline = (TextView) view.findViewById(R.id.deadline);
@@ -79,7 +82,9 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             startedAtLabel = (TextView) view.findViewById(R.id.started_at_label);
             finishedAt = (TextView) view.findViewById(R.id.finished_at);
             finishedAtLabel = (TextView) view.findViewById(R.id.finished_at_label);
-            configIcons = (TextView) view.findViewById(R.id.game_config_icons);
+            timerIcon = (ImageView) view.findViewById(R.id.timer_icon);
+            starIcon = (ImageView) view.findViewById(R.id.star_icon);
+            barIcon = (ImageView) view.findViewById(R.id.bar_icon);
         }
         @Override
         public void bind(final SingleContainer<Game> game, final int pos) {
@@ -98,12 +103,10 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             if (member != null && game.Properties.Started && !game.Properties.Finished) {
                 if (member.NewestPhaseState.OnProbation) {
                     alertIcon.setVisibility(View.VISIBLE);
-                    alertIcon.setText("⌛");
                     readyIcon.setVisibility(View.GONE);
                 } else if (member.NewestPhaseState.ReadyToResolve) {
                     alertIcon.setVisibility(View.GONE);
                     readyIcon.setVisibility(View.VISIBLE);
-                    readyIcon.setText("✅");
                 } else {
                     alertIcon.setVisibility(View.GONE);
                     readyIcon.setVisibility(View.GONE);
@@ -176,21 +179,20 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                 finishedAtLabel.setVisibility(View.GONE);
             }
 
-            StringBuffer iconText = new StringBuffer();
             if (game.Properties.MinQuickness != 0 || game.Properties.MinReliability != 0) {
-                iconText.append("\uD83D\uDD70");
+                timerIcon.setVisibility(View.VISIBLE);
+            } else {
+                timerIcon.setVisibility(View.GONE);
             }
             if (game.Properties.MinRating != 0 || game.Properties.MaxRating != 0) {
-                iconText.append("\uD83E\uDD47");
+                starIcon.setVisibility(View.VISIBLE);
+            } else {
+                starIcon.setVisibility(View.GONE);
             }
             if (game.Properties.MaxHated != 0 || game.Properties.MaxHater != 0) {
-                iconText.append("\uD83D\uDEB7");
-            }
-            if (iconText.length() > 0) {
-                configIcons.setVisibility(View.VISIBLE);
-                configIcons.setText(iconText.toString());
+                barIcon.setVisibility(View.VISIBLE);
             } else {
-                configIcons.setVisibility(View.GONE);
+                barIcon.setVisibility(View.GONE);
             }
 
             variant.setText(makeVariantText(game.Properties.Variant));
