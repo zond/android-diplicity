@@ -132,7 +132,7 @@ public class MainActivity extends RetrofitActivity {
         addGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (getLoggedInuser() != null && getLoggedInUser().Id != null) {
+                if (getLoggedInUser() != null && getLoggedInUser().Id != null) {
                     handleReq(userStatsService.UserStatsLoad(getLoggedInUser().Id), new Sendable<SingleContainer<UserStats>>() {
                         @Override
                         public void send(SingleContainer<UserStats> userStatsSingleContainer) {
