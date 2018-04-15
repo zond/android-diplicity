@@ -120,6 +120,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
 
     // API level
     static final int DIPLICITY_API_LEVEL = 2;
+    static final String CLIENT_NAME = "AndroidDiplicity";
 
     // services
     public GameService gameService;
@@ -446,6 +447,8 @@ public abstract class RetrofitActivity extends AppCompatActivity {
             public Response intercept(Chain chain) throws IOException {
                 Request toIssue = chain.request().newBuilder()
                         .addHeader("Accept", "application/json; charset=UTF-8")
+                        .addHeader("X-Diplicity-Client-Version", "" + BuildConfig.VERSION_CODE)
+                        .addHeader("X-Diplicity-Client-Name", "" + CLIENT_NAME)
                         .addHeader("X-Diplicity-API-Level", "" + DIPLICITY_API_LEVEL).build();
                 if (getLocalDevelopmentMode() && !getLocalDevelopmentModeFakeID().equals("")) {
                     HttpUrl url = toIssue.url().newBuilder().addQueryParameter("fake-id", getLocalDevelopmentModeFakeID()).build();
