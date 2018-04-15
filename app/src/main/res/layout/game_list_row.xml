@@ -101,7 +101,7 @@
         android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@id/variant"
+        android:layout_alignBottom="@id/variant"
         android:layout_toRightOf="@id/deadline"
         android:layout_toEndOf="@id/deadline">
 
