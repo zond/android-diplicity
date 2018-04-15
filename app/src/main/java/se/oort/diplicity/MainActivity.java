@@ -132,7 +132,7 @@ public class MainActivity extends RetrofitActivity {
         addGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (getLoggedInUser().Id != null) {
+                if (getLoggedInuser() != null && getLoggedInUser().Id != null) {
                     handleReq(userStatsService.UserStatsLoad(getLoggedInUser().Id), new Sendable<SingleContainer<UserStats>>() {
                         @Override
                         public void send(SingleContainer<UserStats> userStatsSingleContainer) {
@@ -870,7 +870,7 @@ public class MainActivity extends RetrofitActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            if (getLoggedInUser().Id != null) {
+            if (getLoggedInUser() != null && getLoggedInUser().Id != null) {
                 Intent i = new Intent(this, PreferenceActivity.class);
                 startActivity(i);
             }
@@ -908,7 +908,7 @@ public class MainActivity extends RetrofitActivity {
                 layout.setVisibility(View.VISIBLE);
             }
         } else if (id == R.id.action_bans) {
-            if (getLoggedInUser().Id != null) {
+            if (getLoggedInUser() != null && getLoggedInUser().Id != null) {
                 handleReq(
                     banService.ListBans(getLoggedInUser().Id),
                     new Sendable<MultiContainer<Ban>>() {
