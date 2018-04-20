@@ -510,8 +510,7 @@ public class GameActivity extends RetrofitActivity
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i, boolean b) {
                                     checked[i] = b;
-                                    // Adding 1 because the player itself is never checked.
-                                    int numChecked = 1;
+                                    int numChecked = 0;
                                     for (int j = 0; j < checked.length; j++) {
                                         if (checked[j]) {
                                             numChecked++;
@@ -520,10 +519,10 @@ public class GameActivity extends RetrofitActivity
                                     if (game.DisableConferenceChat && numChecked == checked.length) {
                                         ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
                                         Toast.makeText(GameActivity.this, getResources().getString(R.string.conference_chat_is_disabled), Toast.LENGTH_LONG).show();
-                                    } else if (game.DisablePrivateChat && numChecked == 2) {
+                                    } else if (game.DisablePrivateChat && numChecked == 1) {
                                         ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
                                         Toast.makeText(GameActivity.this, getResources().getString(R.string.private_chat_is_disabled), Toast.LENGTH_LONG).show();
-                                    } else if (game.DisableGroupChat && numChecked > 2 && numChecked < checked.length) {
+                                    } else if (game.DisableGroupChat && numChecked > 1 && numChecked < checked.length) {
                                         ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
                                         Toast.makeText(GameActivity.this, getResources().getString(R.string.group_chat_is_disabled), Toast.LENGTH_LONG).show();
                                     } else {
