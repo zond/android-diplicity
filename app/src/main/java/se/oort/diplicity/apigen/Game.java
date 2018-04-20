@@ -18,6 +18,9 @@ public class Game implements java.io.Serializable {
   public Double MinQuickness;
   public Boolean Private;
   public Boolean NoMerge;
+  public Boolean DisableConferenceChat;
+  public Boolean DisableGroupChat;
+  public Boolean DisablePrivateChat;
   public Long NMembers;
   public java.util.List<Member> Members;
   public java.util.List<PhaseMeta> NewestPhaseMeta;

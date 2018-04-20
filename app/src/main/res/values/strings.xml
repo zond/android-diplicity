@@ -234,4 +234,7 @@
     <string name="timer_requirements">Timer requirements</string>
     <string name="rating_requirements">Rating requirements</string>
     <string name="ban_requirements">Ban requirements</string>
+    <string name="conference_chat_is_disabled">Conference chat is disabled.</string>
+    <string name="private_chat_is_disabled">Private chat is disabled.</string>
+    <string name="group_chat_is_disabled">Group chat is disabled.</string>
 </resources>

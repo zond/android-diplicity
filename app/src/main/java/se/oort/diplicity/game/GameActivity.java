@@ -288,7 +288,11 @@ public class GameActivity extends RetrofitActivity
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         Menu nav_Menu = navigationView.getMenu();
-        if (!game.Started) {
+        if (game.Started) {
+            if (game.DisableConferenceChat && game.DisableGroupChat && game.DisablePrivateChat) {
+                nav_Menu.findItem(R.id.nav_press).setVisible(false);
+            }
+        } else {
             nav_Menu.findItem(R.id.nav_orders).setVisible(false);
             nav_Menu.findItem(R.id.nav_phases).setVisible(false);
             nav_Menu.findItem(R.id.nav_press).setVisible(false);
@@ -506,6 +510,24 @@ public class GameActivity extends RetrofitActivity
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i, boolean b) {
                                     checked[i] = b;
+                                    int numChecked = 0;
+                                    for (int j = 0; j < checked.length; j++) {
+                                        if (checked[j]) {
+                                            numChecked++;
+                                        }
+                                    }
+                                    if (game.DisableConferenceChat && numChecked == checked.length) {
+                                        ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                                        Toast.makeText(GameActivity.this, getResources().getString(R.string.conference_chat_is_disabled), Toast.LENGTH_LONG).show();
+                                    } else if (game.DisablePrivateChat && numChecked == 2) {
+                                        ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                                        Toast.makeText(GameActivity.this, getResources().getString(R.string.private_chat_is_disabled), Toast.LENGTH_LONG).show();
+                                    } else if (game.DisableGroupChat && numChecked > 2 && numChecked < checked.length) {
+                                        ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                                        Toast.makeText(GameActivity.this, getResources().getString(R.string.group_chat_is_disabled), Toast.LENGTH_LONG).show();
+                                    } else {
+                                        ((AlertDialog) dialogInterface).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                                    }
                                 }
                             })
                             .setTitle(R.string.members)
