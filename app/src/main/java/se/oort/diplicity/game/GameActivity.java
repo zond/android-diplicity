@@ -510,7 +510,8 @@ public class GameActivity extends RetrofitActivity
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i, boolean b) {
                                     checked[i] = b;
-                                    int numChecked = 0;
+                                    // Adding 1 because the player itself is never checked.
+                                    int numChecked = 1;
                                     for (int j = 0; j < checked.length; j++) {
                                         if (checked[j]) {
                                             numChecked++;
