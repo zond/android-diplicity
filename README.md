@@ -10,7 +10,7 @@ Discussions about this game happen at [https://groups.google.com/forum/#!forum/d
 
 ## Install
 
-Go to the [release page](https://github.com/zond/android-diplicity/releases) to download the release you want.
+Go to the [Play Store](https://play.google.com/store/apps/details?id=se.oort.diplicity) or to the [release page](https://github.com/zond/android-diplicity/releases) to download the release you want.
 
 ### Automatic builds
 
