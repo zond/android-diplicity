@@ -365,6 +365,9 @@ public class MainActivity extends RetrofitActivity {
                                                     gamesAdapter.notifyDataSetChanged();
                                                 }
                                                 dialog.dismiss();
+                                                if (game.Private) {
+                                                    navigateTo(0, 1);
+                                                }
                                             }
                                         }, new ErrorHandler(new int[]{412, 418}, new Sendable<HttpException>() {
                                             @Override

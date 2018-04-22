@@ -53,6 +53,10 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
         ImageView timerIcon;
         ImageView starIcon;
         ImageView barIcon;
+        TextView conferenceChatDisabled;
+        TextView groupChatDisabled;
+        TextView privateChatDisabled;
+        ImageView phoneIcon;
 
         public ViewHolder(View view) {
             super(view);
@@ -85,6 +89,10 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             timerIcon = (ImageView) view.findViewById(R.id.timer_icon);
             starIcon = (ImageView) view.findViewById(R.id.star_icon);
             barIcon = (ImageView) view.findViewById(R.id.bar_icon);
+            conferenceChatDisabled = (TextView) view.findViewById(R.id.disabled_conference_chat_label);
+            groupChatDisabled = (TextView) view.findViewById(R.id.disabled_group_chat_label);
+            privateChatDisabled = (TextView) view.findViewById(R.id.disabled_private_chat_label);
+            phoneIcon = (ImageView) view.findViewById(R.id.phone_icon);
         }
         @Override
         public void bind(final SingleContainer<Game> game, final int pos) {
@@ -164,6 +172,21 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                 maxHater.setVisibility(View.GONE);
                 maxHaterLabel.setVisibility(View.GONE);
             }
+            if (game.Properties.DisableConferenceChat) {
+                conferenceChatDisabled.setVisibility(View.VISIBLE);
+            } else {
+                conferenceChatDisabled.setVisibility(View.GONE);
+            }
+            if (game.Properties.DisableGroupChat) {
+                groupChatDisabled.setVisibility(View.VISIBLE);
+            } else {
+                groupChatDisabled.setVisibility(View.GONE);
+            }
+            if (game.Properties.DisablePrivateChat) {
+                privateChatDisabled.setVisibility(View.VISIBLE);
+            } else {
+                privateChatDisabled.setVisibility(View.GONE);
+            }
             DateFormat format = DateFormat.getDateInstance(DateFormat.SHORT);
             createdAt.setText(format.format(game.Properties.CreatedAgo.deadlineAt()));
             if (game.Properties.Started) {
@@ -193,6 +216,11 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                 barIcon.setVisibility(View.VISIBLE);
             } else {
                 barIcon.setVisibility(View.GONE);
+            }
+            if (game.Properties.DisableConferenceChat || game.Properties.DisableGroupChat || game.Properties.DisablePrivateChat) {
+                phoneIcon.setVisibility(View.VISIBLE);
+            } else {
+                phoneIcon.setVisibility(View.GONE);
             }
 
             variant.setText(makeVariantText(game.Properties.Variant));
