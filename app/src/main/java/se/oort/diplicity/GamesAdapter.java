@@ -14,10 +14,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.text.DateFormat;
+import java.util.AbstractSet;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import retrofit2.adapter.rxjava.HttpException;
 import se.oort.diplicity.apigen.Game;
@@ -31,7 +35,29 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
     /** Lower case name of the classical variant. Games of this variant are displayed slightly differently in the listings. */
     public static final String CLASSICAL = "classical";
     private RetrofitActivity retrofitActivity;
-    private Set<Integer> expandedItems = Collections.synchronizedSet(new HashSet<Integer>());
+    private Set<Integer> expandedItems = new AbstractSet<Integer>() {
+        private Map<Integer, Object> backend = new ConcurrentHashMap<Integer, Object>();
+        @Override
+        public boolean add(Integer i) {
+            boolean rval = backend.containsKey(i);
+            backend.put(i, new Object());
+            return rval;
+        }
+        @Override
+        public boolean remove(Object i) {
+            boolean rval = backend.containsKey(i);
+            backend.remove(i);
+            return rval;
+        }
+        @Override
+        public Iterator<Integer> iterator() {
+            return backend.keySet().iterator();
+        }
+        @Override
+        public int size() {
+            return backend.size();
+        }
+    };
 
     public class ViewHolder extends RecycleAdapter<SingleContainer<Game>, GamesAdapter.ViewHolder>.ViewHolder {
         TextView desc, variant, deadline, state, rating,

@@ -85,6 +85,8 @@ public class MainActivity extends RetrofitActivity {
     private UserStatsAdapter userStatsAdapter = new UserStatsAdapter(this, new ArrayList<SingleContainer<UserStats>>());
     private List<List<Map<String, String>>> navigationChildGroups;
     private List<Map<String, String>> navigationRootGroups;
+    private int navRoot;
+    private int navChild;
 
     private FloatingActionButton addGameButton;
 
@@ -358,16 +360,17 @@ public class MainActivity extends RetrofitActivity {
                                             public void send(SingleContainer<Game> gameSingleContainer) {
                                                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
                                                 prefs.edit().putBoolean(HAS_JOINED_GAME_KEY, true).apply();
-                                                if (nextCursorContainer.get(0).length() == 0) {
-                                                    findViewById(R.id.empty_view).setVisibility(View.GONE);
-                                                    contentList.setVisibility(View.VISIBLE);
-                                                    gamesAdapter.items.add(gameSingleContainer);
-                                                    gamesAdapter.notifyDataSetChanged();
+                                                if (game.Private && (navRoot != 0 || navChild != 1)) {
+                                                    navigateTo(0, 1);
+                                                } else {
+                                                    if (nextCursorContainer.get(0).length() == 0) {
+                                                        findViewById(R.id.empty_view).setVisibility(View.GONE);
+                                                        contentList.setVisibility(View.VISIBLE);
+                                                        gamesAdapter.items.add(gameSingleContainer);
+                                                        gamesAdapter.notifyDataSetChanged();
+                                                    }
                                                 }
                                                 dialog.dismiss();
-                                                if (game.Private) {
-                                                    navigateTo(0, 1);
-                                                }
                                             }
                                         }, new ErrorHandler(new int[]{412, 418}, new Sendable<HttpException>() {
                                             @Override
@@ -383,7 +386,7 @@ public class MainActivity extends RetrofitActivity {
                                                 } else if (e.code() == 418) {
                                                     dialog.dismiss();
                                                     Toast.makeText(MainActivity.this, getResources().getString(R.string.you_were_added_to_another_game), Toast.LENGTH_LONG).show();
-                                                    navigateTo(0, 1);
+                                                    navigateTo(navRoot, navChild);
                                                 }
                                             }
                                         }), getResources().getString(R.string.creating_game));
@@ -638,6 +641,8 @@ public class MainActivity extends RetrofitActivity {
     }
 
     private void navigateTo(final int root, final int child) {
+        navRoot = root;
+        navChild = child;
         if (root == 0 && (child == 1 || child == 3)) {
             addGameButton.setVisibility(View.VISIBLE);
         } else {
