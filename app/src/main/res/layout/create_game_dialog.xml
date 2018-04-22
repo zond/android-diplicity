@@ -2,25 +2,23 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="3dp"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
-    android:id="@+id/create_game_view"
+    android:layout_height="wrap_content"
+    android:id="@+id/create_game_view">
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:id="@+id/grid"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_width="match_parent"
-            android:orientation="vertical"
+        <GridLayout
+            android:columnCount="2"
+            android:rowCount="12"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/desc_layout"
+                android:layout_columnSpan="2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -28,6 +26,7 @@
                     android:hint="@string/description"
                     android:importantForAutofill="noExcludeDescendants"
                     android:id="@+id/desc"
+                    android:textSize="14dp"
                     android:inputType="textAutoCorrect|textAutoComplete"
                     android:textColor="?android:attr/textColorPrimary"
                     android:layout_width="match_parent"
@@ -35,81 +34,84 @@
 
             </android.support.design.widget.TextInputLayout>
 
-            <LinearLayout
-                android:layout_margin="5dp"
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/variant_label"
+                android:text="@string/variant"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Spinner
+                android:id="@+id/variants"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"/>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/phase_length_layout"
+                android:layout_gravity="fill_horizontal"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/variant_label"
-                    android:text="@string/variant"
-                    android:layout_width="wrap_content"
+                <android.support.design.widget.TextInputEditText
+                    android:hint="@string/phase_length"
+                    android:importantForAutofill="noExcludeDescendants"
+                    android:id="@+id/phase_length"
+                    android:textSize="14dp"
+                    android:inputType="number"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
-                <Spinner
-                    android:layout_marginStart="5dp"
-                    android:layout_marginLeft="5dp"
-                    app:layout_columnWeight="1"
-                    android:id="@+id/variants"
-                    android:layout_height="wrap_content"
-                    android:layout_width="match_parent"/>
+            </android.support.design.widget.TextInputLayout>
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_margin="5dp"
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/phase_length_layout"
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content">
-
-                    <android.support.design.widget.TextInputEditText
-                        android:hint="@string/phase_length"
-                        android:importantForAutofill="noExcludeDescendants"
-                        android:id="@+id/phase_length"
-                        android:inputType="number"
-                        android:textColor="?android:attr/textColorPrimary"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-                </android.support.design.widget.TextInputLayout>
-
-                <Spinner
-                    android:id="@+id/phase_length_units"
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:entries="@array/phaseLengthUnits"
-                    android:layout_gravity="center_vertical"/>
-
-            </LinearLayout>
-
-        <LinearLayout
-            android:layout_margin="5dp"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            <Spinner
+                android:id="@+id/phase_length_units"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/phaseLengthUnits"
+                android:layout_gravity="center_vertical"/>
 
             <TextView
                 android:text="@string/_private"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-
             <CheckBox
                 android:id="@+id/_private"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-        </LinearLayout>
+            <TextView
+                android:text="@string/conference_chat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <CheckBox
+                android:id="@+id/conference_chat"
+                android:checked="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
-        <android.support.design.widget.TextInputLayout
+            <TextView
+                android:text="@string/group_chat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <CheckBox
+                android:id="@+id/group_chat"
+                android:checked="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:text="@string/private_chat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <CheckBox
+                android:checked="true"
+                android:id="@+id/private_chat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <android.support.design.widget.TextInputLayout
                 android:id="@+id/min_rating_label"
+                android:layout_columnSpan="2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -118,6 +120,7 @@
                     android:importantForAutofill="noExcludeDescendants"
                     android:id="@+id/min_rating"
                     android:inputType="numberDecimal"
+                    android:textSize="14dp"
                     android:textColor="?android:attr/textColorPrimary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
@@ -127,12 +130,14 @@
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/max_rating_label"
                 android:layout_width="match_parent"
+                android:layout_columnSpan="2"
                 android:layout_height="wrap_content">
 
                 <android.support.design.widget.TextInputEditText
                     android:hint="@string/max_rating_low_is_weak_players"
                     android:importantForAutofill="noExcludeDescendants"
                     android:id="@+id/max_rating"
+                    android:textSize="14dp"
                     android:inputType="numberDecimal"
                     android:layout_width="match_parent"
                     android:textColor="?android:attr/textColorPrimary"
@@ -142,6 +147,7 @@
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/min_reliability_label"
+                android:layout_columnSpan="2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -149,6 +155,7 @@
                     android:hint="@string/min_reliability_higher_is_less_nmr"
                     android:importantForAutofill="noExcludeDescendants"
                     android:id="@+id/min_reliability"
+                    android:textSize="14dp"
                     android:textColor="?android:attr/textColorPrimary"
                     android:inputType="numberDecimal"
                     android:layout_width="match_parent"
@@ -158,6 +165,7 @@
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/min_quickness_label"
+                android:layout_columnSpan="2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -166,6 +174,7 @@
                     android:importantForAutofill="noExcludeDescendants"
                     android:id="@+id/min_quickness"
                     android:inputType="numberDecimal"
+                    android:textSize="14dp"
                     android:layout_width="match_parent"
                     android:textColor="?android:attr/textColorPrimary"
                     android:layout_height="wrap_content" />
@@ -174,6 +183,7 @@
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/max_hated_label"
+                android:layout_columnSpan="2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -182,6 +192,7 @@
                     android:importantForAutofill="noExcludeDescendants"
                     android:id="@+id/max_hated"
                     android:inputType="numberDecimal"
+                    android:textSize="14dp"
                     android:textColor="?android:attr/textColorPrimary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
@@ -190,11 +201,13 @@
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/max_hater_label"
+                android:layout_columnSpan="2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <android.support.design.widget.TextInputEditText
                     android:hint="@string/max_hater_low_is_patient"
+                    android:textSize="14dp"
                     android:importantForAutofill="noExcludeDescendants"
                     android:id="@+id/max_hater"
                     android:textColor="?android:attr/textColorPrimary"
@@ -204,7 +217,7 @@
 
             </android.support.design.widget.TextInputLayout>
 
-        </LinearLayout>
+        </GridLayout>
 
         <android.support.design.widget.FloatingActionButton
             xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -216,11 +229,12 @@
             android:tint="@android:color/white"
             android:id="@+id/create_game_button"
             android:src="@drawable/ic_done_black_24dp"
-            android:layout_alignBottom="@id/grid"
+            android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
     </RelativeLayout>
+
 </ScrollView>

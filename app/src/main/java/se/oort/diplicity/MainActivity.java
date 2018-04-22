@@ -221,6 +221,9 @@ public class MainActivity extends RetrofitActivity {
                             final EditText maxHatedView = (EditText) dialog.findViewById(R.id.max_hated);
                             final EditText maxHaterView = (EditText) dialog.findViewById(R.id.max_hater);
                             final CheckBox privateView = (CheckBox) dialog.findViewById(R.id._private);
+                            final CheckBox conferenceChat = (CheckBox) dialog.findViewById(R.id.conference_chat);
+                            final CheckBox groupChat = (CheckBox) dialog.findViewById(R.id.group_chat);
+                            final CheckBox privateChat = (CheckBox) dialog.findViewById(R.id.private_chat);
                             final List<Boolean> noMergeContainer = new ArrayList<Boolean>();
                             noMergeContainer.add(Boolean.FALSE);
 
@@ -322,6 +325,9 @@ public class MainActivity extends RetrofitActivity {
                                     game.PhaseLengthMinutes = getPhaseLengthMinutes(phaseLengthView, phaseLengthUnitsSpinner);
                                     game.NoMerge = noMergeContainer.get(0);
                                     game.Private = privateView.isChecked();
+                                    game.DisableConferenceChat = !conferenceChat.isChecked();
+                                    game.DisableGroupChat = !groupChat.isChecked();
+                                    game.DisablePrivateChat = !privateChat.isChecked();
                                     try {
                                         game.MinRating = Double.parseDouble(minRatingView.getText().toString());
                                     } catch (NumberFormatException e) {

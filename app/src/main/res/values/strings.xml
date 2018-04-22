@@ -237,4 +237,7 @@
     <string name="conference_chat_is_disabled">Conference chat is disabled.</string>
     <string name="private_chat_is_disabled">Private chat is disabled.</string>
     <string name="group_chat_is_disabled">Group chat is disabled.</string>
+    <string name="conference_chat">Conference chat</string>
+    <string name="group_chat">Group chat</string>
+    <string name="private_chat">Private chat</string>
 </resources>
