@@ -229,4 +229,8 @@
     <string name="started_at">Started at</string>
     <string name="finished_at">Finished at</string>
     <string name="phase_status">Phase Status</string>
+    <string name="nation">Nation</string>
+    <string name="sc_count">SC Count</string>
+    <string name="units">Units</string>
+    <string name="delta">Delta</string>
 </resources>

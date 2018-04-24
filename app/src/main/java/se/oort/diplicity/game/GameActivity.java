@@ -922,8 +922,9 @@ public class GameActivity extends RetrofitActivity
 
     public void showPhaseStatus() {
         hideAllExcept(R.id.phase_status_view);
+        Long phaseOrdinal = (phaseMeta == null || phaseMeta.PhaseOrdinal == null ? 1L : phaseMeta.PhaseOrdinal);
         handleReq(
-                phaseService.PhaseLoad(game.ID, "1"),
+                phaseService.PhaseLoad(game.ID, phaseOrdinal.toString()),
                 new Sendable<SingleContainer<Phase>>() {
                     @Override
                     public void send(SingleContainer<Phase> phaseSingleContainer) {
@@ -934,7 +935,7 @@ public class GameActivity extends RetrofitActivity
 
                         Counter<String> unitCount = new Counter<String>();
                         for (UnitWrapper wrapper : phaseSingleContainer.Properties.Units) {
-                            scCount.increment(wrapper.Unit.Nation);
+                            unitCount.increment(wrapper.Unit.Nation);
                         }
 
                         Set<String> nations = new HashSet<String>();
@@ -942,23 +943,36 @@ public class GameActivity extends RetrofitActivity
                         nations.addAll(unitCount.keySet());
 
                         ViewGroup phaseStatusInnerView = (ViewGroup) findViewById(R.id.phase_status_inner_view);
-                        for (String nation : nations) {
-                            View itemView = LayoutInflater.from(phaseStatusInnerView.getContext())
-                                    .inflate(R.layout.game_list_row, phaseStatusInnerView, false);
-                            TextView nationView = (TextView) itemView.findViewById(R.id.nation);
-                            nationView.setText(nation);
-                            TextView scCountView = (TextView) itemView.findViewById(R.id.sc_count);
-                            scCountView.setText(scCount.get(nation));
-                            TextView unitCountView = (TextView) itemView.findViewById(R.id.unit_count);
-                            unitCountView.setText(unitCount.get(nation));
+                        phaseStatusInnerView.removeAllViews();
+                        LayoutInflater layoutInflater = LayoutInflater.from(phaseStatusInnerView.getContext());
 
-                            if (unitCount.get(nation) != scCount.get(nation)) {
-                                TextView unitDeltaView = (TextView) itemView.findViewById(R.id.unit_delta);
-                                unitDeltaView.setText(scCount.get(nation) - unitCount.get(nation));
-                            }
+                        // Create table header.
+                        addPhaseStatusRow(phaseStatusInnerView, layoutInflater, getString(R.string.nation), getString(R.string.sc_count), getString(R.string.units), getString(R.string.delta));
+
+                        for (String nation : nations) {
+                            addPhaseStatusRow(phaseStatusInnerView, layoutInflater, nation,
+                                    String.valueOf(scCount.get(nation)),
+                                    String.valueOf(unitCount.get(nation)),
+                                    String.valueOf(scCount.get(nation) - unitCount.get(nation)));
                         }
                     }
                 }, getResources().getString(R.string.loading_state));
+    }
+
+    private void addPhaseStatusRow(ViewGroup phaseStatusInnerView, LayoutInflater layoutInflater, String nation, String scCount, String unitCount, String delta) {
+        View itemView = layoutInflater.inflate(R.layout.phase_status_row, phaseStatusInnerView, false);
+        TextView nationView = (TextView) itemView.findViewById(R.id.nation);
+        nationView.setText(nation);
+        TextView scCountView = (TextView) itemView.findViewById(R.id.sc_count);
+        scCountView.setText(scCount);
+        TextView unitCountView = (TextView) itemView.findViewById(R.id.unit_count);
+        unitCountView.setText(unitCount);
+
+        if (delta != null) {
+            TextView unitDeltaView = (TextView) itemView.findViewById(R.id.unit_delta);
+            unitDeltaView.setText(delta);
+        }
+        phaseStatusInnerView.addView(itemView);
     }
 
     public void showOrders() {
