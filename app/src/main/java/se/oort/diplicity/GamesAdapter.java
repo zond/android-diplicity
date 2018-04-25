@@ -430,25 +430,28 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                     @Override
                     public void onClick(View v) {
                         final AlertDialog dialog = new AlertDialog.Builder(retrofitActivity).setView(R.layout.edit_membership_dialog).show();
-                        ListView nationPreference = (ListView) dialog.findViewById(R.id.nation_preferences);
+                        // 1 is preferences
                         final List<String> prefs = new ArrayList<String>(Arrays.asList(finalMember.NationPreferences.split(",")));
-                        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                                retrofitActivity,
-                                android.R.layout.simple_list_item_single_choice,
-                                prefs);
-                        nationPreference.setAdapter(adapter);
-                        nationPreference.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                Log.d("diplicity", "onclick " + position);
-                                if (position > 0) {
-                                    String up = prefs.get(position - 1);
-                                    prefs.set(position - 1, prefs.get(position));
-                                    prefs.set(position, up);
-                                    adapter.notifyDataSetChanged();
+                        if (game.Properties.NationAllocation == 1) {
+                            ListView nationPreference = (ListView) dialog.findViewById(R.id.nation_preferences);
+                            final ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                                    retrofitActivity,
+                                    android.R.layout.simple_list_item_single_choice,
+                                    prefs);
+                            nationPreference.setAdapter(adapter);
+                            nationPreference.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                    Log.d("diplicity", "onclick " + position);
+                                    if (position > 0) {
+                                        String up = prefs.get(position - 1);
+                                        prefs.set(position - 1, prefs.get(position));
+                                        prefs.set(position, up);
+                                        adapter.notifyDataSetChanged();
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
                         final TextView aliasView = (TextView) dialog.findViewById(R.id.alias);
                         aliasView.setText(finalMember.GameAlias);
                         ((FloatingActionButton) dialog.findViewById(R.id.update_membership_button)).setOnClickListener(new View.OnClickListener() {
