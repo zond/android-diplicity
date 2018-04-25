@@ -298,6 +298,7 @@ public class GameActivity extends RetrofitActivity
             nav_Menu.findItem(R.id.nav_press).setVisible(false);
             nav_Menu.findItem(R.id.nav_phase_settings).setVisible(false);
             nav_Menu.findItem(R.id.nav_game_settings).setVisible(false);
+            nav_Menu.findItem(R.id.nav_phase_status).setVisible(false);
         }
         if (phaseMeta == null || !phaseMeta.Resolved) {
             nav_Menu.findItem(R.id.nav_phase_result).setVisible(false);
@@ -943,22 +944,31 @@ public class GameActivity extends RetrofitActivity
                         nations.addAll(unitCount.keySet());
 
                         ViewGroup phaseStatusInnerView = (ViewGroup) findViewById(R.id.phase_status_inner_view);
-                        phaseStatusInnerView.removeAllViews();
+                        phaseStatusInnerView.removeViews(1, phaseStatusInnerView.getChildCount() - 1);
                         LayoutInflater layoutInflater = LayoutInflater.from(phaseStatusInnerView.getContext());
 
-                        // Create table header.
-                        addPhaseStatusRow(phaseStatusInnerView, layoutInflater, getString(R.string.nation), getString(R.string.sc_count), getString(R.string.units), getString(R.string.delta));
-
-                        for (String nation : nations) {
+                        List<String> nationsList = new ArrayList<>(nations);
+                        Collections.sort(nationsList);
+                        for (String nation : nationsList) {
                             addPhaseStatusRow(phaseStatusInnerView, layoutInflater, nation,
                                     String.valueOf(scCount.get(nation)),
                                     String.valueOf(unitCount.get(nation)),
-                                    String.valueOf(scCount.get(nation) - unitCount.get(nation)));
+                                    String.format("%+d", scCount.get(nation) - unitCount.get(nation)));
                         }
                     }
                 }, getResources().getString(R.string.loading_state));
     }
 
+    /**
+     * Add a row to the phase status table.
+     *
+     * @param phaseStatusInnerView The parent to add the status row to.
+     * @param layoutInflater The inflater for creating status rows.
+     * @param nation The string for the nation column.
+     * @param scCount The string for the SC column.
+     * @param unitCount The string for the unit column.
+     * @param delta The string for the delta column.
+     */
     private void addPhaseStatusRow(ViewGroup phaseStatusInnerView, LayoutInflater layoutInflater, String nation, String scCount, String unitCount, String delta) {
         View itemView = layoutInflater.inflate(R.layout.phase_status_row, phaseStatusInnerView, false);
         TextView nationView = (TextView) itemView.findViewById(R.id.nation);

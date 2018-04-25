@@ -49,6 +49,57 @@
                 android:layout_width="match_parent"
                 android:orientation="vertical"
                 android:layout_height="wrap_content">
+
+                <TableRow android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="true"
+                    android:clickable="true"
+                    android:animateLayoutChanges="true"
+                    android:layout_marginBottom="3dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_alignParentTop="true"
+                        android:textAppearance="?attr/textAppearanceListItem"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:layout_column="1"
+                        android:text="@string/nation" />
+
+                    <TextView
+                        android:layout_alignParentTop="true"
+                        android:textAppearance="?attr/textAppearanceListItem"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/default_gap"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:layout_column="2"
+                        android:text="@string/sc_count" />
+
+                    <TextView
+                        android:layout_alignParentTop="true"
+                        android:textAppearance="?attr/textAppearanceListItem"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/default_gap"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:layout_column="3"
+                        android:text="@string/units" />
+
+                    <TextView
+                        android:layout_alignParentTop="true"
+                        android:textAppearance="?attr/textAppearanceListItem"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/default_gap"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:layout_column="4"
+                        android:text="@string/delta" />
+
+                </TableRow>
+
             </TableLayout>
 
         </ScrollView>
