@@ -2,8 +2,7 @@ package se.oort.diplicity.apigen;
 
 import retrofit2.http.*;
 	
-public class UserStats implements java.io.Serializable {
-  public String UserId;
+public class UserStatsNumbers implements java.io.Serializable {
   public Long StartedGames;
   public Long FinishedGames;
   public Long SoloGames;
@@ -19,7 +18,4 @@ public class UserStats implements java.io.Serializable {
   public Long SharedBans;
   public Double Hated;
   public Double Hater;
-  public UserStatsNumbers PrivateStats;
-  public Glicko Glicko;
-  public User User;
 }

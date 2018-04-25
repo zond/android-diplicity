@@ -16,11 +16,18 @@ public class Game implements java.io.Serializable {
   public Double MaxRating;
   public Double MinReliability;
   public Double MinQuickness;
+  public Boolean Private;
+  public Boolean NoMerge;
+  public Boolean DisableConferenceChat;
+  public Boolean DisableGroupChat;
+  public Boolean DisablePrivateChat;
+  public Long NationAllocation;
   public Long NMembers;
   public java.util.List<Member> Members;
   public java.util.List<PhaseMeta> NewestPhaseMeta;
   public java.util.List<Ban> ActiveBans;
   public java.util.List<String> FailedRequirements;
+  public Member FirstMember;
   public java.util.Date CreatedAt;
   public Ticker CreatedAgo;
   public java.util.Date StartedAt;

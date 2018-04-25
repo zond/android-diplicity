@@ -9,4 +9,5 @@ public class PhaseResult implements java.io.Serializable {
   public java.util.List<String> ActiveUsers;
   public java.util.List<String> ReadyUsers;
   public java.util.List<String> AllUsers;
+  public Boolean Private;
 }

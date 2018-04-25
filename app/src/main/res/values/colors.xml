@@ -5,4 +5,9 @@
     <color name="colorAccent">#FF4081</color>
     <color name="colorAlert">#FF0000</color>
     <color name="colorReady">#00FF00</color>
+    <color name="colorWhite">#CCCCCC</color>
+    <color name="colorRed">#CC0000</color>
+    <color name="colorGold">#DAA520</color>
+    <color name="colorYellow">#FFFF33</color>
 </resources>
+
