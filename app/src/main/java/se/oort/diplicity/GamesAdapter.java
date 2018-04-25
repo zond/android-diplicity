@@ -432,7 +432,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                         final AlertDialog dialog = new AlertDialog.Builder(retrofitActivity).setView(R.layout.edit_membership_dialog).show();
                         // 1 is preferences
                         final List<String> prefs = new ArrayList<String>(Arrays.asList(finalMember.NationPreferences.split(",")));
-                        if (game.Properties.NationAllocation == 1) {
+                        if (game.Properties.NationAllocation == 1 && !game.Properties.Started) {
                             ListView nationPreference = (ListView) dialog.findViewById(R.id.nation_preferences);
                             final ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                                     retrofitActivity,
