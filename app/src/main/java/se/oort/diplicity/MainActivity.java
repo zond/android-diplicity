@@ -1,6 +1,7 @@
 package se.oort.diplicity;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -28,6 +29,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.Spinner;
@@ -54,10 +56,14 @@ import rx.Subscriber;
 import se.oort.diplicity.apigen.Ban;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Link;
+import se.oort.diplicity.apigen.Member;
 import se.oort.diplicity.apigen.MultiContainer;
+import se.oort.diplicity.apigen.Phase;
 import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.apigen.User;
 import se.oort.diplicity.apigen.UserStats;
+import se.oort.diplicity.game.GameActivity;
+import se.oort.diplicity.game.PressActivity;
 
 import static java.util.Arrays.asList;
 
@@ -113,6 +119,52 @@ public class MainActivity extends RetrofitActivity {
         public int compareTo(SpinnerVariantElement other) {
             return name.compareTo(other.name);
         }
+    }
+
+    private class SpinnerAllocationElement implements Comparable<SpinnerAllocationElement>{
+        public String name;
+        public Integer code;
+        public String toString() {
+            return name;
+        }
+        public int compareTo(SpinnerAllocationElement other) { return name.compareTo(other.name); }
+    }
+
+    public static void showNationPreferencesDialog(RetrofitActivity retrofitActivity, String variantName, final Sendable<List<String>> done) {
+        VariantService.Variant variant = null;
+        for (SingleContainer<VariantService.Variant> variantContainer : retrofitActivity.getVariants().Properties) {
+            if (variantContainer.Properties.Name.equals(variantName)) {
+                variant = variantContainer.Properties;
+                break;
+            }
+        }
+        if (variant == null) {
+            done.send(new ArrayList<String>());
+            return;
+        }
+        final AlertDialog dialog = new AlertDialog.Builder(retrofitActivity).setView(R.layout.nation_preference_dialog).show();
+        ListView nationPreference = (ListView) dialog.findViewById(R.id.nation_preferences);
+        final List<String> nations = new ArrayList<>(variant.Nations);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(retrofitActivity, android.R.layout.simple_list_item_single_choice, nations);
+        nationPreference.setAdapter(adapter);
+        nationPreference.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position > 0) {
+                    String up = nations.get(position - 1);
+                    nations.set(position - 1, nations.get(position));
+                    nations.set(position, up);
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
+        ((FloatingActionButton) dialog.findViewById(R.id.confirm_preferences)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+                done.send(nations);
+            }
+        });
     }
 
     @Override
@@ -212,6 +264,28 @@ public class MainActivity extends RetrofitActivity {
                             variants.setAdapter(variantAdapter);
                             variantAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                             variants.setSelection(classical);
+
+                            final Spinner allocations = ((Spinner) dialog.findViewById(R.id.allocation));
+                            final List<SpinnerAllocationElement> allocationNames = new ArrayList<>();
+                            SpinnerAllocationElement randomAllocation = new SpinnerAllocationElement();
+                            randomAllocation.code = 0;
+                            randomAllocation.name = getResources().getString(R.string.random);
+                            allocationNames.add(randomAllocation);
+                            SpinnerAllocationElement prefAllocation= new SpinnerAllocationElement();
+                            prefAllocation.code = 1;
+                            prefAllocation.name = getResources().getString(R.string.preferences);
+                            allocationNames.add(prefAllocation);
+                            Collections.sort(allocationNames);
+                            int randomAllocIdx = 0;
+                            for (int i = 0; i < allocationNames.size(); i++) {
+                                if (allocationNames.get(i).name.equals(getResources().getString(R.string.random))) {
+                                    randomAllocIdx = i;
+                                }
+                            }
+                            ArrayAdapter<SpinnerAllocationElement> allocAdapter = new ArrayAdapter<SpinnerAllocationElement>(MainActivity.this, android.R.layout.simple_spinner_item, allocationNames);
+                            allocations.setAdapter(allocAdapter);
+                            allocAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            allocations.setSelection(randomAllocIdx);
 
                             final EditText gameNameView = (EditText) dialog.findViewById(R.id.desc);
                             final EditText phaseLengthView = (EditText) dialog.findViewById(R.id.phase_length);
@@ -330,6 +404,7 @@ public class MainActivity extends RetrofitActivity {
                                     game.DisableConferenceChat = !conferenceChat.isChecked();
                                     game.DisableGroupChat = !groupChat.isChecked();
                                     game.DisablePrivateChat = !privateChat.isChecked();
+                                    game.NationAllocation = new Long(allocationNames.get(allocations.getSelectedItemPosition()).code);
                                     try {
                                         game.MinRating = Double.parseDouble(minRatingView.getText().toString());
                                     } catch (NumberFormatException e) {
@@ -355,41 +430,54 @@ public class MainActivity extends RetrofitActivity {
                                     } catch (NumberFormatException e) {
                                     }
                                     if (validateGame.Return(game)) {
-                                        handleReq(gameService.GameCreate(game), new Sendable<SingleContainer<Game>>() {
+                                        Sendable<List<String>> creator = new Sendable<List<String>>() {
                                             @Override
-                                            public void send(SingleContainer<Game> gameSingleContainer) {
-                                                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-                                                prefs.edit().putBoolean(HAS_JOINED_GAME_KEY, true).apply();
-                                                if (game.Private && (navRoot != 0 || navChild != 1)) {
-                                                    navigateTo(0, 1);
-                                                } else {
-                                                    if (nextCursorContainer.get(0).length() == 0) {
-                                                        findViewById(R.id.empty_view).setVisibility(View.GONE);
-                                                        contentList.setVisibility(View.VISIBLE);
-                                                        gamesAdapter.items.add(gameSingleContainer);
-                                                        gamesAdapter.notifyDataSetChanged();
-                                                    }
-                                                }
-                                                dialog.dismiss();
-                                            }
-                                        }, new ErrorHandler(new int[]{412, 418}, new Sendable<HttpException>() {
-                                            @Override
-                                            public void send(HttpException e) {
-                                                if (e.code() == 412) {
-                                                    handleReq(userStatsService.UserStatsLoad(getLoggedInUser().Id), new Sendable<SingleContainer<UserStats>>() {
-                                                        @Override
-                                                        public void send(SingleContainer<UserStats> userStatsSingleContainer) {
-                                                            statsContainer.set(0, userStatsSingleContainer.Properties);
-                                                            validateGame.Return(game);
+                                            public void send(List<String> strings) {
+                                                game.FirstMember = new Member();
+                                                game.FirstMember.NationPreferences = String.join(",", strings);
+                                                handleReq(gameService.GameCreate(game), new Sendable<SingleContainer<Game>>() {
+                                                    @Override
+                                                    public void send(SingleContainer<Game> gameSingleContainer) {
+                                                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                                                        prefs.edit().putBoolean(HAS_JOINED_GAME_KEY, true).apply();
+                                                        if (game.Private && (navRoot != 0 || navChild != 1)) {
+                                                            navigateTo(0, 1);
+                                                        } else {
+                                                            if (nextCursorContainer.get(0).length() == 0) {
+                                                                findViewById(R.id.empty_view).setVisibility(View.GONE);
+                                                                contentList.setVisibility(View.VISIBLE);
+                                                                gamesAdapter.items.add(gameSingleContainer);
+                                                                gamesAdapter.notifyDataSetChanged();
+                                                            }
                                                         }
-                                                    }, getResources().getString(R.string.creating_game));
-                                                } else if (e.code() == 418) {
-                                                    dialog.dismiss();
-                                                    Toast.makeText(MainActivity.this, getResources().getString(R.string.you_were_added_to_another_game), Toast.LENGTH_LONG).show();
-                                                    navigateTo(navRoot, navChild);
-                                                }
+                                                        dialog.dismiss();
+                                                    }
+                                                }, new ErrorHandler(new int[]{412, 418}, new Sendable<HttpException>() {
+                                                    @Override
+                                                    public void send(HttpException e) {
+                                                        if (e.code() == 412) {
+                                                            handleReq(userStatsService.UserStatsLoad(getLoggedInUser().Id), new Sendable<SingleContainer<UserStats>>() {
+                                                                @Override
+                                                                public void send(SingleContainer<UserStats> userStatsSingleContainer) {
+                                                                    statsContainer.set(0, userStatsSingleContainer.Properties);
+                                                                    validateGame.Return(game);
+                                                                }
+                                                            }, getResources().getString(R.string.creating_game));
+                                                        } else if (e.code() == 418) {
+                                                            dialog.dismiss();
+                                                            Toast.makeText(MainActivity.this, getResources().getString(R.string.you_were_added_to_another_game), Toast.LENGTH_LONG).show();
+                                                            navigateTo(navRoot, navChild);
+                                                        }
+                                                    }
+                                                }), getResources().getString(R.string.creating_game));
                                             }
-                                        }), getResources().getString(R.string.creating_game));
+                                        };
+                                        // 1 is preferences.
+                                        if (game.NationAllocation.intValue() == 1) {
+                                            showNationPreferencesDialog(MainActivity.this, game.Variant, creator);
+                                        } else {
+                                            creator.send(new ArrayList<String>());
+                                        }
                                     }
                                 }
                             });

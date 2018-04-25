@@ -30,6 +30,16 @@
 
         </android.support.design.widget.TextInputLayout>
 
+        <ListView
+            android:id="@+id/nation_preferences"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </ListView>
+
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
