@@ -36,7 +36,7 @@ import se.oort.diplicity.apigen.UserConfig;
 
 public class PreferenceActivity extends RetrofitActivity {
 
-    private static Pattern COLOR_REG = Pattern.compile("#[a-fA-F0-9]{6,8}");
+    private static Pattern COLOR_REG = Pattern.compile("^(\\w+/)?(\\w+/)?(#[a-fA-F0-9]{6,6}|[a-fA-F0-9]{8,8})$");
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -206,10 +206,11 @@ public class PreferenceActivity extends RetrofitActivity {
             String initialValue = "";
             int initialColor = -1;
             if (i < config.Colors.size()) {
-                if (COLOR_REG.matcher(config.Colors.get(i)).find()) {
+                Matcher matcher = COLOR_REG.matcher(config.Colors.get(i));
+                if (matcher.find()) {
                     initialValue = config.Colors.get(i);
                     try {
-                        initialColor = Color.parseColor(initialValue);
+                        initialColor = Color.parseColor(matcher.group(3));
                     } catch (IllegalArgumentException e) {
                     }
                 }
@@ -268,9 +269,12 @@ public class PreferenceActivity extends RetrofitActivity {
                     return false;
                 }
             };
-            colorPref.getEditText().setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
             colorPref.setKey("colorOverride" + i);
-            colorPref.setTitle(getActivity().getResources().getString(R.string.color_override_n, i));
+            if (i < config.Colors.size()) {
+                colorPref.setTitle(getActivity().getResources().getString(R.string.color_override));
+            } else {
+                colorPref.setTitle(getActivity().getResources().getString(R.string.new_color_override));
+            }
             colorPref.setSummary(initialValue);
             colorPref.setDefaultValue(initialValue);
             colorPref.setPersistent(false);

@@ -249,7 +249,8 @@
     <string name="preferences">Preferences</string>
     <string name="preference_allocation">Preference allocation</string>
     <string name="allocation">Allocation</string>
-    <string name="color_override_n">Map color %s override</string>
     <string name="overrides_color_n_when_viewing_maps">Overrides color %s when viewing maps</string>
-    <string name="colors_must_be_valid_hex_codes">Colors must be valid hex codes</string>
+    <string name="colors_must_be_valid_hex_codes">Colors must be valid hex codes, optionally prepended with "[VARIANT]/[NATION]/" or "[NATION]/"</string>
+    <string name="color_override">Map color override</string>
+    <string name="new_color_override">New map color override</string>
 </resources>
