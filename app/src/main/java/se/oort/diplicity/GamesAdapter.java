@@ -6,6 +6,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -380,7 +381,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                             @Override
                             public void send(List<String> strings) {
                                 Member member = new Member();
-                                member.NationPreferences = String.join(",", strings);
+                                member.NationPreferences = TextUtils.join(",", strings);
                                 retrofitActivity.handleReq(retrofitActivity.memberService.MemberCreate(member, game.Properties.ID),
                                         new Sendable<SingleContainer<Member>>() {
                                             @Override
@@ -458,7 +459,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                             @Override
                             public void onClick(View v) {
                                 finalMember.GameAlias = aliasView.getText().toString();
-                                finalMember.NationPreferences = String.join(",", prefs);
+                                finalMember.NationPreferences = TextUtils.join(",", prefs);
                                 retrofitActivity.handleReq(
                                         retrofitActivity.memberService.MemberUpdate(finalMember, game.Properties.ID, finalMember.User.Id),
                                         new Sendable<SingleContainer<Member>>() {

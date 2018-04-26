@@ -17,6 +17,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -434,7 +435,7 @@ public class MainActivity extends RetrofitActivity {
                                             @Override
                                             public void send(List<String> strings) {
                                                 game.FirstMember = new Member();
-                                                game.FirstMember.NationPreferences = String.join(",", strings);
+                                                game.FirstMember.NationPreferences = TextUtils.join(",", strings);
                                                 handleReq(gameService.GameCreate(game), new Sendable<SingleContainer<Game>>() {
                                                     @Override
                                                     public void send(SingleContainer<Game> gameSingleContainer) {
