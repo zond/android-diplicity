@@ -945,9 +945,9 @@ public class GameActivity extends RetrofitActivity
 
     public void showPhaseStatus() {
         hideAllExcept(R.id.phase_status_view);
-        Long phaseOrdinal = (phaseMeta == null || phaseMeta.PhaseOrdinal == null ? 1L : phaseMeta.PhaseOrdinal);
-        handleReq(
-                phaseService.PhaseLoad(game.ID, phaseOrdinal.toString()),
+        if (phaseMeta != null && phaseMeta.PhaseOrdinal != null) {
+            handleReq(
+                phaseService.PhaseLoad(game.ID, phaseMeta.PhaseOrdinal.toString()),
                 new Sendable<SingleContainer<Phase>>() {
                     @Override
                     public void send(SingleContainer<Phase> phaseSingleContainer) {
@@ -979,6 +979,7 @@ public class GameActivity extends RetrofitActivity
                         }
                     }
                 }, getResources().getString(R.string.loading_state));
+        }
     }
 
     /**
