@@ -559,17 +559,6 @@ public class MainActivity extends RetrofitActivity {
         contentList.addItemDecoration(dividerItemDecoration);
 
         loadMoreProcContainer.add(null);
-
-        if (!ACTION_VIEW_USER_GAMES.equals(getIntent().getAction()) && !Intent.ACTION_VIEW.equals(getIntent().getAction())) {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            if (prefs.getBoolean(HAS_JOINED_GAME_KEY, false)) {
-                // My started.
-                navigateTo(0, 0);
-            } else {
-                // Open.
-                navigateTo(0, 3);
-            }
-        }
     }
 
     @Override
@@ -586,6 +575,15 @@ public class MainActivity extends RetrofitActivity {
             Matcher m = viewGamePattern.matcher(uri.getPath());
             if (m.matches()) {
                 displaySingleGame(m.group(1));
+            }
+        } else {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            if (prefs.getBoolean(HAS_JOINED_GAME_KEY, false)) {
+                // My started.
+                navigateTo(0, 0);
+            } else {
+                // Open.
+                navigateTo(0, 3);
             }
         }
     }

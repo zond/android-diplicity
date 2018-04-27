@@ -3,7 +3,6 @@ package se.oort.diplicity.game;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -77,7 +76,6 @@ public class GameActivity extends RetrofitActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String SERIALIZED_GAME_KEY = "serialized_game";
-    public static final String SERIALIZED_PHASE_META_KEY = "serialized_phase_meta";
 
     // Included in the intent bundle.
     public Game game;
@@ -98,18 +96,11 @@ public class GameActivity extends RetrofitActivity
     // Used to display the phases view again after clicking it, without having to load all phases again.
     private MultiContainer<Phase> phases;
 
-    public static Intent startGameIntent(Context context, Game game, PhaseMeta phaseMeta) {
+    public static Intent startGameIntent(Context context, Game game) {
         Intent intent = new Intent(context, GameActivity.class);
         intent.putExtra(GameActivity.SERIALIZED_GAME_KEY, RetrofitActivity.serialize(game));
-        if (phaseMeta != null) {
-            intent.putExtra(GameActivity.SERIALIZED_PHASE_META_KEY, RetrofitActivity.serialize(phaseMeta));
-        }
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
         return intent;
-    }
-
-    public static void startGameActivity(Context context, Game game, PhaseMeta phaseMeta) {
-        context.startActivity(startGameIntent(context, game, phaseMeta));
     }
 
     @Override
@@ -152,11 +143,8 @@ public class GameActivity extends RetrofitActivity
             member = getLoggedInMember(game);
         }
 
-        byte[] serializedPhaseMeta = getIntent().getByteArrayExtra(SERIALIZED_PHASE_META_KEY);
-        if (serializedGame != null) {
-            if (serializedPhaseMeta != null) {
-                phaseMeta = (PhaseMeta) unserialize(serializedPhaseMeta);
-            }
+        if (game.NewestPhaseMeta.size() > 0) {
+            phaseMeta = game.NewestPhaseMeta.get(0);
         }
     }
 
@@ -548,7 +536,7 @@ public class GameActivity extends RetrofitActivity
                             withPhases(false, new Sendable<MultiContainer<Phase>>() {
                                 @Override
                                 public void send(MultiContainer<Phase> phaseMultiContainer) {
-                                    PressActivity.startPressActivity(GameActivity.this, game, channel, member, phaseMultiContainer);
+                                    GameActivity.this.startActivity(PressActivity.startPressIntent(GameActivity.this, game, channel, member, phaseMultiContainer));
                                     dialogInterface.dismiss();
                                 }
                             });

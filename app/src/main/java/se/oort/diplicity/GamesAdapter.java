@@ -22,8 +22,6 @@ import java.text.DateFormat;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -415,11 +413,7 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             ((FloatingActionButton) itemView.findViewById(R.id.open_button)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (game.Properties.NewestPhaseMeta != null && game.Properties.NewestPhaseMeta.size() > 0) {
-                        GameActivity.startGameActivity(retrofitActivity, game.Properties, game.Properties.NewestPhaseMeta.get(0));
-                    } else {
-                        GameActivity.startGameActivity(retrofitActivity, game.Properties, null);
-                    }
+                    retrofitActivity.startActivity(GameActivity.startGameIntent(retrofitActivity, game.Properties));
                 }
             });
 

@@ -68,10 +68,6 @@ public class PressActivity extends RetrofitActivity {
         return intent;
     }
 
-    public static void startPressActivity(Context context, Game game, ChannelService.Channel channel, Member member, MultiContainer<Phase> phases) {
-        context.startActivity(startPressIntent(context, game, channel, member, phases));
-    }
-
     @Override
     protected boolean consumeDiplicityJSON(MessagingService.DiplicityJSON diplicityJSON) {
         if (diplicityJSON.type.equals("message") && diplicityJSON.message.GameID.equals(game.ID) && diplicityJSON.message.ChannelMembers.equals(channel.Members)) {

@@ -16,7 +16,6 @@ import rx.observables.JoinObservable;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Member;
 import se.oort.diplicity.apigen.MultiContainer;
-import se.oort.diplicity.apigen.Order;
 import se.oort.diplicity.apigen.Phase;
 import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.game.GameActivity;
@@ -77,14 +76,14 @@ public class NotificationReceiveActivity extends RetrofitActivity {
                                     public Object call(SingleContainer<Game> gameSingleContainer, MultiContainer<Phase> phaseMultiContainer) {
                                         Member member = getLoggedInMember(gameSingleContainer.Properties);
                                         if (member != null) {
-                                            Intent mainIntent = new Intent(NotificationReceiveActivity.this, MainActivity.class);
-                                            mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-                                            Intent gameIntent = GameActivity.startGameIntent(NotificationReceiveActivity.this, gameSingleContainer.Properties, gameSingleContainer.Properties.NewestPhaseMeta.get(0));
                                             ChannelService.Channel channel = new ChannelService.Channel();
                                             channel.GameID = message.message.GameID;
                                             channel.Members = message.message.ChannelMembers;
                                             Intent pressIntent = PressActivity.startPressIntent(NotificationReceiveActivity.this, gameSingleContainer.Properties, channel, member, phaseMultiContainer);
                                             if (android.os.Build.VERSION.SDK_INT > 15) {
+                                                Intent mainIntent = new Intent(NotificationReceiveActivity.this, MainActivity.class);
+                                                mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                                                Intent gameIntent = GameActivity.startGameIntent(NotificationReceiveActivity.this, gameSingleContainer.Properties);
                                                 TaskStackBuilder.create(NotificationReceiveActivity.this)
                                                         .addNextIntent(mainIntent)
                                                         .addNextIntent(gameIntent)
@@ -119,9 +118,9 @@ public class NotificationReceiveActivity extends RetrofitActivity {
                         mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
                         Intent gameIntent;
                         if (gameSingleContainer.Properties.NewestPhaseMeta != null && gameSingleContainer.Properties.NewestPhaseMeta.size() > 0) {
-                            gameIntent = GameActivity.startGameIntent(NotificationReceiveActivity.this, gameSingleContainer.Properties, gameSingleContainer.Properties.NewestPhaseMeta.get(0));
+                            gameIntent = GameActivity.startGameIntent(NotificationReceiveActivity.this, gameSingleContainer.Properties);
                         } else {
-                            gameIntent = GameActivity.startGameIntent(NotificationReceiveActivity.this, gameSingleContainer.Properties, null);
+                            gameIntent = GameActivity.startGameIntent(NotificationReceiveActivity.this, gameSingleContainer.Properties);
                         }
                         if (android.os.Build.VERSION.SDK_INT > 15) {
                             TaskStackBuilder.create(NotificationReceiveActivity.this)

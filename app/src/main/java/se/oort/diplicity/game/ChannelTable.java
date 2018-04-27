@@ -80,7 +80,7 @@ public class ChannelTable extends TableLayout {
             button.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    PressActivity.startPressActivity(getContext(), game, channel, member, phases);
+                    getContext().startActivity(PressActivity.startPressIntent(getContext(), game, channel, member, phases));
                 }
             });
             button.setLayoutParams(wrapContentParams);
