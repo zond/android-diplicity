@@ -149,10 +149,10 @@ public class GameActivity extends RetrofitActivity
                 }
             });
             member = getLoggedInMember(game);
-        }
 
-        if (game.NewestPhaseMeta.size() > 0) {
-            phaseMeta = game.NewestPhaseMeta.get(0);
+            if (game.NewestPhaseMeta != null && game.NewestPhaseMeta.size() > 0) {
+                phaseMeta = game.NewestPhaseMeta.get(0);
+            }
         }
 
         byte[] serializedPhases = getIntent().getByteArrayExtra(SERIALIZED_PHASES_KEY);
