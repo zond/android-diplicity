@@ -1,6 +1,8 @@
 package se.oort.diplicity;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
@@ -8,7 +10,11 @@ import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.text.InputType;
+import android.text.method.DigitsKeyListener;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -17,6 +23,11 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import se.oort.diplicity.apigen.FCMNotificationConfig;
 import se.oort.diplicity.apigen.FCMToken;
@@ -24,6 +35,8 @@ import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.apigen.UserConfig;
 
 public class PreferenceActivity extends RetrofitActivity {
+
+    private static Pattern COLOR_REG = Pattern.compile("^(\\w+/)?(\\w+/)?(#[a-fA-F0-9]{6,6}|[a-fA-F0-9]{8,8})$");
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -153,6 +166,8 @@ public class PreferenceActivity extends RetrofitActivity {
                                     }
                                 });
 
+                                populateColorOverrides(userConfigSingleContainer);
+
                                 if (!prefs.getBoolean(getResources().getString(R.string.local_development_mode_pref_key), false)) {
                                     removeFakeIDPref();
                                 } else {
@@ -162,6 +177,109 @@ public class PreferenceActivity extends RetrofitActivity {
                             }
                         }, getResources().getString(R.string.loading_settings));
             }
+        }
+
+        private void populateColorOverrides(final SingleContainer<UserConfig> configContainer) {
+            UserConfig config = configContainer.Properties;
+            PreferenceCategory parent = ((PreferenceCategory) findPreference("interface_prefs"));
+            Set<Preference> toRemove = new HashSet<Preference>();
+            for (int i = 0; i < parent.getPreferenceCount(); i++) {
+                if (parent.getPreference(i).getKey().indexOf("colorOverride") == 0) {
+                    toRemove.add(parent.getPreference(i));
+                }
+            }
+            for (Preference p : toRemove) {
+                parent.removePreference(p);
+            }
+            if (config.Colors == null) {
+                config.Colors = new ArrayList<String>();
+            }
+            for (int i = 0; i < config.Colors.size(); i++) {
+                addColorOverride(configContainer, i);
+            }
+            addColorOverride(configContainer, config.Colors.size());
+        }
+
+        private void addColorOverride(final SingleContainer<UserConfig> configContainer, final int i) {
+            final UserConfig config = configContainer.Properties;
+
+            String initialValue = "";
+            int initialColor = -1;
+            if (i < config.Colors.size()) {
+                Matcher matcher = COLOR_REG.matcher(config.Colors.get(i));
+                if (matcher.find()) {
+                    initialValue = config.Colors.get(i);
+                    try {
+                        initialColor = Color.parseColor(matcher.group(3));
+                    } catch (IllegalArgumentException e) {
+                    }
+                }
+            }
+
+            final int finalColor = initialColor;
+            final EditTextPreference colorPref = new EditTextPreference(getActivity()) {
+                @Override
+                protected View onCreateView(ViewGroup parent) {
+                    View rval = super.onCreateView(parent);
+                    if (finalColor != -1) {
+                        rval.setBackgroundColor(finalColor);
+                    }
+                    return rval;
+                }
+            };
+            final Preference.OnPreferenceChangeListener colorChanged = new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object o) {
+                    String newColor = (String) o;
+                    if (!newColor.equals("")) {
+                        if (!COLOR_REG.matcher(newColor).find()) {
+                            if (newColor.indexOf("#") != 0) {
+                                newColor = "#" + newColor;
+                            }
+                            if (!COLOR_REG.matcher(newColor).find()) {
+                                Toast.makeText(retrofitActivity(), R.string.colors_must_be_valid_hex_codes, Toast.LENGTH_LONG).show();
+                                return false;
+                            }
+                        }
+                    }
+                    boolean update = false;
+                    if (i < config.Colors.size()) {
+                        if (newColor.equals("")) {
+                            config.Colors.remove(i);
+                        } else {
+                            config.Colors.set(i, newColor);
+                        }
+                        update = true;
+                    } else if (!newColor.equals("")) {
+                        config.Colors.add(newColor);
+                        update = true;
+                    }
+                    if (update) {
+                        retrofitActivity().handleReq(
+                                retrofitActivity().userConfigService.UserConfigUpdate(config, retrofitActivity().getLoggedInUser().Id),
+                                new Sendable<SingleContainer<UserConfig>>() {
+                                    @Override
+                                    public void send(SingleContainer<UserConfig> userConfigSingleContainer) {
+                                        configContainer.Properties = userConfigSingleContainer.Properties;
+                                        populateColorOverrides(configContainer);
+                                    }
+                                },
+                                getResources().getString(R.string.updating_settings));
+                    }
+                    return false;
+                }
+            };
+            colorPref.setKey("colorOverride" + i);
+            if (i < config.Colors.size()) {
+                colorPref.setTitle(getActivity().getResources().getString(R.string.color_override));
+            } else {
+                colorPref.setTitle(getActivity().getResources().getString(R.string.new_color_override));
+            }
+            colorPref.setSummary(initialValue);
+            colorPref.setDefaultValue(initialValue);
+            colorPref.setPersistent(false);
+            colorPref.setOnPreferenceChangeListener(colorChanged);
+            ((PreferenceCategory) findPreference("interface_prefs")).addPreference(colorPref);
         }
 
         private void removeFakeIDPref() {
