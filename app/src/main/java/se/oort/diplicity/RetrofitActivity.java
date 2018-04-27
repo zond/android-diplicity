@@ -50,6 +50,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterInputStream;
 
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
@@ -171,44 +174,35 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     private final static List<LoginSubscriber<?>> loginSubscribers = Collections.synchronizedList(new ArrayList<LoginSubscriber<?>>());
 
     public static Serializable unserialize(byte[] b) {
-        ByteArrayInputStream bis = null;
-        ObjectInputStream ois = null;
+        ByteArrayInputStream byteArrayInputStream = null;
+        InflaterInputStream inflaterInputStream = null;
+        ObjectInputStream objectInputStream = null;
         Serializable o;
         try {
-            bis = new ByteArrayInputStream(b);
-            ois = new ObjectInputStream(bis);
-            o = (Serializable) ois.readObject();
+            byteArrayInputStream = new ByteArrayInputStream(b);
+            inflaterInputStream = new InflaterInputStream(byteArrayInputStream);
+            objectInputStream = new ObjectInputStream(inflaterInputStream);
+            o = (Serializable) objectInputStream.readObject();
+            objectInputStream.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
-        } finally {
-            try {
-                ois.close();
-                bis.close();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
         }
         return o;
     }
 
     public static byte[] serialize(Serializable o) {
         ObjectOutputStream objectOutputStream = null;
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        DeflaterOutputStream deflaterOutputStream = null;
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try {
-            objectOutputStream = new ObjectOutputStream(bout);
+            deflaterOutputStream = new DeflaterOutputStream(byteArrayOutputStream);
+            objectOutputStream = new ObjectOutputStream(deflaterOutputStream);
             objectOutputStream.writeObject(o);
-            objectOutputStream.flush();
+            objectOutputStream.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
-        } finally {
-            try {
-                bout.close();
-                objectOutputStream.close();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
         }
-        return bout.toByteArray();
+        return byteArrayOutputStream.toByteArray();
     }
 
     public Sendable<Throwable> newProgressAndToastHandler(final ErrorHandler onError, final String progressMessage) {
