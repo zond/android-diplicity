@@ -80,13 +80,16 @@ public class GameActivity extends RetrofitActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String SERIALIZED_GAME_KEY = "serialized_game";
+    public static final String SERIALIZED_PHASES_KEY = "serialized_phases";
 
     // Included in the intent bundle.
     public Game game;
-    // Included in the intent bundle.
+    // Included in game if the game is started.
     public PhaseMeta phaseMeta;
     // Calculated from the intent bundle.
     public Member member;
+    // Included in the intent bundle if the game is started.
+    private MultiContainer<Phase> phases;
 
     // Used to receive orders from the user.
     public Map<String, OptionsService.Option> options = new HashMap<>();
@@ -97,12 +100,13 @@ public class GameActivity extends RetrofitActivity
     private FlickFrameLayout flickFrameLayout;
     // Used to remember which view we are in (map, orders, phases etc).
     private int currentView;
-    // Used to display the phases view again after clicking it, without having to load all phases again.
-    private MultiContainer<Phase> phases;
 
-    public static Intent startGameIntent(Context context, Game game) {
+    public static Intent startGameIntent(Context context, Game game, MultiContainer<Phase> phases) {
         Intent intent = new Intent(context, GameActivity.class);
         intent.putExtra(GameActivity.SERIALIZED_GAME_KEY, RetrofitActivity.serialize(game));
+        if (phases != null) {
+            intent.putExtra(GameActivity.SERIALIZED_PHASES_KEY, RetrofitActivity.serialize(phases));
+        }
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
         return intent;
     }
@@ -150,61 +154,38 @@ public class GameActivity extends RetrofitActivity
         if (game.NewestPhaseMeta.size() > 0) {
             phaseMeta = game.NewestPhaseMeta.get(0);
         }
+
+        byte[] serializedPhases = getIntent().getByteArrayExtra(SERIALIZED_PHASES_KEY);
+        if (serializedPhases != null) {
+            phases = (MultiContainer<Phase>) unserialize(serializedPhases);
+        }
     }
 
     public void lastPhase() {
-        handleReq(
-                phaseService.PhaseLoad(game.ID, "" + game.NewestPhaseMeta.get(0).PhaseOrdinal),
-                new Sendable<SingleContainer<Phase>>() {
-                    @Override
-                    public void send(SingleContainer<Phase> phaseSingleContainer) {
-                        Gson gson = new Gson();
-                        phaseMeta = gson.fromJson(gson.toJson(phaseSingleContainer.Properties), PhaseMeta.class);
-                        draw();
-                    }
-                }, getResources().getString(R.string.loading_state));
+        Gson gson = new Gson();
+        phaseMeta = gson.fromJson(gson.toJson(phases.Properties.get(game.NewestPhaseMeta.get(0).PhaseOrdinal.intValue() - 1).Properties), PhaseMeta.class);
+        draw();
     }
 
     public void firstPhase() {
-        handleReq(
-                phaseService.PhaseLoad(game.ID, "1"),
-                new Sendable<SingleContainer<Phase>>() {
-                    @Override
-                    public void send(SingleContainer<Phase> phaseSingleContainer) {
-                        Gson gson = new Gson();
-                        phaseMeta = gson.fromJson(gson.toJson(phaseSingleContainer.Properties), PhaseMeta.class);
-                        draw();
-                    }
-                }, getResources().getString(R.string.loading_state));
+        Gson gson = new Gson();
+        phaseMeta = gson.fromJson(gson.toJson(phases.Properties.get(0).Properties), PhaseMeta.class);
+        draw();
     }
 
     public void nextPhase() {
         if (phaseMeta != null && phaseMeta.PhaseOrdinal < game.NewestPhaseMeta.get(0).PhaseOrdinal) {
-            handleReq(
-                    phaseService.PhaseLoad(game.ID, "" + (phaseMeta.PhaseOrdinal + 1)),
-                    new Sendable<SingleContainer<Phase>>() {
-                        @Override
-                        public void send(SingleContainer<Phase> phaseSingleContainer) {
-                            Gson gson = new Gson();
-                            phaseMeta = gson.fromJson(gson.toJson(phaseSingleContainer.Properties), PhaseMeta.class);
-                            draw();
-                        }
-                    }, getResources().getString(R.string.loading_state));
+            Gson gson = new Gson();
+            phaseMeta = gson.fromJson(gson.toJson(phases.Properties.get(phaseMeta.PhaseOrdinal.intValue()).Properties), PhaseMeta.class);
+            draw();
         }
     }
 
     public void prevPhase() {
         if (phaseMeta != null && phaseMeta.PhaseOrdinal > 1) {
-            handleReq(
-                    phaseService.PhaseLoad(game.ID, "" + (phaseMeta.PhaseOrdinal - 1)),
-                    new Sendable<SingleContainer<Phase>>() {
-                        @Override
-                        public void send(SingleContainer<Phase> phaseSingleContainer) {
-                            Gson gson = new Gson();
-                            phaseMeta = gson.fromJson(gson.toJson(phaseSingleContainer.Properties), PhaseMeta.class);
-                            draw();
-                        }
-                    }, getResources().getString(R.string.loading_state));
+            Gson gson = new Gson();
+            phaseMeta = gson.fromJson(gson.toJson(phases.Properties.get(phaseMeta.PhaseOrdinal.intValue() - 2).Properties), PhaseMeta.class);
+            draw();
         }
     }
 
@@ -536,16 +517,11 @@ public class GameActivity extends RetrofitActivity
                             }
                             channelMembers.add(member.Nation);
                             Collections.sort(channelMembers);
-                            final ChannelService.Channel channel = new ChannelService.Channel();
+                            ChannelService.Channel channel = new ChannelService.Channel();
                             channel.GameID = game.ID;
                             channel.Members = channelMembers;
-                            withPhases(false, new Sendable<MultiContainer<Phase>>() {
-                                @Override
-                                public void send(MultiContainer<Phase> phaseMultiContainer) {
-                                    GameActivity.this.startActivity(PressActivity.startPressIntent(GameActivity.this, game, channel, member, phaseMultiContainer));
-                                    dialogInterface.dismiss();
-                                }
-                            });
+                            GameActivity.this.startActivity(PressActivity.startPressIntent(GameActivity.this, game, channel, member, phases));
+                            dialogInterface.dismiss();
                         }
                     }).show();
 
@@ -563,13 +539,8 @@ public class GameActivity extends RetrofitActivity
                         for (SingleContainer<ChannelService.Channel> channelSingleContainer : channelMultiContainer.Properties) {
                             channels.add(channelSingleContainer.Properties);
                         }
-                        final ChannelTable channelTable = (ChannelTable) findViewById(R.id.press_channel_table);
-                        withPhases(false, new Sendable<MultiContainer<Phase>>() {
-                            @Override
-                            public void send(MultiContainer<Phase> phaseMultiContainer) {
-                                channelTable.setChannels(GameActivity.this, game, member, channels, phaseMultiContainer);
-                            }
-                        });
+                        ChannelTable channelTable = (ChannelTable) findViewById(R.id.press_channel_table);
+                        channelTable.setChannels(GameActivity.this, game, member, channels, phases);
                     }
                 }, getResources().getString(R.string.loading_channels));
     }
@@ -760,44 +731,23 @@ public class GameActivity extends RetrofitActivity
                 }, getResources().getString(R.string.loading_phase_settings));
     }
 
-    public void withPhases(boolean loadPhases, final Sendable<MultiContainer<Phase>> handler) {
-        if (loadPhases || phases == null) {
-            handleReq(
-                    phaseService.ListPhases(game.ID),
-                    new Sendable<MultiContainer<Phase>>() {
-                        @Override
-                        public void send(MultiContainer<Phase> phaseMultiContainer) {
-                            phases = phaseMultiContainer;
-                            handler.send(phaseMultiContainer);
-                        }
-                    }, getResources().getString(R.string.loading_phases));
-        } else {
-            handler.send(phases);
-        }
-    }
-
     public void showPhases(boolean loadPhases) {
         hideAllExcept(R.id.phases_view);
-        withPhases(loadPhases, new Sendable<MultiContainer<Phase>>() {
+        final List<PhaseElement> phaseList = new ArrayList<>();
+        for (int i = 0; i < phases.Properties.size(); i++) {
+            phaseList.add(new PhaseElement(phases.Properties.get(phases.Properties.size() - i - 1).Properties));
+        }
+        ListView phasesView = (ListView) findViewById(R.id.phases_view);
+        phasesView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void send(MultiContainer<Phase> phaseMultiContainer) {
-                final List<PhaseElement> phases = new ArrayList<>();
-                for (int i = 0; i < phaseMultiContainer.Properties.size(); i++) {
-                    phases.add(new PhaseElement(phaseMultiContainer.Properties.get(phaseMultiContainer.Properties.size() - i - 1).Properties));
-                }
-                ListView phasesView = (ListView) findViewById(R.id.phases_view);
-                phasesView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        Gson gson = new Gson();
-                        phaseMeta = gson.fromJson(gson.toJson(phases.get(i).phase), PhaseMeta.class);
-                        currentView = R.id.nav_map;
-                        showMap();
-                    }
-                });
-                phasesView.setAdapter(new ArrayAdapter<PhaseElement>(GameActivity.this, android.R.layout.simple_list_item_1, phases));
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Gson gson = new Gson();
+                phaseMeta = gson.fromJson(gson.toJson(phaseList.get(i).phase), PhaseMeta.class);
+                currentView = R.id.nav_map;
+                showMap();
             }
         });
+        phasesView.setAdapter(new ArrayAdapter<PhaseElement>(GameActivity.this, android.R.layout.simple_list_item_1, phaseList));
     }
 
     public void showGameResults() {
@@ -934,39 +884,33 @@ public class GameActivity extends RetrofitActivity
     public void showPhaseStatus() {
         hideAllExcept(R.id.phase_status_view);
         if (phaseMeta != null && phaseMeta.PhaseOrdinal != null) {
-            handleReq(
-                phaseService.PhaseLoad(game.ID, phaseMeta.PhaseOrdinal.toString()),
-                new Sendable<SingleContainer<Phase>>() {
-                    @Override
-                    public void send(SingleContainer<Phase> phaseSingleContainer) {
-                        Counter<String> scCount = new Counter<String>();
-                        for (SC sc : phaseSingleContainer.Properties.SCs) {
-                            scCount.increment(sc.Owner);
-                        }
+            SingleContainer<Phase> phaseSingleContainer = phases.Properties.get(phaseMeta.PhaseOrdinal.intValue() - 1);
+            Counter<String> scCount = new Counter<String>();
+            for (SC sc : phaseSingleContainer.Properties.SCs) {
+                scCount.increment(sc.Owner);
+            }
 
-                        Counter<String> unitCount = new Counter<String>();
-                        for (UnitWrapper wrapper : phaseSingleContainer.Properties.Units) {
-                            unitCount.increment(wrapper.Unit.Nation);
-                        }
+            Counter<String> unitCount = new Counter<String>();
+            for (UnitWrapper wrapper : phaseSingleContainer.Properties.Units) {
+                unitCount.increment(wrapper.Unit.Nation);
+            }
 
-                        Set<String> nations = new HashSet<String>();
-                        nations.addAll(scCount.keySet());
-                        nations.addAll(unitCount.keySet());
+            Set<String> nations = new HashSet<String>();
+            nations.addAll(scCount.keySet());
+            nations.addAll(unitCount.keySet());
 
-                        ViewGroup phaseStatusInnerView = (ViewGroup) findViewById(R.id.phase_status_inner_view);
-                        phaseStatusInnerView.removeViews(1, phaseStatusInnerView.getChildCount() - 1);
-                        LayoutInflater layoutInflater = LayoutInflater.from(phaseStatusInnerView.getContext());
+            ViewGroup phaseStatusInnerView = (ViewGroup) findViewById(R.id.phase_status_inner_view);
+            phaseStatusInnerView.removeViews(1, phaseStatusInnerView.getChildCount() - 1);
+            LayoutInflater layoutInflater = LayoutInflater.from(phaseStatusInnerView.getContext());
 
-                        List<String> nationsList = new ArrayList<>(nations);
-                        Collections.sort(nationsList);
-                        for (String nation : nationsList) {
-                            addPhaseStatusRow(phaseStatusInnerView, layoutInflater, nation,
-                                    String.valueOf(scCount.get(nation)),
-                                    String.valueOf(unitCount.get(nation)),
-                                    String.format("%+d", scCount.get(nation) - unitCount.get(nation)));
-                        }
-                    }
-                }, getResources().getString(R.string.loading_state));
+            List<String> nationsList = new ArrayList<>(nations);
+            Collections.sort(nationsList);
+            for (String nation : nationsList) {
+                addPhaseStatusRow(phaseStatusInnerView, layoutInflater, nation,
+                        String.valueOf(scCount.get(nation)),
+                        String.valueOf(unitCount.get(nation)),
+                        String.format("%+d", scCount.get(nation) - unitCount.get(nation)));
+            }
         }
     }
 
@@ -998,48 +942,42 @@ public class GameActivity extends RetrofitActivity
 
     public void showOrders() {
         hideAllExcept(R.id.orders_view);
-        handleReq(
-                JoinObservable.when(JoinObservable
-                        .from(orderService.ListOrders(game.ID, phaseMeta.PhaseOrdinal.toString()))
-                        .and(phaseService.PhaseLoad(game.ID, phaseMeta.PhaseOrdinal.toString()))
-                        .then(new Func2<MultiContainer<Order>, SingleContainer<Phase>, Object>() {
-                            @Override
-                            public Object call(MultiContainer<Order> orderMultiContainer, SingleContainer<Phase> phaseSingleContainer) {
-                                Map<String, String> resultMap = new HashMap<String, String>();
-                                if (phaseSingleContainer.Properties.Resolutions != null) {
-                                    for (Resolution resolution : phaseSingleContainer.Properties.Resolutions) {
-                                        resultMap.put(resolution.Province, resolution.Resolution);
-                                    }
-                                }
-                                List<String> orders = new ArrayList<String>();
-                                for (SingleContainer<Order> orderContainer : orderMultiContainer.Properties) {
-                                    String resolution = resultMap.get(orderContainer.Properties.Parts.get(0));
-                                    if (resolution == null) {
-                                        orders.add(getResources().getString(R.string.nation_order, orderContainer.Properties.Nation, TextUtils.join(" ", orderContainer.Properties.Parts)));
-                                    } else {
-                                        orders.add(getResources().getString(R.string.nation_order_result, orderContainer.Properties.Nation, TextUtils.join(" ", orderContainer.Properties.Parts), resolution));
-                                    }
-                                }
-                                Collections.sort(orders);
-                                final EditText ordersView = (EditText) findViewById(R.id.orders_view);
-                                ordersView.setOnTouchListener(new View.OnTouchListener() {
-                                    @Override
-                                    public boolean onTouch(View view, MotionEvent motionEvent) {
-                                        flickFrameLayout.onTouchEvent(motionEvent);
-                                        ordersView.onTouchEvent(motionEvent);
-                                        return true;
-                                    }
-                                });
-                                StringBuffer orderBuffer = new StringBuffer();
-                                for (String order : orders) {
-                                    orderBuffer.append(order + "\n");
-                                }
-                                ordersView.setText(orderBuffer);
-                                return null;
-                            }
-                        })).toObservable(),
-                null,
-                getResources().getString(R.string.loading_orders));
+        handleReq(orderService.ListOrders(game.ID, phaseMeta.PhaseOrdinal.toString()), new Sendable<MultiContainer<Order>>() {
+            @Override
+            public void send(MultiContainer<Order> orderMultiContainer) {
+                SingleContainer<Phase> phaseSingleContainer = phases.Properties.get(phaseMeta.PhaseOrdinal.intValue() - 1);
+                Map<String, String> resultMap = new HashMap<String, String>();
+                if (phaseSingleContainer.Properties.Resolutions != null) {
+                    for (Resolution resolution : phaseSingleContainer.Properties.Resolutions) {
+                        resultMap.put(resolution.Province, resolution.Resolution);
+                    }
+                }
+                List<String> orders = new ArrayList<String>();
+                for (SingleContainer<Order> orderContainer : orderMultiContainer.Properties) {
+                    String resolution = resultMap.get(orderContainer.Properties.Parts.get(0));
+                    if (resolution == null) {
+                        orders.add(getResources().getString(R.string.nation_order, orderContainer.Properties.Nation, TextUtils.join(" ", orderContainer.Properties.Parts)));
+                    } else {
+                        orders.add(getResources().getString(R.string.nation_order_result, orderContainer.Properties.Nation, TextUtils.join(" ", orderContainer.Properties.Parts), resolution));
+                    }
+                }
+                Collections.sort(orders);
+                final EditText ordersView = (EditText) findViewById(R.id.orders_view);
+                ordersView.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View view, MotionEvent motionEvent) {
+                        flickFrameLayout.onTouchEvent(motionEvent);
+                        ordersView.onTouchEvent(motionEvent);
+                        return true;
+                    }
+                });
+                StringBuffer orderBuffer = new StringBuffer();
+                for (String order : orders) {
+                    orderBuffer.append(order + "\n");
+                }
+                ordersView.setText(orderBuffer);
+            }
+        }, getResources().getString(R.string.loading_orders));
     }
 
     public void showMap() {
@@ -1122,10 +1060,10 @@ public class GameActivity extends RetrofitActivity
                 handleReq(JoinObservable.when(JoinObservable
                         .from(optionsService.GetOptions(game.ID, phaseMeta.PhaseOrdinal.toString()))
                         .and(orderService.ListOrders(game.ID, phaseMeta.PhaseOrdinal.toString()))
-                        .and(phaseService.PhaseLoad(game.ID, phaseMeta.PhaseOrdinal.toString()))
-                        .then(new Func3<SingleContainer<Map<String,OptionsService.Option>>, MultiContainer<Order>, SingleContainer<Phase>, Object>() {
+                        .then(new Func2<SingleContainer<Map<String,OptionsService.Option>>, MultiContainer<Order>, Object>() {
                             @Override
-                            public Object call(SingleContainer<Map<String, OptionsService.Option>> opts, MultiContainer<Order> ords, SingleContainer<Phase> phase) {
+                            public Object call(SingleContainer<Map<String, OptionsService.Option>> opts, MultiContainer<Order> ords) {
+                                SingleContainer<Phase> phase = phases.Properties.get(phaseMeta.PhaseOrdinal.intValue() - 1);
                                 options = opts.Properties;
                                 orders.clear();
                                 for (SingleContainer<Order> orderContainer : ords.Properties) {

@@ -83,7 +83,7 @@ public class NotificationReceiveActivity extends RetrofitActivity {
                                             if (android.os.Build.VERSION.SDK_INT > 15) {
                                                 Intent mainIntent = new Intent(NotificationReceiveActivity.this, MainActivity.class);
                                                 mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-                                                Intent gameIntent = GameActivity.startGameIntent(NotificationReceiveActivity.this, gameSingleContainer.Properties);
+                                                Intent gameIntent = GameActivity.startGameIntent(NotificationReceiveActivity.this, gameSingleContainer.Properties, phaseMultiContainer);
                                                 TaskStackBuilder.create(NotificationReceiveActivity.this)
                                                         .addNextIntent(mainIntent)
                                                         .addNextIntent(gameIntent)
@@ -110,28 +110,32 @@ public class NotificationReceiveActivity extends RetrofitActivity {
 
     private void startGameActivity(String gameID) {
         handleReq(
-                gameService.GameLoad(gameID),
-                new Sendable<SingleContainer<Game>>() {
-                    @Override
-                    public void send(SingleContainer<Game> gameSingleContainer) {
-                        Intent mainIntent = new Intent(NotificationReceiveActivity.this, MainActivity.class);
-                        mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-                        Intent gameIntent;
-                        if (gameSingleContainer.Properties.NewestPhaseMeta != null && gameSingleContainer.Properties.NewestPhaseMeta.size() > 0) {
-                            gameIntent = GameActivity.startGameIntent(NotificationReceiveActivity.this, gameSingleContainer.Properties);
-                        } else {
-                            gameIntent = GameActivity.startGameIntent(NotificationReceiveActivity.this, gameSingleContainer.Properties);
-                        }
-                        if (android.os.Build.VERSION.SDK_INT > 15) {
-                            TaskStackBuilder.create(NotificationReceiveActivity.this)
-                                    .addNextIntent(mainIntent)
-                                    .addNextIntent(gameIntent).startActivities();
-                        } else {
-                            startActivity(gameIntent);
-                        }
-                        finish();
-
-                    }
-                }, getResources().getString(R.string.loading_state));
+                JoinObservable.when(JoinObservable
+                        .from(gameService.GameLoad(gameID))
+                        .and(phaseService.ListPhases(gameID))
+                        .then(new Func2<SingleContainer<Game>, MultiContainer<Phase>, Object>() {
+                            @Override
+                            public Object call(SingleContainer<Game> gameSingleContainer, MultiContainer<Phase> phaseMultiContainer) {
+                                Intent mainIntent = new Intent(NotificationReceiveActivity.this, MainActivity.class);
+                                mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                                Intent gameIntent;
+                                if (gameSingleContainer.Properties.NewestPhaseMeta != null && gameSingleContainer.Properties.NewestPhaseMeta.size() > 0) {
+                                    gameIntent = GameActivity.startGameIntent(NotificationReceiveActivity.this, gameSingleContainer.Properties, phaseMultiContainer);
+                                } else {
+                                    gameIntent = GameActivity.startGameIntent(NotificationReceiveActivity.this, gameSingleContainer.Properties, phaseMultiContainer);
+                                }
+                                if (android.os.Build.VERSION.SDK_INT > 15) {
+                                    TaskStackBuilder.create(NotificationReceiveActivity.this)
+                                            .addNextIntent(mainIntent)
+                                            .addNextIntent(gameIntent).startActivities();
+                                } else {
+                                    startActivity(gameIntent);
+                                }
+                                finish();
+                                return null;
+                            }
+                        })).toObservable(),
+                null,
+                getResources().getString(R.string.loading_state));
     }
 }

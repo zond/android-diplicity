@@ -32,6 +32,8 @@ import retrofit2.adapter.rxjava.HttpException;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Link;
 import se.oort.diplicity.apigen.Member;
+import se.oort.diplicity.apigen.MultiContainer;
+import se.oort.diplicity.apigen.Phase;
 import se.oort.diplicity.apigen.PhaseMeta;
 import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.game.GameActivity;
@@ -413,7 +415,14 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             ((FloatingActionButton) itemView.findViewById(R.id.open_button)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    retrofitActivity.startActivity(GameActivity.startGameIntent(retrofitActivity, game.Properties));
+                    retrofitActivity.handleReq(
+                            retrofitActivity.phaseService.ListPhases(game.Properties.ID),
+                            new Sendable<MultiContainer<Phase>>() {
+                                @Override
+                                public void send(MultiContainer<Phase> phaseMultiContainer) {
+                                    retrofitActivity.startActivity(GameActivity.startGameIntent(retrofitActivity, game.Properties, phaseMultiContainer));
+                                }
+                            }, retrofitActivity.getResources().getString(R.string.loading_state));
                 }
             });
 
