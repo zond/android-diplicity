@@ -11,6 +11,10 @@
             android:icon="@drawable/ic_assignment_black_24dp"
             android:title="@string/orders" />
         <item
+            android:id="@+id/nav_phase_status"
+            android:icon="@drawable/ic_assessment_black_24dp"
+            android:title="@string/phase_status" />
+        <item
             android:id="@+id/nav_phases"
             android:icon="@drawable/ic_format_list_numbered_black_24dp"
             android:title="@string/phases" />

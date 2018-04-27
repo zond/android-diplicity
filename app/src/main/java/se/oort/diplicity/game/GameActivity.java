@@ -14,10 +14,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -70,7 +72,9 @@ import se.oort.diplicity.apigen.PhaseState;
 import se.oort.diplicity.apigen.Resolution;
 import se.oort.diplicity.apigen.SC;
 import se.oort.diplicity.apigen.SingleContainer;
+import se.oort.diplicity.apigen.Unit;
 import se.oort.diplicity.apigen.UnitWrapper;
+import se.oort.diplicity.util.Counter;
 
 public class GameActivity extends RetrofitActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -286,6 +290,7 @@ public class GameActivity extends RetrofitActivity
             nav_Menu.findItem(R.id.nav_press).setVisible(false);
             nav_Menu.findItem(R.id.nav_phase_settings).setVisible(false);
             nav_Menu.findItem(R.id.nav_game_settings).setVisible(false);
+            nav_Menu.findItem(R.id.nav_phase_status).setVisible(false);
         }
         if (phaseMeta == null || !phaseMeta.Resolved) {
             nav_Menu.findItem(R.id.nav_phase_result).setVisible(false);
@@ -319,6 +324,7 @@ public class GameActivity extends RetrofitActivity
         for (int viewID : new int[]{
                 R.id.map_view,
                 R.id.orders_view,
+                R.id.phase_status_view,
                 R.id.phases_view,
                 R.id.press_view,
                 R.id.phase_results_view,
@@ -925,6 +931,71 @@ public class GameActivity extends RetrofitActivity
         }
     }
 
+    public void showPhaseStatus() {
+        hideAllExcept(R.id.phase_status_view);
+        if (phaseMeta != null && phaseMeta.PhaseOrdinal != null) {
+            handleReq(
+                phaseService.PhaseLoad(game.ID, phaseMeta.PhaseOrdinal.toString()),
+                new Sendable<SingleContainer<Phase>>() {
+                    @Override
+                    public void send(SingleContainer<Phase> phaseSingleContainer) {
+                        Counter<String> scCount = new Counter<String>();
+                        for (SC sc : phaseSingleContainer.Properties.SCs) {
+                            scCount.increment(sc.Owner);
+                        }
+
+                        Counter<String> unitCount = new Counter<String>();
+                        for (UnitWrapper wrapper : phaseSingleContainer.Properties.Units) {
+                            unitCount.increment(wrapper.Unit.Nation);
+                        }
+
+                        Set<String> nations = new HashSet<String>();
+                        nations.addAll(scCount.keySet());
+                        nations.addAll(unitCount.keySet());
+
+                        ViewGroup phaseStatusInnerView = (ViewGroup) findViewById(R.id.phase_status_inner_view);
+                        phaseStatusInnerView.removeViews(1, phaseStatusInnerView.getChildCount() - 1);
+                        LayoutInflater layoutInflater = LayoutInflater.from(phaseStatusInnerView.getContext());
+
+                        List<String> nationsList = new ArrayList<>(nations);
+                        Collections.sort(nationsList);
+                        for (String nation : nationsList) {
+                            addPhaseStatusRow(phaseStatusInnerView, layoutInflater, nation,
+                                    String.valueOf(scCount.get(nation)),
+                                    String.valueOf(unitCount.get(nation)),
+                                    String.format("%+d", scCount.get(nation) - unitCount.get(nation)));
+                        }
+                    }
+                }, getResources().getString(R.string.loading_state));
+        }
+    }
+
+    /**
+     * Add a row to the phase status table.
+     *
+     * @param phaseStatusInnerView The parent to add the status row to.
+     * @param layoutInflater The inflater for creating status rows.
+     * @param nation The string for the nation column.
+     * @param scCount The string for the SC column.
+     * @param unitCount The string for the unit column.
+     * @param delta The string for the delta column.
+     */
+    private void addPhaseStatusRow(ViewGroup phaseStatusInnerView, LayoutInflater layoutInflater, String nation, String scCount, String unitCount, String delta) {
+        View itemView = layoutInflater.inflate(R.layout.phase_status_row, phaseStatusInnerView, false);
+        TextView nationView = (TextView) itemView.findViewById(R.id.nation);
+        nationView.setText(nation);
+        TextView scCountView = (TextView) itemView.findViewById(R.id.sc_count);
+        scCountView.setText(scCount);
+        TextView unitCountView = (TextView) itemView.findViewById(R.id.unit_count);
+        unitCountView.setText(unitCount);
+
+        if (delta != null) {
+            TextView unitDeltaView = (TextView) itemView.findViewById(R.id.unit_delta);
+            unitDeltaView.setText(delta);
+        }
+        phaseStatusInnerView.addView(itemView);
+    }
+
     public void showOrders() {
         hideAllExcept(R.id.orders_view);
         handleReq(
@@ -1149,6 +1220,8 @@ public class GameActivity extends RetrofitActivity
             showMap();
         } else if (id == R.id.nav_orders) {
             showOrders();
+        } else if (id == R.id.nav_phase_status) {
+            showPhaseStatus();
         } else if (id == R.id.nav_phases) {
             showPhases(oldView != currentView);
         } else if (id == R.id.nav_press) {
