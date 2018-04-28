@@ -89,6 +89,7 @@
                         android:text="@string/units" />
 
                     <TextView
+                        android:id="@+id/dislodged_header"
                         android:layout_alignParentTop="true"
                         android:textAppearance="?attr/textAppearanceListItem"
                         android:layout_width="wrap_content"
@@ -96,6 +97,16 @@
                         android:layout_marginLeft="@dimen/default_gap"
                         android:textColor="?android:attr/textColorPrimary"
                         android:layout_column="4"
+                        android:text="@string/dislodged" />
+
+                    <TextView
+                        android:layout_alignParentTop="true"
+                        android:textAppearance="?attr/textAppearanceListItem"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/default_gap"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:layout_column="5"
                         android:text="@string/delta" />
 
                 </TableRow>
