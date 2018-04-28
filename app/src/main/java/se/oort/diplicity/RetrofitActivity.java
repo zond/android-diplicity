@@ -530,7 +530,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                 pushToken.Note = message + " at " + new Date();
             }
         }
-        if (pushToken != null) {
+        if (pushToken != null && getLoggedInUser() != null) {
             final FCMToken finalToken = pushToken;
             handleReq(
                     userConfigService.UserConfigUpdate(userConfig, getLoggedInUser().Id),

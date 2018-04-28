@@ -68,15 +68,17 @@ public class PreferenceActivity extends RetrofitActivity {
                                 emailPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                                     @Override
                                     public boolean onPreferenceChange(Preference preference, Object o) {
-                                        userConfigSingleContainer.Properties.MailConfig.Enabled = (Boolean) o;
-                                        retrofitActivity().handleReq(
-                                                retrofitActivity().userConfigService.UserConfigUpdate(userConfigSingleContainer.Properties, retrofitActivity().getLoggedInUser().Id),
-                                                new Sendable<SingleContainer<UserConfig>>() {
-                                                    @Override
-                                                    public void send(SingleContainer<UserConfig> userConfigSingleContainer) {
-                                                    }
-                                                },
-                                                getResources().getString(R.string.updating_settings));
+                                        if (retrofitActivity().getLoggedInUser() != null) {
+                                            userConfigSingleContainer.Properties.MailConfig.Enabled = (Boolean) o;
+                                            retrofitActivity().handleReq(
+                                                    retrofitActivity().userConfigService.UserConfigUpdate(userConfigSingleContainer.Properties, retrofitActivity().getLoggedInUser().Id),
+                                                    new Sendable<SingleContainer<UserConfig>>() {
+                                                        @Override
+                                                        public void send(SingleContainer<UserConfig> userConfigSingleContainer) {
+                                                        }
+                                                    },
+                                                    getResources().getString(R.string.updating_settings));
+                                        }
                                         return true;
                                     }
                                 });
