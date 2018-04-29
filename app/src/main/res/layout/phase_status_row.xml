@@ -72,7 +72,7 @@
         android:layout_alignParentRight="true"
         android:layout_toEndOf="@id/unit_count"
         android:layout_toRightOf="@id/unit_count"
-        android:id="@+id/unit_delta"
+        android:id="@+id/dislodged_count"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:layout_width="wrap_content"
@@ -80,4 +80,25 @@
         android:gravity="right"
         android:textColor="?android:attr/textColorSecondary"
         android:layout_column="4" />
+
+    <TextView
+        android:inputType="none"
+        android:editable="false"
+        android:textIsSelectable="true"
+        android:textSize="16sp"
+        android:background="@android:color/transparent"
+        android:textAppearance="@android:style/Widget.TextView"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_toEndOf="@id/dislodged_count"
+        android:layout_toRightOf="@id/dislodged_count"
+        android:id="@+id/unit_delta"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:textColor="?android:attr/textColorSecondary"
+        android:layout_column="5" />
 </TableRow>

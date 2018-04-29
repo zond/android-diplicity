@@ -58,6 +58,7 @@ import se.oort.diplicity.RetrofitActivity;
 import se.oort.diplicity.Sendable;
 import se.oort.diplicity.UserView;
 import se.oort.diplicity.VariantService;
+import se.oort.diplicity.apigen.Dislodged;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.GameResult;
 import se.oort.diplicity.apigen.GameState;
@@ -895,6 +896,18 @@ public class GameActivity extends RetrofitActivity
                 unitCount.increment(wrapper.Unit.Nation);
             }
 
+            Counter<String> dislodgedCount = null;
+            View dislodgedHeader = findViewById(R.id.dislodged_header);
+            if (phaseSingleContainer.Properties.Dislodgeds != null) {
+                dislodgedHeader.setVisibility(View.VISIBLE);
+                dislodgedCount = new Counter<String>();
+                for (Dislodged dislodged : phaseSingleContainer.Properties.Dislodgeds) {
+                    dislodgedCount.increment(dislodged.Dislodged.Nation);
+                }
+            } else {
+                dislodgedHeader.setVisibility(View.GONE);
+            }
+
             Set<String> nations = new HashSet<String>();
             nations.addAll(scCount.keySet());
             nations.addAll(unitCount.keySet());
@@ -906,10 +919,13 @@ public class GameActivity extends RetrofitActivity
             List<String> nationsList = new ArrayList<>(nations);
             Collections.sort(nationsList);
             for (String nation : nationsList) {
+                String dislodgedString = (dislodgedCount != null ? String.valueOf(dislodgedCount.get(nation)) : null);
+                int delta = scCount.get(nation) - unitCount.get(nation) - (dislodgedCount != null ? dislodgedCount.get(nation) : 0);
                 addPhaseStatusRow(phaseStatusInnerView, layoutInflater, nation,
                         String.valueOf(scCount.get(nation)),
                         String.valueOf(unitCount.get(nation)),
-                        String.format("%+d", scCount.get(nation) - unitCount.get(nation)));
+                        dislodgedString,
+                        String.format("%+d", delta));
             }
         }
     }
@@ -922,9 +938,11 @@ public class GameActivity extends RetrofitActivity
      * @param nation The string for the nation column.
      * @param scCount The string for the SC column.
      * @param unitCount The string for the unit column.
+     * @param dislodgedCount The string for the dislodged column.
      * @param delta The string for the delta column.
      */
-    private void addPhaseStatusRow(ViewGroup phaseStatusInnerView, LayoutInflater layoutInflater, String nation, String scCount, String unitCount, String delta) {
+    private void addPhaseStatusRow(ViewGroup phaseStatusInnerView, LayoutInflater layoutInflater,
+                                   String nation, String scCount, String unitCount, String dislodgedCount, String delta) {
         View itemView = layoutInflater.inflate(R.layout.phase_status_row, phaseStatusInnerView, false);
         TextView nationView = (TextView) itemView.findViewById(R.id.nation);
         nationView.setText(nation);
@@ -932,7 +950,10 @@ public class GameActivity extends RetrofitActivity
         scCountView.setText(scCount);
         TextView unitCountView = (TextView) itemView.findViewById(R.id.unit_count);
         unitCountView.setText(unitCount);
-
+        if (dislodgedCount != null) {
+            TextView dislodgedCountView = (TextView) itemView.findViewById(R.id.dislodged_count);
+            dislodgedCountView.setText(dislodgedCount);
+        }
         if (delta != null) {
             TextView unitDeltaView = (TextView) itemView.findViewById(R.id.unit_delta);
             unitDeltaView.setText(delta);
