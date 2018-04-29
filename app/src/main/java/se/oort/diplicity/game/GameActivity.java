@@ -46,7 +46,6 @@ import java.util.Set;
 
 import retrofit2.adapter.rxjava.HttpException;
 import rx.functions.Func2;
-import rx.functions.Func3;
 import rx.observables.JoinObservable;
 import se.oort.diplicity.App;
 import se.oort.diplicity.ChannelService;
@@ -73,7 +72,6 @@ import se.oort.diplicity.apigen.PhaseState;
 import se.oort.diplicity.apigen.Resolution;
 import se.oort.diplicity.apigen.SC;
 import se.oort.diplicity.apigen.SingleContainer;
-import se.oort.diplicity.apigen.Unit;
 import se.oort.diplicity.apigen.UnitWrapper;
 import se.oort.diplicity.util.Counter;
 
@@ -707,7 +705,7 @@ public class GameActivity extends RetrofitActivity
     public void showPhaseStates() {
         hideAllExcept(R.id.phase_state_view);
 
-        final MemberTable phaseStateView = (MemberTable) findViewById(R.id.phase_state_view);
+        final MemberTable phaseStateView = (MemberTable) findViewById(R.id.phase_state_view_table);
         phaseStateView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
