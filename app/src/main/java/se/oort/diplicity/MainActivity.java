@@ -559,11 +559,7 @@ public class MainActivity extends RetrofitActivity {
         contentList.addItemDecoration(dividerItemDecoration);
 
         loadMoreProcContainer.add(null);
-    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
         if (ACTION_VIEW_USER_GAMES.equals(getIntent().getAction())) {
             byte[] serializedUser = getIntent().getByteArrayExtra(SERIALIZED_USER_KEY);
             if (serializedUser != null) {
