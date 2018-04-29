@@ -13,32 +13,42 @@
     tools:context="se.oort.diplicity.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <TextView
-        android:id="@+id/content_title"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:gravity="center_horizontal"
-        android:textColor="?android:attr/textColorPrimary" />
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_height="wrap_content">
 
-    <android.support.v7.widget.RecyclerView
-        android:layout_below="@id/content_title"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
-        android:id="@+id/content_list" />
-    
-    <TextView
-        android:id="@+id/empty_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/content_title"
-        android:layout_alignParentBottom="true"
-        android:gravity="center"
-        android:visibility="gone"
-        android:textColor="?android:attr/textColorPrimary"
-        android:text="@string/no_data_available"/>
+        <TextView
+            android:id="@+id/content_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textColor="?android:attr/textColorPrimary" />
+
+        <Button
+            android:id="@+id/game_list_filter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/content_list" />
+
+        <TextView
+            android:id="@+id/empty_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:visibility="gone"
+            android:textColor="?android:attr/textColorPrimary"
+            android:text="@string/no_data_available"/>
+
+    </LinearLayout>
+
 
     <android.support.design.widget.FloatingActionButton
         xmlns:app="http://schemas.android.com/apk/res-auto"

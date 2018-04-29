@@ -259,4 +259,11 @@
     <string name="colors_must_be_valid_hex_codes">Colors must be valid hex codes, optionally prepended with "[VARIANT]/[NATION]/" or "[NATION]/"</string>
     <string name="color_override">Map color override</string>
     <string name="new_color_override">New map color override</string>
+    <string name="no_filter">No filter</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="from">From</string>
+    <string name="to">To</string>
+    <string name="both">Both</string>
+    <string name="all">All</string>
 </resources>

@@ -570,7 +570,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
 
     public MultiContainer<VariantService.Variant> getVariants() {
         if (variants == null) {
-            variants = new Gson().fromJson(prefs.getString(VARIANTS_PREF_KEY, "[]"), new TypeToken<MultiContainer<VariantService.Variant>>(){}.getType());
+            variants = new Gson().fromJson(prefs.getString(VARIANTS_PREF_KEY, "{}"), new TypeToken<MultiContainer<VariantService.Variant>>(){}.getType());
         }
         return variants;
     }
