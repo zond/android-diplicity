@@ -130,7 +130,7 @@ public class MainActivity extends RetrofitActivity {
                 if (typ == FLOAT_FILTER) {
                     final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.interval_input_dialog).show();
                     if (value != null) {
-                        String[] bits = value.split(":");
+                        String[] bits = value.split(":", -1);
                         if (bits.length == 2) {
                             ((EditText) dialog.findViewById(R.id.from_edit)).setText(bits[0]);
                             ((EditText) dialog.findViewById(R.id.to_edit)).setText(bits[1]);
@@ -139,19 +139,21 @@ public class MainActivity extends RetrofitActivity {
                     ((FloatingActionButton) dialog.findViewById(R.id.confirm_input)).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            float from = 0;
-                            float to = 0;
+                            String from = "";
+                            String to = "";
                             try {
-                                from = Float.parseFloat(((EditText) dialog.findViewById(R.id.from_edit)).getText().toString());
+                                float fromF = Float.parseFloat(((EditText) dialog.findViewById(R.id.from_edit)).getText().toString());
+                                from = "" + fromF;
                             } catch (NumberFormatException e) {
                                 // noop
                             }
                             try {
-                                to = Float.parseFloat(((EditText) dialog.findViewById(R.id.to_edit)).getText().toString());
+                                float toF = Float.parseFloat(((EditText) dialog.findViewById(R.id.to_edit)).getText().toString());
+                                to = "" + toF;
                             } catch (NumberFormatException e) {
                                 // noop
                             }
-                            if (from != 0 || to != 0) {
+                            if (from.length() > 0 || to.length() > 0) {
                                 value = "" + from + ":" + to;
                             } else {
                                 value = null;
@@ -163,7 +165,7 @@ public class MainActivity extends RetrofitActivity {
                 } else if (typ == INT_FILTER) {
                     final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.interval_input_dialog).show();
                     if (value != null) {
-                        String[] bits = value.split(":");
+                        String[] bits = value.split(":", -1);
                         if (bits.length == 2) {
                             ((EditText) dialog.findViewById(R.id.from_edit)).setText(bits[0]);
                             ((EditText) dialog.findViewById(R.id.to_edit)).setText(bits[1]);
@@ -172,19 +174,21 @@ public class MainActivity extends RetrofitActivity {
                     ((FloatingActionButton) dialog.findViewById(R.id.confirm_input)).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            int from = 0;
-                            int to = 0;
+                            String from = "";
+                            String to = "";
                             try {
-                                from = Integer.parseInt(((EditText) dialog.findViewById(R.id.from_edit)).getText().toString());
+                                int fromI = Integer.parseInt(((EditText) dialog.findViewById(R.id.from_edit)).getText().toString());
+                                from = "" + fromI;
                             } catch (NumberFormatException e) {
                                 // noop
                             }
                             try {
-                                to = Integer.parseInt(((EditText) dialog.findViewById(R.id.to_edit)).getText().toString());
+                                int toI = Integer.parseInt(((EditText) dialog.findViewById(R.id.to_edit)).getText().toString());
+                                to = "" + toI;
                             } catch (NumberFormatException e) {
                                 // noop
                             }
-                            if (from != 0 || to != 0) {
+                            if (from.length() > 0 || to.length() > 0) {
                                 value = "" + from + ":" + to;
                             } else {
                                 value = null;
@@ -217,7 +221,7 @@ public class MainActivity extends RetrofitActivity {
                     if (value == null) {
                         return name + ": -";
                     }
-                    String[] bits = value.split(":");
+                    String[] bits = value.split(":", -1);
                     if (bits.length == 2) {
                         return(name + ": " + bits[0] + "-" + bits[1]);
                     }
@@ -243,6 +247,10 @@ public class MainActivity extends RetrofitActivity {
                     variants.add(new String[] {variantContainer.Properties.Name, variantContainer.Properties.Name});
                 }
             }
+            List<String[]> chatSettings = new ArrayList<>();
+            chatSettings.add(new String[] {getResources().getString(R.string.yes), "false"});
+            chatSettings.add(new String[] {getResources().getString(R.string.no), "true"});
+            chatSettings.add(new String[] {getResources().getString(R.string.both), null});
             List<String[]> allocations = new ArrayList<>();
             allocations.add(new String[] {getResources().getString(R.string.random), "0"});
             allocations.add(new String[] {getResources().getString(R.string.preferences), "1"});
@@ -256,6 +264,9 @@ public class MainActivity extends RetrofitActivity {
             filters.add(new Filter(getResources().getString(R.string.max_rating), "max-rating", FLOAT_FILTER));
             filters.add(new Filter(getResources().getString(R.string.nation_allocation), "nation-allocation", allocations));
             filters.add(new Filter(getResources().getString(R.string.phase_length_in_minutes), "phase-length-minutes", INT_FILTER));
+            filters.add(new Filter(getResources().getString(R.string.conference_chat), "conference-chat-disabled", chatSettings));
+            filters.add(new Filter(getResources().getString(R.string.group_chat), "group-chat-disabled", chatSettings));
+            filters.add(new Filter(getResources().getString(R.string.private_chat), "private-chat-disabled", chatSettings));
             String storedFilter = prefs.getString(GAME_LIST_FILTER_KEY, "phase-length-minutes=720:2880");
             for (String piece : storedFilter.split("&")) {
                 String[] bits = piece.split("=");
@@ -942,34 +953,34 @@ public class MainActivity extends RetrofitActivity {
             loadMoreProcContainer.set(0, new Sendable<String>() {
                 @Override
                 public void send(String s) {
-                    appendItems(gameService.ListOtherFinishedGames(user.Id, s, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes")), null, getString(R.string.games), gamesAdapter);
+                    appendItems(gameService.ListOtherFinishedGames(user.Id, s, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes"), gameListFilter.get("conference-chat-disabled"), gameListFilter.get("group-chat-disabled"), gameListFilter.get("private-chat-disabled")), null, getString(R.string.games), gamesAdapter);
                 }
             });
             filterButton.setText(gameListFilter.toString());
             filterButton.setVisibility(View.VISIBLE);
-            displayItems(gameService.ListOtherFinishedGames(user.Id, null, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes")), getString(R.string.x_s_finished, user.Name), getString(R.string._games), gamesAdapter);
+            displayItems(gameService.ListOtherFinishedGames(user.Id, null, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes"), gameListFilter.get("conference-chat-disabled"), gameListFilter.get("group-chat-disabled"), gameListFilter.get("private-chat-disabled")), getString(R.string.x_s_finished, user.Name), getString(R.string._games), gamesAdapter);
         } else if (state.equals(STAGING)) {
             addGameButton.setVisibility(View.GONE);
             loadMoreProcContainer.set(0, new Sendable<String>() {
                 @Override
                 public void send(String s) {
-                    appendItems(gameService.ListOtherStagingGames(user.Id, s, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes")), null, getString(R.string.games), gamesAdapter);
+                    appendItems(gameService.ListOtherStagingGames(user.Id, s, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes"), gameListFilter.get("conference-chat-disabled"), gameListFilter.get("group-chat-disabled"), gameListFilter.get("private-chat-disabled")), null, getString(R.string.games), gamesAdapter);
                 }
             });
             filterButton.setText(gameListFilter.toString());
             filterButton.setVisibility(View.VISIBLE);
-            displayItems(gameService.ListOtherStagingGames(user.Id, null, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes")), getString(R.string.x_s_staging, user.Name), getString(R.string._games), gamesAdapter);
+            displayItems(gameService.ListOtherStagingGames(user.Id, null, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes"), gameListFilter.get("conference-chat-disabled"), gameListFilter.get("group-chat-disabled"), gameListFilter.get("private-chat-disabled")), getString(R.string.x_s_staging, user.Name), getString(R.string._games), gamesAdapter);
         } else if (state.equals(STARTED)) {
             addGameButton.setVisibility(View.GONE);
             loadMoreProcContainer.set(0, new Sendable<String>() {
                 @Override
                 public void send(String s) {
-                    appendItems(gameService.ListOtherStartedGames(user.Id, s, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes")), null, getString(R.string.games), gamesAdapter);
+                    appendItems(gameService.ListOtherStartedGames(user.Id, s, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes"), gameListFilter.get("conference-chat-disabled"), gameListFilter.get("group-chat-disabled"), gameListFilter.get("private-chat-disabled")), null, getString(R.string.games), gamesAdapter);
                 }
             });
             filterButton.setText(gameListFilter.toString());
             filterButton.setVisibility(View.VISIBLE);
-            displayItems(gameService.ListOtherStartedGames(user.Id, null, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes")), getString(R.string.x_s_started, user.Name), getString(R.string._games), gamesAdapter);
+            displayItems(gameService.ListOtherStartedGames(user.Id, null, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes"), gameListFilter.get("conference-chat-disabled"), gameListFilter.get("group-chat-disabled"), gameListFilter.get("private-chat-disabled")), getString(R.string.x_s_started, user.Name), getString(R.string._games), gamesAdapter);
         }
     }
 
@@ -988,64 +999,64 @@ public class MainActivity extends RetrofitActivity {
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
                     public void send(String s) {
-                        appendItems(gameService.ListMyStartedGames(s, null, null, null, null, null, null, null, null, null, null, null), null, navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
+                        appendItems(gameService.ListMyStartedGames(s, null, null, null, null, null, null, null, null, null, null, null, null, null, null), null, navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                     }
                 });
                 filterButton.setVisibility(View.GONE);
-                displayItems(gameService.ListMyStartedGames( null, null, null, null, null, null, null, null, null, null, null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
+                displayItems(gameService.ListMyStartedGames( null, null, null, null, null, null, null, null, null, null, null, null, null, null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                 break;
             case 1: // My staging
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
                     public void send(String s) {
-                        appendItems(gameService.ListMyStagingGames(s, null, null, null, null, null, null, null, null, null, null, null), null, navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
+                        appendItems(gameService.ListMyStagingGames(s, null, null, null, null, null, null, null, null, null, null, null, null, null, null), null, navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                     }
                 });
                 filterButton.setVisibility(View.GONE);
-                displayItems(gameService.ListMyStagingGames( null, null, null, null, null, null, null, null, null, null, null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
+                displayItems(gameService.ListMyStagingGames( null, null, null, null, null, null, null, null, null, null, null, null, null, null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                 break;
             case 2: // My finished
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
                     public void send(String s) {
-                        appendItems(gameService.ListMyFinishedGames(s, null, null, null, null, null, null, null, null, null, null, null), null, navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
+                        appendItems(gameService.ListMyFinishedGames(s, null, null, null, null, null, null, null, null, null, null, null, null, null, null), null, navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                     }
                 });
                 filterButton.setVisibility(View.GONE);
-                displayItems(gameService.ListMyFinishedGames( null, null, null, null, null, null, null, null, null, null, null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
+                displayItems(gameService.ListMyFinishedGames( null, null, null, null, null, null, null, null, null, null, null, null, null, null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                 break;
             case 3: // Open
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
                     public void send(String s) {
-                        appendItems(gameService.ListOpenGames(s, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes")), null, navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
+                        appendItems(gameService.ListOpenGames(s, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes"), gameListFilter.get("conference-chat-disabled"), gameListFilter.get("group-chat-disabled"), gameListFilter.get("private-chat-disabled")), null, navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                     }
                 });
                 filterButton.setText(gameListFilter.toString());
                 filterButton.setVisibility(View.VISIBLE);
-                displayItems(gameService.ListOpenGames( null, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes")), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
+                displayItems(gameService.ListOpenGames( null, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes"), gameListFilter.get("conference-chat-disabled"), gameListFilter.get("group-chat-disabled"), gameListFilter.get("private-chat-disabled")), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                 break;
             case 4: // Started
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
                     public void send(String s) {
-                        appendItems(gameService.ListStartedGames(s, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes")), null, navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
+                        appendItems(gameService.ListStartedGames(s, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes"), gameListFilter.get("conference-chat-disabled"), gameListFilter.get("group-chat-disabled"), gameListFilter.get("private-chat-disabled")), null, navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                     }
                 });
                 filterButton.setText(gameListFilter.toString());
                 filterButton.setVisibility(View.VISIBLE);
-                displayItems(gameService.ListStartedGames( null, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes")), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
+                displayItems(gameService.ListStartedGames( null, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes"), gameListFilter.get("conference-chat-disabled"), gameListFilter.get("group-chat-disabled"), gameListFilter.get("private-chat-disabled")), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                 break;
             case 5: // Finished
                 loadMoreProcContainer.set(0, new Sendable<String>() {
                     @Override
                     public void send(String s) {
-                        appendItems(gameService.ListFinishedGames(s, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes")), null, navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
+                        appendItems(gameService.ListFinishedGames(s, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes"), gameListFilter.get("conference-chat-disabled"), gameListFilter.get("group-chat-disabled"), gameListFilter.get("private-chat-disabled")), null, navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                     }
                 });
                 filterButton.setText(gameListFilter.toString());
                 filterButton.setVisibility(View.VISIBLE);
-                displayItems(gameService.ListFinishedGames( null, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes")), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
+                displayItems(gameService.ListFinishedGames( null, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes"), gameListFilter.get("conference-chat-disabled"), gameListFilter.get("group-chat-disabled"), gameListFilter.get("private-chat-disabled")), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                 break;
             case 6: // Lookup
                 final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.lookup_game_dialog).show();

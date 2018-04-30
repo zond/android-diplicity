@@ -10,6 +10,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_width="match_parent"
+        android:layout_marginBottom="80dp"
         android:layout_height="wrap_content">
 
     </ListView>
@@ -24,7 +25,7 @@
         android:tint="@android:color/white"
         android:id="@+id/confirm_filters"
         android:src="@drawable/ic_done_black_24dp"
-        android:layout_below="@id/filters"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_width="wrap_content"
