@@ -455,6 +455,15 @@ public class MainActivity extends RetrofitActivity {
                                     return true;
                                 }
                             };
+                            dialog.findViewById(R.id.help_icon).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    String url = "https://sites.google.com/view/diplicity/home/documentation/creating-a-game";
+                                    Intent i = new Intent(Intent.ACTION_VIEW);
+                                    i.setData(Uri.parse(url));
+                                    startActivity(i);
+                                }
+                            });
                             final Spinner variants = ((Spinner) dialog.findViewById(R.id.variants));
                             final List<SpinnerVariantElement> variantNames = new ArrayList<>();
                             for (SingleContainer<VariantService.Variant> variantContainer : getVariants().Properties) {
@@ -984,7 +993,24 @@ public class MainActivity extends RetrofitActivity {
         }
     }
 
+    private void helpOn(final String url) {
+        findViewById(R.id.help_icon).setVisibility(View.VISIBLE);
+        findViewById(R.id.help_icon).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+            }
+        });
+    }
+
+    private void helpOff() {
+        findViewById(R.id.help_icon).setVisibility(View.GONE);
+    }
+
     private void navigateTo(final int root, final int child) {
+        helpOff();
         navRoot = root;
         navChild = child;
         if (root == 0 && (child == 1 || child == 3)) {
@@ -1012,6 +1038,7 @@ public class MainActivity extends RetrofitActivity {
                         appendItems(gameService.ListMyStagingGames(s, null, null, null, null, null, null, null, null, null, null, null, null, null, null), null, navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                     }
                 });
+                helpOn("https://sites.google.com/view/diplicity/home/documentation/creating-a-game");
                 filterButton.setVisibility(View.GONE);
                 displayItems(gameService.ListMyStagingGames( null, null, null, null, null, null, null, null, null, null, null, null, null, null, null), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                 break;
@@ -1032,6 +1059,7 @@ public class MainActivity extends RetrofitActivity {
                         appendItems(gameService.ListOpenGames(s, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes"), gameListFilter.get("conference-chat-disabled"), gameListFilter.get("group-chat-disabled"), gameListFilter.get("private-chat-disabled")), null, navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
                     }
                 });
+                helpOn("https://sites.google.com/view/diplicity/home/documentation/joining-a-game");
                 filterButton.setText(gameListFilter.toString());
                 filterButton.setVisibility(View.VISIBLE);
                 displayItems(gameService.ListOpenGames( null, null, gameListFilter.get("variant"), gameListFilter.get("min-reliability"), gameListFilter.get("min-quickness"), gameListFilter.get("max-hater"), gameListFilter.get("max-hated"), gameListFilter.get("min-rating"), gameListFilter.get("max-rating"), null, gameListFilter.get("nation-allocation"), gameListFilter.get("phase-length-minutes"), gameListFilter.get("conference-chat-disabled"), gameListFilter.get("group-chat-disabled"), gameListFilter.get("private-chat-disabled")), navigationChildGroups.get(root).get(child).get("CHILD_NAME"), navigationRootGroups.get(root).get("ROOT_NAME").toLowerCase(), gamesAdapter);
@@ -1250,6 +1278,11 @@ public class MainActivity extends RetrofitActivity {
         } else if (id == R.id.action_error_log) {
             AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).setView(R.layout.error_log_dialog).show();
             ((EditText) dialog.findViewById(R.id.error_log)).setText(App.errorLog.toString());
+        } else if (id == R.id.action_help) {
+            String url = "https://sites.google.com/view/diplicity";
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
         } else if (id == R.id.action_forum) {
             String url = "https://groups.google.com/forum/#!forum/diplicity-talk";
             Intent i = new Intent(Intent.ACTION_VIEW);

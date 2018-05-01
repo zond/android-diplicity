@@ -3,6 +3,7 @@ package se.oort.diplicity.game;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -162,29 +163,41 @@ public class GameActivity extends RetrofitActivity
 
     public void lastPhase() {
         Gson gson = new Gson();
-        phaseMeta = gson.fromJson(gson.toJson(phases.Properties.get(game.NewestPhaseMeta.get(0).PhaseOrdinal.intValue() - 1).Properties), PhaseMeta.class);
-        draw();
+        Phase phase = phases.Properties.get(game.NewestPhaseMeta.get(0).PhaseOrdinal.intValue() - 1).Properties;
+        if (phase != null) {
+            phaseMeta = gson.fromJson(gson.toJson(phase), PhaseMeta.class);
+            draw();
+        }
     }
 
     public void firstPhase() {
         Gson gson = new Gson();
-        phaseMeta = gson.fromJson(gson.toJson(phases.Properties.get(0).Properties), PhaseMeta.class);
-        draw();
+        Phase phase = phases.Properties.get(0).Properties;
+        if (phase != null) {
+            phaseMeta = gson.fromJson(gson.toJson(phase), PhaseMeta.class);
+            draw();
+        }
     }
 
     public void nextPhase() {
         if (phaseMeta != null && phaseMeta.PhaseOrdinal < game.NewestPhaseMeta.get(0).PhaseOrdinal) {
             Gson gson = new Gson();
-            phaseMeta = gson.fromJson(gson.toJson(phases.Properties.get(phaseMeta.PhaseOrdinal.intValue()).Properties), PhaseMeta.class);
-            draw();
+            Phase phase = phases.Properties.get(phaseMeta.PhaseOrdinal.intValue()).Properties;
+            if (phase != null) {
+                phaseMeta = gson.fromJson(gson.toJson(phase), PhaseMeta.class);
+                draw();
+            }
         }
     }
 
     public void prevPhase() {
         if (phaseMeta != null && phaseMeta.PhaseOrdinal > 1) {
             Gson gson = new Gson();
-            phaseMeta = gson.fromJson(gson.toJson(phases.Properties.get(phaseMeta.PhaseOrdinal.intValue() - 2).Properties), PhaseMeta.class);
-            draw();
+            Phase phase = phases.Properties.get(phaseMeta.PhaseOrdinal.intValue() - 2).Properties;
+            if (phase != null) {
+                phaseMeta = gson.fromJson(gson.toJson(phase), PhaseMeta.class);
+                draw();
+            }
         }
     }
 
@@ -283,6 +296,17 @@ public class GameActivity extends RetrofitActivity
             currentView = R.id.nav_map;
         }
         navigateTo(currentView);
+    }
+
+    private void helpURL(final String url) {
+        findViewById(R.id.help_icon).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+            }
+        });
     }
 
     @Override
@@ -1171,6 +1195,7 @@ public class GameActivity extends RetrofitActivity
     }
 
     private void navigateTo(int id) {
+        helpURL("https://sites.google.com/view/diplicity/home/documentation/submitting-orders");
         int oldView = currentView;
         currentView = id;
         if (id == R.id.nav_map) {
@@ -1182,6 +1207,7 @@ public class GameActivity extends RetrofitActivity
         } else if (id == R.id.nav_phases) {
             showPhases(oldView != currentView);
         } else if (id == R.id.nav_press) {
+            helpURL("https://sites.google.com/view/diplicity/home/documentation/diplomatic-press");
             showPress();
         } else if (id == R.id.nav_phase_result) {
             showPhaseResults();

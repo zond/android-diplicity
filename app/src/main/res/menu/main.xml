@@ -22,13 +22,18 @@
         android:title="@string/forum"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_help"
+        android:orderInCategory="500"
+        android:title="@string/help"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_source"
-        android:orderInCategory="400"
+        android:orderInCategory="600"
         android:title="@string/source_code"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_error_log"
-        android:orderInCategory="500"
+        android:orderInCategory="700"
         android:title="@string/error_log"
         app:showAsAction="never" />
 </menu>
