@@ -58,7 +58,15 @@ public class MapView extends FrameLayout {
                 WebView mWebView = (WebView) findViewById(R.id.web_view);
                 String toEvaluate = "window.map.addReadyAction(function() { " + js + " });";
                 if (Build.VERSION.SDK_INT >= 19) {
-                    mWebView.evaluateJavascript(toEvaluate, null);
+                    try {
+                        mWebView.evaluateJavascript(toEvaluate, null);
+                    } catch (IllegalStateException e) {
+                        // Since, evidently, the Build.VERSION.SDK_INT check isn't enough,
+                        // according to Firebase crash reports....???!???!
+                        if (e.getMessage().contains("This API not supported on Android 4.3 and earlier")) {
+                            mWebView.loadUrl("javascript:" + toEvaluate);
+                        }
+                    }
                 } else {
                     mWebView.loadUrl("javascript:" + toEvaluate);
                 }

@@ -112,11 +112,16 @@ public class GameActivity extends RetrofitActivity
     }
 
     @Override
-    protected boolean consumeDiplicityJSON(MessagingService.DiplicityJSON diplicityJSON) {
+    protected boolean consumeDiplicityJSON(final MessagingService.DiplicityJSON diplicityJSON) {
         if (diplicityJSON.type.equals("phase") && diplicityJSON.gameID.equals(game.ID)) {
-            phases = null;
-            game.NewestPhaseMeta.set(0, diplicityJSON.phaseMeta);
-            Toast.makeText(this, R.string.the_game_has_a_new_phase, Toast.LENGTH_SHORT).show();
+            handleReq(phaseService.ListPhases(game.ID), new Sendable<MultiContainer<Phase>>() {
+                @Override
+                public void send(MultiContainer<Phase> phaseMultiContainer) {
+                    phases = phaseMultiContainer;
+                    game.NewestPhaseMeta.set(0, diplicityJSON.phaseMeta);
+                    Toast.makeText(GameActivity.this, R.string.the_game_has_a_new_phase, Toast.LENGTH_SHORT).show();
+                }
+            }, getResources().getString(R.string.loading_phases));
             return true;
         }
         return false;
@@ -754,7 +759,7 @@ public class GameActivity extends RetrofitActivity
                 }, getResources().getString(R.string.loading_phase_settings));
     }
 
-    public void showPhases(boolean loadPhases) {
+    public void showPhases() {
         hideAllExcept(R.id.phases_view);
         final List<PhaseElement> phaseList = new ArrayList<>();
         for (int i = 0; i < phases.Properties.size(); i++) {
@@ -1205,7 +1210,7 @@ public class GameActivity extends RetrofitActivity
         } else if (id == R.id.nav_phase_status) {
             showPhaseStatus();
         } else if (id == R.id.nav_phases) {
-            showPhases(oldView != currentView);
+            showPhases();
         } else if (id == R.id.nav_press) {
             helpURL("https://sites.google.com/view/diplicity/home/documentation/diplomatic-press");
             showPress();
