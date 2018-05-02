@@ -65,7 +65,7 @@
     <string name="maximum_hater_must_be_above_your_hater_x">Maximum hater must be above your hater (%s)</string>
     <string name="title_activity_game">GameActivity</string>
     <string name="map">Map</string>
-    <string name="desc_season_year_type">%1$s: %2$s %3$s, %4$s</string>
+    <string name="desc_season_year_type">%2$s %3$s, %4$s: %1$s</string>
     <string name="loading_start_state">Loading start state</string>
     <string name="loading_options">Loading options</string>
     <string name="cancel">Cancel</string>
@@ -124,8 +124,7 @@
     <string name="_unread">%1s unread</string>
     <string name="float_format">%1$.2f</string>
     <string name="untitled">Untitled</string>
-    <string name="desc_season_year_type_deadline">%1$s: %2$s %3$s, %4$s (%5$s)</string>
-    <string name="season_year_type_deadline">%1$s %2$s, %3$s (%4$s)</string>
+    <string name="desc_season_year_type_deadline">(%5$s) %2$s %3$s, %4$s: %1$s</string>
     <string name="loading_game_settings">Loading game settings</string>
     <string name="muted">Muted</string>
     <string name="updating_game_state">Updating game state</string>

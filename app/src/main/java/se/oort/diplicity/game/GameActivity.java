@@ -34,6 +34,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -222,9 +223,30 @@ public class GameActivity extends RetrofitActivity
         return getResources().getString(R.string.desc_season_year_type_deadline, descPart, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type, App.millisToDuration(phaseMeta.NextDeadlineIn.millisLeft()));
     }
 
-    public void draw() {
+    private Toolbar updateTitle() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        try {
+            Field f = toolbar.getClass().getDeclaredField("mTitleTextView");
+            f.setAccessible(true);
+            TextView toolbarTextView = (TextView) f.get(toolbar);
+            toolbarTextView.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+            toolbarTextView.setFocusable(true);
+            toolbarTextView.setFocusableInTouchMode(true);
+            toolbarTextView.requestFocus();
+            toolbarTextView.setSingleLine(true);
+            toolbarTextView.setSelected(true);
+            toolbarTextView.setMarqueeRepeatLimit(-1);
+        } catch (NoSuchFieldException e) {
+        } catch (IllegalAccessException e) {
+        }
         setTitle(gameTitle());
 
+        return toolbar;
+    }
+
+    public void draw() {
         setContentView(R.layout.activity_game);
 
         if (game == null) {
@@ -243,8 +265,7 @@ public class GameActivity extends RetrofitActivity
             }
         });
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        Toolbar toolbar = updateTitle();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         final ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(

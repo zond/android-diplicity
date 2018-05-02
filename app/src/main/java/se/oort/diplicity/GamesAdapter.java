@@ -312,8 +312,10 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             }
 
             if (expandedItems.contains(pos)) {
+                desc.setMaxLines(3);
                 expanded.setVisibility(View.VISIBLE);
             } else {
+                desc.setMaxLines(1);
                 expanded.setVisibility(View.GONE);
             }
 
