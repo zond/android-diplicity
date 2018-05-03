@@ -41,6 +41,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -240,13 +241,19 @@ public class MainActivity extends RetrofitActivity {
         public List<Filter> filters = new ArrayList<>();
         public GameListFilter() {
             List<String[]> variants = new ArrayList<>();
-            variants.add(new String[] {getResources().getString(R.string.all), null});
             MultiContainer<VariantService.Variant> multiVariantContainer = getVariants();
             if (multiVariantContainer.Properties != null) {
                 for (SingleContainer<VariantService.Variant> variantContainer : multiVariantContainer.Properties) {
                     variants.add(new String[] {variantContainer.Properties.Name, variantContainer.Properties.Name});
                 }
             }
+            Collections.sort(variants, new Comparator<String[]>() {
+                @Override
+                public int compare(String[] o1, String[] o2) {
+                    return o1[0].compareTo(o2[0]);
+                }
+            });
+            variants.add(0, new String[] {getResources().getString(R.string.all), null});
             List<String[]> chatSettings = new ArrayList<>();
             chatSettings.add(new String[] {getResources().getString(R.string.yes), "false"});
             chatSettings.add(new String[] {getResources().getString(R.string.no), "true"});
