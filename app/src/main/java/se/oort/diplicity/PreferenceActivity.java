@@ -1,5 +1,8 @@
 package se.oort.diplicity;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -11,6 +14,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.text.method.DigitsKeyListener;
 import android.util.Log;
 import android.view.View;
@@ -22,13 +26,17 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import rx.Single;
 import se.oort.diplicity.apigen.FCMNotificationConfig;
 import se.oort.diplicity.apigen.FCMToken;
 import se.oort.diplicity.apigen.SingleContainer;
@@ -36,7 +44,17 @@ import se.oort.diplicity.apigen.UserConfig;
 
 public class PreferenceActivity extends RetrofitActivity {
 
+    private static class FragmentAndConfig {
+        Fragment fragment;
+        SingleContainer<UserConfig> config;
+        public FragmentAndConfig(Fragment f, SingleContainer<UserConfig> c) {
+            this.fragment = f;
+            this.config = c;
+        }
+    }
+
     private static Pattern COLOR_REG = Pattern.compile("^(\\w+/)?(\\w+/)?(#[a-fA-F0-9]{6,6}|[a-fA-F0-9]{8,8})$");
+    private static Map<Context, FragmentAndConfig> configs = new ConcurrentHashMap<>();
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -44,10 +62,48 @@ public class PreferenceActivity extends RetrofitActivity {
         getFragmentManager().beginTransaction().replace(android.R.id.content, new Fragment()).commit();
     }
 
+    public void colorsFromClipboard(final View v) {
+        final FragmentAndConfig f = configs.get(v.getContext());
+        if (f != null) {
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = clipboard.getPrimaryClip();
+            if (clip.getItemCount() > 0) {
+                f.config.Properties.Colors = new ArrayList<String>(Arrays.asList(clip.getItemAt(0).coerceToText(v.getContext()).toString().split("\n")));
+                f.fragment.retrofitActivity().handleReq(
+                        f.fragment.retrofitActivity().userConfigService.UserConfigUpdate(f.config.Properties, f.fragment.retrofitActivity().getLoggedInUser().Id),
+                        new Sendable<SingleContainer<UserConfig>>() {
+                            @Override
+                            public void send(SingleContainer<UserConfig> userConfigSingleContainer) {
+                                Toast.makeText(v.getContext(), R.string.colors_copied_from_clipboard, Toast.LENGTH_LONG).show();
+                                f.fragment.populateColorOverrides(f.config);
+                            }
+                        },
+                        getResources().getString(R.string.updating_settings));
+            }
+        }
+    }
+
+    public void colorsToClipboard(View v) {
+        FragmentAndConfig f = configs.get(v.getContext());
+        if (f != null) {
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText(getResources().getString(R.string.color_scheme), TextUtils.join("\n", f.config.Properties.Colors));
+            clipboard.setPrimaryClip(clip);
+            Toast.makeText(v.getContext(), R.string.colors_copied_to_clipboard, Toast.LENGTH_LONG).show();
+
+        }
+    }
+
     public static class Fragment extends PreferenceFragment {
 
-        private RetrofitActivity retrofitActivity() {
+        protected RetrofitActivity retrofitActivity() {
             return (RetrofitActivity) getActivity();
+        }
+
+        @Override
+        public void onPause() {
+            configs.remove(getContext());
+            super.onPause();
         }
 
         @Override
@@ -59,6 +115,8 @@ public class PreferenceActivity extends RetrofitActivity {
                         new Sendable<SingleContainer<UserConfig>>() {
                             @Override
                             public void send(final SingleContainer<UserConfig> userConfigSingleContainer) {
+                                configs.put(getContext(), new FragmentAndConfig(Fragment.this, userConfigSingleContainer));
+
                                 final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 
                                 findPreference(getResources().getString(R.string.app_version_pref_key)).setSummary("" + BuildConfig.VERSION_CODE);
@@ -170,6 +228,8 @@ public class PreferenceActivity extends RetrofitActivity {
 
                                 populateColorOverrides(userConfigSingleContainer);
 
+
+
                                 if (!prefs.getBoolean(getResources().getString(R.string.local_development_mode_pref_key), false)) {
                                     removeFakeIDPref();
                                 } else {
@@ -181,7 +241,7 @@ public class PreferenceActivity extends RetrofitActivity {
             }
         }
 
-        private void populateColorOverrides(final SingleContainer<UserConfig> configContainer) {
+        protected void populateColorOverrides(final SingleContainer<UserConfig> configContainer) {
             UserConfig config = configContainer.Properties;
             PreferenceCategory parent = ((PreferenceCategory) findPreference("interface_prefs"));
             Set<Preference> toRemove = new HashSet<Preference>();

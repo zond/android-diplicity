@@ -266,4 +266,9 @@
     <string name="both">Both</string>
     <string name="all">All</string>
     <string name="help">Help</string>
+    <string name="paste_colors">Paste colors</string>
+    <string name="copy_colors">Copy colors</string>
+    <string name="color_scheme">Color scheme</string>
+    <string name="colors_copied_to_clipboard">Colors copied to clipboard</string>
+    <string name="colors_copied_from_clipboard">Colors copied from clipboard</string>
 </resources>

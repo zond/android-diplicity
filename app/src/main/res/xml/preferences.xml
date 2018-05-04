@@ -7,6 +7,7 @@
             android:title="@string/zoom_buttons"
             android:summary="@string/display_zoom_buttons_in_map_view"
             android:key="@string/zoom_buttons_pref_key" />
+        <Preference android:layout="@layout/color_scheme_buttons" android:key="color_scheme_buttons"></Preference>
     </PreferenceCategory>
     <PreferenceCategory
         android:title="@string/notifications">
