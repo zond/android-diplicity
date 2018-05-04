@@ -102,7 +102,7 @@ public class PreferenceActivity extends RetrofitActivity {
 
         @Override
         public void onPause() {
-            configs.remove(getContext());
+            configs.remove(retrofitActivity());
             super.onPause();
         }
 
@@ -115,7 +115,7 @@ public class PreferenceActivity extends RetrofitActivity {
                         new Sendable<SingleContainer<UserConfig>>() {
                             @Override
                             public void send(final SingleContainer<UserConfig> userConfigSingleContainer) {
-                                configs.put(getContext(), new FragmentAndConfig(Fragment.this, userConfigSingleContainer));
+                                configs.put(retrofitActivity(), new FragmentAndConfig(Fragment.this, userConfigSingleContainer));
 
                                 final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 
