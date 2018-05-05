@@ -272,4 +272,5 @@
     <string name="colors_copied_to_clipboard">Colors copied to clipboard</string>
     <string name="colors_copied_from_clipboard">Colors copied from clipboard</string>
     <string name="clipboard_is_empty">Clipboard is empty?</string>
+    <string name="nation_preference_ranking">Nation preference ranking</string>
 </resources>
