@@ -67,18 +67,20 @@ public class PreferenceActivity extends RetrofitActivity {
         if (f != null) {
             ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             ClipData clip = clipboard.getPrimaryClip();
-            if (clip.getItemCount() > 0) {
-                f.config.Properties.Colors = new ArrayList<String>(Arrays.asList(clip.getItemAt(0).coerceToText(v.getContext()).toString().split("\n")));
-                f.fragment.retrofitActivity().handleReq(
-                        f.fragment.retrofitActivity().userConfigService.UserConfigUpdate(f.config.Properties, f.fragment.retrofitActivity().getLoggedInUser().Id),
-                        new Sendable<SingleContainer<UserConfig>>() {
-                            @Override
-                            public void send(SingleContainer<UserConfig> userConfigSingleContainer) {
-                                Toast.makeText(v.getContext(), R.string.colors_copied_from_clipboard, Toast.LENGTH_LONG).show();
-                                f.fragment.populateColorOverrides(f.config);
-                            }
-                        },
-                        getResources().getString(R.string.updating_settings));
+            if (clip != null) {
+                if (clip.getItemCount() > 0) {
+                    f.config.Properties.Colors = new ArrayList<String>(Arrays.asList(clip.getItemAt(0).coerceToText(v.getContext()).toString().split("\n")));
+                    f.fragment.retrofitActivity().handleReq(
+                            f.fragment.retrofitActivity().userConfigService.UserConfigUpdate(f.config.Properties, f.fragment.retrofitActivity().getLoggedInUser().Id),
+                            new Sendable<SingleContainer<UserConfig>>() {
+                                @Override
+                                public void send(SingleContainer<UserConfig> userConfigSingleContainer) {
+                                    Toast.makeText(v.getContext(), R.string.colors_copied_from_clipboard, Toast.LENGTH_LONG).show();
+                                    f.fragment.populateColorOverrides(f.config);
+                                }
+                            },
+                            getResources().getString(R.string.updating_settings));
+                }
             }
         }
     }
