@@ -1154,14 +1154,18 @@ public class GameActivity extends RetrofitActivity
                                 }
                                 int units = 0;
                                 int scs = 0;
-                                for (UnitWrapper unit : phase.Properties.Units) {
-                                    if (unit.Unit.Nation.equals(member.Nation)) {
-                                        units++;
+                                if (phase.Properties.Units != null) {
+                                    for (UnitWrapper unit : phase.Properties.Units) {
+                                        if (unit.Unit.Nation.equals(member.Nation)) {
+                                            units++;
+                                        }
                                     }
                                 }
-                                for (SC sc : phase.Properties.SCs) {
-                                    if (sc.Owner.equals(member.Nation)) {
-                                        scs++;
+                                if (phase.Properties.SCs != null) {
+                                    for (SC sc : phase.Properties.SCs) {
+                                        if (sc.Owner.equals(member.Nation)) {
+                                            scs++;
+                                        }
                                     }
                                 }
                                 if (hasBuildOpts && units < scs) {
