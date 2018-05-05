@@ -17,10 +17,12 @@ import java.util.List;
 import se.oort.diplicity.ChannelService;
 import se.oort.diplicity.R;
 import se.oort.diplicity.RetrofitActivity;
+import se.oort.diplicity.VariantService;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Member;
 import se.oort.diplicity.apigen.MultiContainer;
 import se.oort.diplicity.apigen.Phase;
+import se.oort.diplicity.apigen.SingleContainer;
 
 public class ChannelTable extends TableLayout {
     private AttributeSet attributeSet;
@@ -54,13 +56,25 @@ public class ChannelTable extends TableLayout {
                     TableRow.LayoutParams.WRAP_CONTENT);
             tableRow.setLayoutParams(rowParams);
 
+            SingleContainer<VariantService.Variant> variant = null;
+            for (SingleContainer<VariantService.Variant> v : retrofitActivity.getVariants().Properties) {
+                if (v.Properties.Name.equals(game.Variant)) {
+                    variant = v;
+                    break;
+                }
+            }
+
             TextView name = new TextView(retrofitActivity);
             TableRow.LayoutParams nameParams = new TableRow.LayoutParams(
                     TableRow.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
             setMargins(nameParams);
             name.setLayoutParams(nameParams);
-            name.setText(TextUtils.join(", ", channel.Members));
+            if (variant != null && channel.Members.size() == variant.Properties.Nations.size()) {
+                name.setText(getResources().getString(R.string.everyone));
+            } else {
+                name.setText(TextUtils.join(", ", channel.Members));
+            }
             tableRow.addView(name);
 
             TextView messages = new TextView(retrofitActivity);

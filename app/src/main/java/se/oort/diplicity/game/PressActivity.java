@@ -32,6 +32,7 @@ import se.oort.diplicity.R;
 import se.oort.diplicity.RetrofitActivity;
 import se.oort.diplicity.Sendable;
 import se.oort.diplicity.UserView;
+import se.oort.diplicity.VariantService;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Member;
 import se.oort.diplicity.apigen.Message;
@@ -114,7 +115,18 @@ public class PressActivity extends RetrofitActivity {
         byte[] serializedPhases = getIntent().getByteArrayExtra(SERIALIZED_PHASES_KEY);
         phases = (MultiContainer<Phase>) unserialize(serializedPhases);
 
-        ((TextView) findViewById(R.id.multi_line_title)).setText(TextUtils.join(", ", channel.Members));
+        SingleContainer<VariantService.Variant> variant = null;
+        for (SingleContainer<VariantService.Variant> v : getVariants().Properties) {
+            if (v.Properties.Name.equals(game.Variant)) {
+                variant = v;
+                break;
+            }
+        }
+        if (variant != null && channel.Members.size() == variant.Properties.Nations.size()) {
+            ((TextView) findViewById(R.id.multi_line_title)).setText(getResources().getString(R.string.everyone));
+        } else {
+            ((TextView) findViewById(R.id.multi_line_title)).setText(TextUtils.join(", ", channel.Members));
+        }
 
         if (member == null) {
             findViewById(R.id.send_message_button).setVisibility(View.GONE);
