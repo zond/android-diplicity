@@ -935,13 +935,17 @@ public class GameActivity extends RetrofitActivity
         if (phaseMeta != null && phaseMeta.PhaseOrdinal != null) {
             SingleContainer<Phase> phaseSingleContainer = phases.Properties.get(phaseMeta.PhaseOrdinal.intValue() - 1);
             Counter<String> scCount = new Counter<String>();
-            for (SC sc : phaseSingleContainer.Properties.SCs) {
-                scCount.increment(sc.Owner);
+            if (phaseSingleContainer.Properties.SCs != null) {
+                for (SC sc : phaseSingleContainer.Properties.SCs) {
+                    scCount.increment(sc.Owner);
+                }
             }
 
             Counter<String> unitCount = new Counter<String>();
-            for (UnitWrapper wrapper : phaseSingleContainer.Properties.Units) {
-                unitCount.increment(wrapper.Unit.Nation);
+            if (phaseSingleContainer.Properties.Units != null) {
+                for (UnitWrapper wrapper : phaseSingleContainer.Properties.Units) {
+                    unitCount.increment(wrapper.Unit.Nation);
+                }
             }
 
             Counter<String> dislodgedCount = null;
