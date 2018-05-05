@@ -80,7 +80,11 @@ public class PreferenceActivity extends RetrofitActivity {
                                 }
                             },
                             getResources().getString(R.string.updating_settings));
+                } else {
+                    Toast.makeText(v.getContext(), R.string.clipboard_is_empty, Toast.LENGTH_LONG).show();
                 }
+            } else {
+                Toast.makeText(v.getContext(), R.string.clipboard_is_empty, Toast.LENGTH_LONG).show();
             }
         }
     }
