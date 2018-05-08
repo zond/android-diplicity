@@ -175,8 +175,8 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
             if (game.Properties.MinRating != 0 || game.Properties.MaxRating != 0) {
                 rating.setText(ctx.getResources().getString(
                         R.string.x_to_y,
-                        retrofitActivity.toString(game.Properties.MinRating),
-                        retrofitActivity.toString(game.Properties.MaxRating)));
+                        game.Properties.MinRating == 0.0 ? "" : retrofitActivity.toString(game.Properties.MinRating),
+                        game.Properties.MinRating == 0.0 ? "" : retrofitActivity.toString(game.Properties.MaxRating)));
                 rating.setVisibility(View.VISIBLE);
                 ratingLabel.setVisibility(View.VISIBLE);
             } else {
