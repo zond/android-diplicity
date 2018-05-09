@@ -13,6 +13,7 @@ import android.text.TextWatcher;
 import android.text.util.Linkify;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -165,9 +166,14 @@ public class PressActivity extends RetrofitActivity {
                             new Sendable<SingleContainer<Message>>() {
                                 @Override
                                 public void send(SingleContainer<Message> messageSingleContainer) {
-                                    ((EditText) findViewById(R.id.new_message_body)).setText("");
+                                    EditText inputText = (EditText) findViewById(R.id.new_message_body);
+                                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                                    imm.hideSoftInputFromWindow(inputText.getWindowToken(), 0);
+                                    inputText.setText("");
+                                    inputText.clearFocus();
                                     prefs.edit().putString(draftKey(), "").apply();
                                     loadMessages(false);
+
                                 }
                             },
                             getResources().getString(R.string.sending_message));
