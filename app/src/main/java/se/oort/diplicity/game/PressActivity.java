@@ -205,7 +205,7 @@ public class PressActivity extends RetrofitActivity {
                     public void send(final MultiContainer<Message> messageMultiContainer) {
                         final EditText inputText = (EditText) findViewById(R.id.new_message_body);
                         boolean reopenKeyboard = false;
-                        if (PressActivity.this.getCurrentFocus().equals(inputText)) {
+                        if (inputText.equals(PressActivity.this.getCurrentFocus())) {
                             reopenKeyboard = true;
                         }
                         final boolean finalReopenKeyboard = reopenKeyboard;
