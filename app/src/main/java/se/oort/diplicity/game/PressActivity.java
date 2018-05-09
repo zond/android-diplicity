@@ -203,6 +203,12 @@ public class PressActivity extends RetrofitActivity {
                 new Sendable<MultiContainer<Message>>() {
                     @Override
                     public void send(final MultiContainer<Message> messageMultiContainer) {
+                        final EditText inputText = (EditText) findViewById(R.id.new_message_body);
+                        boolean reopenKeyboard = false;
+                        if (PressActivity.this.getCurrentFocus().equals(inputText)) {
+                            reopenKeyboard = true;
+                        }
+                        final boolean finalReopenKeyboard = reopenKeyboard;
                         ((LinearLayout) findViewById(R.id.press_messages)).removeAllViews();
                         ArrayList<SingleContainer<Phase>> phaseList = new ArrayList<SingleContainer<Phase>>(phases.Properties);
                         Collections.sort(phaseList, new Comparator<SingleContainer<Phase>>() {
@@ -245,6 +251,9 @@ public class PressActivity extends RetrofitActivity {
                                 findViewById(R.id.press_messages).invalidate();
                                 pressScroll.invalidate();
                                 pressScroll.fullScroll(View.FOCUS_DOWN);
+                                if (finalReopenKeyboard) {
+                                    inputText.requestFocus();
+                                }
                             }
                         });
                     }
