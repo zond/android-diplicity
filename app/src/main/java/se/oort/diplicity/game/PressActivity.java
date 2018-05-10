@@ -66,7 +66,6 @@ public class PressActivity extends RetrofitActivity {
         }
         intent.putExtra(PressActivity.SERIALIZED_GAME_KEY, serialize(game));
         intent.putExtra(PressActivity.SERIALIZED_PHASES_KEY, serialize(phases));
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
         return intent;
     }
 

@@ -108,7 +108,6 @@ public class GameActivity extends RetrofitActivity
         if (phases != null) {
             intent.putExtra(GameActivity.SERIALIZED_PHASES_KEY, RetrofitActivity.serialize(phases));
         }
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
         return intent;
     }
 
