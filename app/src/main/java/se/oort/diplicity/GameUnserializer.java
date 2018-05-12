@@ -34,7 +34,7 @@ public class GameUnserializer implements JsonDeserializer<Game> {
                 .registerTypeAdapter(Ticker.class, new TickerUnserializer())
                 .create();
     }
-    private boolean alarmOn(Context context, Game game, Member member, Alarm.Alert alert) {
+    private static boolean alarmOn(Context context, Game game, Member member, Alarm.Alert alert) {
         if (game.Finished) {
             return false;
         }
@@ -47,7 +47,7 @@ public class GameUnserializer implements JsonDeserializer<Game> {
         if (member.NewestPhaseState.ReadyToResolve) {
             return false;
         }
-        if (App.getDeadlineWarningMinutes(retrofitActivity) == 0) {
+        if (App.getDeadlineWarningMinutes(context) == 0) {
             return false;
         }
         if (alert.alertAt(context).getTime() < new Date().getTime()) {
@@ -55,18 +55,12 @@ public class GameUnserializer implements JsonDeserializer<Game> {
         }
         return true;
     }
-    private void turnOnAlarm(Game game, Member member) {
-        Alarm.Alert.fromGame(game, member).turnOn(retrofitActivity);
-    }
-    private void turnOffAlarm(Game game, Member member) {
-        Alarm.Alert.fromGame(game, member).turnOff(retrofitActivity);
-    }
-    private void manageAlarms(Context context, Game game, Member member) {
+    public static void manageAlarms(Context context, Game game, Member member) {
         Alarm.Alert alert = Alarm.Alert.fromGame(game, member);
         if (alarmOn(context, game, member, alert)) {
-            turnOnAlarm(game, member);
+            Alarm.Alert.fromGame(game, member).turnOn(context);
         } else {
-            turnOffAlarm(game, member);
+            Alarm.Alert.fromGame(game, member).turnOff(context);
         }
     }
     public Game deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
