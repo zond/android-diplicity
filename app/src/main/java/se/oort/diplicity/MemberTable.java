@@ -120,8 +120,12 @@ public class MemberTable extends TableLayout {
                                         new Sendable<SingleContainer<PhaseState>>() {
                                             @Override
                                             public void send(SingleContainer<PhaseState> phaseStateSingleContainer) {
-                                                if (readyToResolve.isChecked()) {
-                                                    Alarm.Alert.fromGame(finalGame, member).turnOff(retrofitActivity);
+                                                for (Member member : finalGame.Members) {
+                                                    if (member.User.Id.equals(retrofitActivity.getLoggedInUser().Id)) {
+                                                        member.NewestPhaseState = phaseStateSingleContainer.Properties;
+                                                        GameUnserializer.manageAlarms(retrofitActivity, finalGame, member);
+                                                        break;
+                                                    }
                                                 }
                                                 onProbation.setChecked(false);
                                             }
