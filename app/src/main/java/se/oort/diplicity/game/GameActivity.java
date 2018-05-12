@@ -3,6 +3,8 @@ package se.oort.diplicity.game;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -24,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
@@ -33,6 +36,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+
+import org.w3c.dom.Text;
 
 import java.lang.reflect.Field;
 import java.text.DateFormat;
@@ -49,8 +54,10 @@ import java.util.Set;
 import retrofit2.adapter.rxjava.HttpException;
 import rx.functions.Func2;
 import rx.observables.JoinObservable;
+import se.oort.diplicity.Alarm;
 import se.oort.diplicity.App;
 import se.oort.diplicity.ChannelService;
+import se.oort.diplicity.GameUnserializer;
 import se.oort.diplicity.MemberTable;
 import se.oort.diplicity.MessagingService;
 import se.oort.diplicity.OptionsService;
@@ -1063,6 +1070,43 @@ public class GameActivity extends RetrofitActivity
         };
 
         if (game.Started) {
+            FrameLayout rdyButtonFrame = (FrameLayout) findViewById(R.id.rdy_button_frame);
+            if (member != null) {
+                final TextView rdyButtonText = (TextView) findViewById(R.id.rdy_button_text);
+                rdyButtonFrame.setVisibility(View.VISIBLE);
+                if (member.NewestPhaseState.ReadyToResolve) {
+                    rdyButtonText.setPaintFlags(rdyButtonText.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
+                    rdyButtonText.setTextColor(Color.WHITE);
+                } else {
+                    rdyButtonText.setPaintFlags(rdyButtonText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                    rdyButtonText.setTextColor(Color.RED);
+                }
+                rdyButtonFrame.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        member.NewestPhaseState.ReadyToResolve = !member.NewestPhaseState.ReadyToResolve;
+                        handleReq(
+                                phaseStateService.PhaseStateUpdate(member.NewestPhaseState, game.ID, phaseMeta.PhaseOrdinal.toString(), member.Nation),
+                                new Sendable<SingleContainer<PhaseState>>() {
+                                    @Override
+                                    public void send(SingleContainer<PhaseState> phaseStateSingleContainer) {
+                                        member.NewestPhaseState = phaseStateSingleContainer.Properties;
+                                        GameUnserializer.manageAlarms(GameActivity.this, game, member);
+                                        if (member.NewestPhaseState.ReadyToResolve) {
+                                            rdyButtonText.setPaintFlags(rdyButtonText.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
+                                            rdyButtonText.setTextColor(Color.WHITE);
+                                        } else {
+                                            rdyButtonText.setPaintFlags(rdyButtonText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                                            rdyButtonText.setTextColor(Color.RED);
+                                        }
+                                    }
+                                }, getResources().getString(R.string.updating_phase_state));
+                    }
+                });
+            } else {
+                rdyButtonFrame.setVisibility(View.GONE);
+            }
+
             findViewById(R.id.rewind).setVisibility(View.VISIBLE);
             FloatingActionButton firstPhaseButton = (FloatingActionButton) findViewById(R.id.rewind);
             if (phaseMeta.PhaseOrdinal < 3) {
