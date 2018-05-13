@@ -63,6 +63,7 @@ public class MapView extends FrameLayout {
     private Map<String, OptionsService.Option> options = new HashMap<>();
     private Map<String, Order> orders = Collections.synchronizedMap(new HashMap<String, Order>());
     private Sendable<Object> phaseChangeNotifier;
+    private String url;
 
     private void inflate() {
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -281,6 +282,12 @@ public class MapView extends FrameLayout {
 
     public void draw() {
         if (game.Started) {
+            url = retrofitActivity.getBaseURL() + "Game/" + game.ID + "/Phase/" + phaseMeta.Properties.PhaseOrdinal + "/Map";
+            if (retrofitActivity.getLocalDevelopmentMode() && !retrofitActivity.getLocalDevelopmentModeFakeID().equals("")) {
+                url = url + "?fake-id=" + retrofitActivity.getLocalDevelopmentModeFakeID();
+            }
+            load();
+
             FrameLayout rdyButtonFrame = (FrameLayout) findViewById(R.id.rdy_button_frame);
             if (member != null && !phaseMeta.Properties.Resolved) {
                 final TextView rdyButtonText = (TextView) findViewById(R.id.rdy_button_text);
@@ -378,11 +385,6 @@ public class MapView extends FrameLayout {
                     }
                 });
             }
-            String url = retrofitActivity.getBaseURL() + "Game/" + game.ID + "/Phase/" + phaseMeta.Properties.PhaseOrdinal + "/Map";
-            if (retrofitActivity.getLocalDevelopmentMode() && !retrofitActivity.getLocalDevelopmentModeFakeID().equals("")) {
-                url = url + "?fake-id=" + retrofitActivity.getLocalDevelopmentModeFakeID();
-            }
-            load(url);
             if (member != null && !phaseMeta.Properties.Resolved) {
                 retrofitActivity.handleReq(JoinObservable.when(JoinObservable
                         .from(retrofitActivity.optionsService.GetOptions(game.ID, phaseMeta.Properties.PhaseOrdinal.toString()))
@@ -458,7 +460,7 @@ public class MapView extends FrameLayout {
             retrofitActivity.handleReq(retrofitActivity.variantService.GetStartPhase(game.Variant), new Sendable<SingleContainer<VariantService.Phase>>() {
                 @Override
                 public void send(SingleContainer<VariantService.Phase> phaseSingleContainer) {
-                    String url = null;
+                    url = null;
                     for (Link link : phaseSingleContainer.Links) {
                         if (link.Rel.equals("map")) {
                             url = link.URL;
@@ -466,7 +468,7 @@ public class MapView extends FrameLayout {
                         }
                     }
                     if (url != null) {
-                        load(url);
+                        load();
                     } else {
                         App.firebaseCrashReport("No map URL found in variant " + game.Variant + "?");
                         Toast.makeText(retrofitActivity, R.string.unknown_error, Toast.LENGTH_SHORT).show();
@@ -491,7 +493,7 @@ public class MapView extends FrameLayout {
         draw();
     }
     
-    public void load(String url) {
+    public void load() {
         synchronized (this) {
             if (onFinished == null) {
                 onFinished = new ArrayList<>();

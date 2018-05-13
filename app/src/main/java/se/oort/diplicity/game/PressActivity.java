@@ -21,12 +21,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewSwitcher;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 import se.oort.diplicity.App;
 import se.oort.diplicity.ChannelService;
@@ -142,15 +144,16 @@ public class PressActivity extends RetrofitActivity {
             }
         });
 
+        final List<Boolean> mapShown = new ArrayList<>();
+        final List<Boolean> loadedProperly = new ArrayList<>();
+        mapShown.add(false);
+        loadedProperly.add(false);
+        final ViewSwitcher pressContainer = (ViewSwitcher) findViewById(R.id.press_container);
         ((FloatingActionButton) findViewById(R.id.map_toggle)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mapView.getVisibility() == View.GONE) {
-                    findViewById(R.id.press_layout).setVisibility(View.GONE);
-                    mapView.setVisibility(View.VISIBLE);
-                } else {
-                    findViewById(R.id.press_layout).setVisibility(View.VISIBLE);
-                    mapView.setVisibility(View.GONE);
+                pressContainer.showNext();
+                if (mapShown.get(0)) {
                     final NestedScrollView pressScroll = (NestedScrollView) findViewById(R.id.press_scroll);
                     pressScroll.post(new Runnable() {
                         @Override
@@ -161,8 +164,11 @@ public class PressActivity extends RetrofitActivity {
                             pressScroll.fullScroll(View.FOCUS_DOWN);
                         }
                     });
-
+                } else if (!loadedProperly.get(0)){
+                    mapView.load();
+                    loadedProperly.set(0, true);
                 }
+                mapShown.set(0, !mapShown.get(0));
             }
         });
 
