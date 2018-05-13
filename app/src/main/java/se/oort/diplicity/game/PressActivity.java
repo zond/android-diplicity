@@ -11,6 +11,8 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.util.Linkify;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -19,12 +21,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewSwitcher;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 import se.oort.diplicity.App;
 import se.oort.diplicity.ChannelService;
@@ -39,6 +43,7 @@ import se.oort.diplicity.apigen.Member;
 import se.oort.diplicity.apigen.Message;
 import se.oort.diplicity.apigen.MultiContainer;
 import se.oort.diplicity.apigen.Phase;
+import se.oort.diplicity.apigen.PhaseMeta;
 import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.apigen.Ticker;
 
@@ -127,6 +132,45 @@ public class PressActivity extends RetrofitActivity {
         } else {
             ((TextView) findViewById(R.id.multi_line_title)).setText(TextUtils.join(", ", channel.Members));
         }
+
+        final MapView mapView = (MapView) findViewById(R.id.map_view);
+        SingleContainer<PhaseMeta> phaseMetaSingleContainer = new SingleContainer<PhaseMeta>();
+        if (game.Started) {
+            phaseMetaSingleContainer.Properties = game.NewestPhaseMeta.get(0);
+        }
+        mapView.show(PressActivity.this, game, phaseMetaSingleContainer, phases, member, new Sendable<Object>() {
+            @Override
+            public void send(Object o) {
+            }
+        });
+
+        final List<Boolean> mapShown = new ArrayList<>();
+        final List<Boolean> loadedProperly = new ArrayList<>();
+        mapShown.add(false);
+        loadedProperly.add(false);
+        final ViewSwitcher pressContainer = (ViewSwitcher) findViewById(R.id.press_container);
+        ((FloatingActionButton) findViewById(R.id.map_toggle)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pressContainer.showNext();
+                if (mapShown.get(0)) {
+                    final NestedScrollView pressScroll = (NestedScrollView) findViewById(R.id.press_scroll);
+                    pressScroll.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            findViewById(R.id.press_layout).invalidate();
+                            findViewById(R.id.press_messages).invalidate();
+                            pressScroll.invalidate();
+                            pressScroll.fullScroll(View.FOCUS_DOWN);
+                        }
+                    });
+                } else if (!loadedProperly.get(0)){
+                    mapView.load();
+                    loadedProperly.set(0, true);
+                }
+                mapShown.set(0, !mapShown.get(0));
+            }
+        });
 
         if (member == null) {
             findViewById(R.id.send_message_button).setVisibility(View.GONE);
