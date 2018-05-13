@@ -6,6 +6,8 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:layout_width="match_parent"
     android:id="@+id/press_container"
+    android:inAnimation="@anim/slide_in_right"
+    android:outAnimation="@android:anim/slide_out_right"
     android:layout_height="match_parent">
 
     <android.support.v4.widget.NestedScrollView
