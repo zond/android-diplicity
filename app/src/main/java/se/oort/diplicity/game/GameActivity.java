@@ -93,16 +93,11 @@ public class GameActivity extends RetrofitActivity
     // Included in the intent bundle.
     public Game game;
     // Included in game if the game is started.
-    public PhaseMeta phaseMeta;
+    public SingleContainer<PhaseMeta> phaseMeta = new SingleContainer<>();
     // Calculated from the intent bundle.
     public Member member;
     // Included in the intent bundle if the game is started.
-    private MultiContainer<Phase> phases;
-
-    // Used to receive orders from the user.
-    public Map<String, OptionsService.Option> options = new HashMap<>();
-    // Used to update/render orders on the map.
-    public Map<String, Order> orders = Collections.synchronizedMap(new HashMap<String, Order>());
+    private MultiContainer<Phase> phases = new MultiContainer<>();
 
     // Used to swipe between phases.
     private FlickFrameLayout flickFrameLayout;
@@ -163,7 +158,7 @@ public class GameActivity extends RetrofitActivity
             member = getLoggedInMember(game);
 
             if (game.NewestPhaseMeta != null && game.NewestPhaseMeta.size() > 0) {
-                phaseMeta = game.NewestPhaseMeta.get(0);
+                phaseMeta.Properties = game.NewestPhaseMeta.get(0);
             }
         }
 
@@ -173,41 +168,23 @@ public class GameActivity extends RetrofitActivity
         }
     }
 
-    public void lastPhase() {
-        Gson gson = new Gson();
-        Phase phase = phases.Properties.get(game.NewestPhaseMeta.get(0).PhaseOrdinal.intValue() - 1).Properties;
-        if (phase != null) {
-            phaseMeta = gson.fromJson(gson.toJson(phase), PhaseMeta.class);
-            draw();
-        }
-    }
-
-    public void firstPhase() {
-        Gson gson = new Gson();
-        Phase phase = phases.Properties.get(0).Properties;
-        if (phase != null) {
-            phaseMeta = gson.fromJson(gson.toJson(phase), PhaseMeta.class);
-            draw();
-        }
-    }
-
     public void nextPhase() {
-        if (phaseMeta != null && phaseMeta.PhaseOrdinal < game.NewestPhaseMeta.get(0).PhaseOrdinal) {
+        if (phaseMeta.Properties != null && phaseMeta.Properties.PhaseOrdinal < game.NewestPhaseMeta.get(0).PhaseOrdinal) {
             Gson gson = new Gson();
-            Phase phase = phases.Properties.get(phaseMeta.PhaseOrdinal.intValue()).Properties;
+            Phase phase = phases.Properties.get(phaseMeta.Properties.PhaseOrdinal.intValue()).Properties;
             if (phase != null) {
-                phaseMeta = gson.fromJson(gson.toJson(phase), PhaseMeta.class);
+                phaseMeta.Properties = gson.fromJson(gson.toJson(phase), PhaseMeta.class);
                 draw();
             }
         }
     }
 
     public void prevPhase() {
-        if (phaseMeta != null && phaseMeta.PhaseOrdinal > 1) {
+        if (phaseMeta.Properties != null && phaseMeta.Properties.PhaseOrdinal > 1) {
             Gson gson = new Gson();
-            Phase phase = phases.Properties.get(phaseMeta.PhaseOrdinal.intValue() - 2).Properties;
+            Phase phase = phases.Properties.get(phaseMeta.Properties.PhaseOrdinal.intValue() - 2).Properties;
             if (phase != null) {
-                phaseMeta = gson.fromJson(gson.toJson(phase), PhaseMeta.class);
+                phaseMeta.Properties = gson.fromJson(gson.toJson(phase), PhaseMeta.class);
                 draw();
             }
         }
@@ -220,13 +197,13 @@ public class GameActivity extends RetrofitActivity
         } else if (game != null && !game.Desc.equals("")) {
             descPart = game.Desc;
         }
-        if (phaseMeta == null) {
+        if (phaseMeta.Properties == null) {
             return descPart;
         }
-        if (phaseMeta.NextDeadlineIn.nanos == 0) {
-            return getResources().getString(R.string.desc_season_year_type, descPart, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type);
+        if (phaseMeta.Properties.NextDeadlineIn.nanos == 0) {
+            return getResources().getString(R.string.desc_season_year_type, descPart, phaseMeta.Properties.Season, phaseMeta.Properties.Year, phaseMeta.Properties.Type);
         }
-        return getResources().getString(R.string.desc_season_year_type_deadline, descPart, phaseMeta.Season, phaseMeta.Year, phaseMeta.Type, App.millisToDuration(phaseMeta.NextDeadlineIn.millisLeft()));
+        return getResources().getString(R.string.desc_season_year_type_deadline, descPart, phaseMeta.Properties.Season, phaseMeta.Properties.Year, phaseMeta.Properties.Type, App.millisToDuration(phaseMeta.Properties.NextDeadlineIn.millisLeft()));
     }
 
     private Toolbar updateTitle() {
@@ -317,7 +294,7 @@ public class GameActivity extends RetrofitActivity
             nav_Menu.findItem(R.id.nav_game_settings).setVisible(false);
             nav_Menu.findItem(R.id.nav_phase_status).setVisible(false);
         }
-        if (phaseMeta == null || !phaseMeta.Resolved) {
+        if (phaseMeta.Properties == null || !phaseMeta.Properties.Resolved) {
             nav_Menu.findItem(R.id.nav_phase_result).setVisible(false);
         }
         if (!game.Finished) {
@@ -382,130 +359,6 @@ public class GameActivity extends RetrofitActivity
         }
     }
 
-    private void setOrder(String province, List<String> parts) {
-        Sendable<SingleContainer<Order>> handler = new Sendable<SingleContainer<Order>>() {
-            @Override
-            public void send(SingleContainer<Order> orderSingleContainer) {
-                MapView mv = (MapView) findViewById(R.id.map_view);
-                mv.evaluateJS("window.map.removeOrders()");
-                for (Map.Entry<String, Order> entry : orders.entrySet()) {
-                    mv.evaluateJS("window.map.addOrder(" + new Gson().toJson(entry.getValue().Parts) + ", col" + entry.getValue().Nation + ");");
-                }
-
-            }
-        };
-        if (parts == null || parts.size() == 0) {
-            if (orders.containsKey(province)) {
-                orders.remove(province);
-                handleReq(
-                        orderService.OrderDelete(game.ID, phaseMeta.PhaseOrdinal.toString(), province),
-                        handler, getResources().getString(R.string.removing_order));
-            }
-        } else {
-            Order order = new Order();
-            order.GameID = game.ID;
-            order.Nation = member.Nation;
-            order.PhaseOrdinal = phaseMeta.PhaseOrdinal;
-            order.Parts = parts;
-            orders.put(province, order);
-            handleReq(
-                    orderService.OrderCreate(order, game.ID, phaseMeta.PhaseOrdinal.toString()),
-                    handler, getResources().getString(R.string.saving_order));
-        }
-    }
-
-    private void completeOrder(final List<String> prefix, final Map<String, OptionsService.Option> opts, final String srcProvince) {
-        Set<String> optionTypes = new HashSet<>();
-        Set<String> optionValues = new HashSet<>();
-        for (Map.Entry<String, OptionsService.Option> opt : opts.entrySet()) {
-            optionTypes.add(opt.getValue().Type);
-            optionValues.add(opt.getKey());
-        }
-        if (optionTypes.size() != 1) {
-            Log.e("Diplicity", "Options contain multiple types: " + optionTypes);
-            return;
-        }
-        String optionType = optionTypes.iterator().next();
-        if (optionType.equals("Province")) {
-            final MapView m = (MapView) findViewById(R.id.map_view);
-            for (Map.Entry<String, OptionsService.Option> opt : opts.entrySet()) {
-                m.evaluateJS("window.map.addClickListener('" + opt.getKey() + "', function(prov) { Android.provinceClicked(prov); });");
-            }
-            m.setOnClickedProvince(new Sendable<String>() {
-                @Override
-                public void send(final String s) {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (!opts.containsKey(s)) {
-                                return;
-                            }
-                            m.evaluateJS("window.map.clearClickListeners();");
-                            prefix.add(s);
-                            Map<String, OptionsService.Option> next = opts.get(s).Next;
-                            if (next == null || next.isEmpty()) {
-                                setOrder(srcProvince, prefix);
-                                acceptOrders();
-                            } else {
-                                String newSrcProvince = srcProvince;
-                                if (newSrcProvince == null) {
-                                    newSrcProvince = s;
-                                    if (newSrcProvince.indexOf('/') != -1) {
-                                        newSrcProvince = newSrcProvince.substring(0, newSrcProvince.indexOf('/'));
-                                    }
-                                }
-                                completeOrder(prefix, next, newSrcProvince);
-                            }
-                        }
-                    });
-                }
-            });
-        } else if (optionType.equals("OrderType") || optionType.equals("UnitType")) {
-            final List<String> optionVals = new ArrayList<>(optionValues);
-            Collections.sort(optionVals);
-            optionVals.add(getResources().getString(R.string.cancel));
-            new AlertDialog.Builder(this).setItems(optionVals.toArray(new CharSequence[optionVals.size()]), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    if (optionVals.get(i).equals(getResources().getString(R.string.cancel))) {
-                        setOrder(srcProvince, null);
-                        acceptOrders();
-                        return;
-                    }
-                    prefix.add(optionVals.get(i));
-                    Map<String, OptionsService.Option> next = opts.get(optionVals.get(i)).Next;
-                    if (next == null || next.isEmpty()) {
-                        setOrder(srcProvince, prefix);
-                        acceptOrders();
-                    } else {
-                        completeOrder(prefix, next, srcProvince);
-                    }
-                }
-            }).setOnCancelListener(new DialogInterface.OnCancelListener() {
-                @Override
-                public void onCancel(DialogInterface dialogInterface) {
-                    acceptOrders();
-                }
-            }).show();
-        } else if (optionType.equals("SrcProvince")) {
-            if (optionValues.size() != 1) {
-                throw new RuntimeException("Multiple SrcProvince options: " + optionValues);
-            }
-            prefix.set(0, optionValues.iterator().next());
-            Map<String, OptionsService.Option> next = opts.get(optionValues.iterator().next()).Next;
-            if (next == null || next.isEmpty()) {
-                setOrder(srcProvince, prefix);
-                acceptOrders();
-            } else {
-                completeOrder(prefix, next, srcProvince);
-            }
-        }
-
-    }
-
-    public void acceptOrders() {
-        completeOrder(new ArrayList<String>(), options, null);
-    }
 
     private class PhaseElement {
         public Phase phase;
@@ -772,7 +625,7 @@ public class GameActivity extends RetrofitActivity
         });
 
         handleReq(
-                phaseStateService.ListPhaseStates(game.ID, phaseMeta.PhaseOrdinal.toString()),
+                phaseStateService.ListPhaseStates(game.ID, phaseMeta.Properties.PhaseOrdinal.toString()),
                 new Sendable<MultiContainer<PhaseState>>() {
                     @Override
                     public void send(MultiContainer<PhaseState> phaseStateMultiContainer) {
@@ -780,7 +633,7 @@ public class GameActivity extends RetrofitActivity
                         for (SingleContainer<PhaseState> phaseStateSingleContainer : phaseStateMultiContainer.Properties) {
                             phaseStates.add(phaseStateSingleContainer.Properties);
                         }
-                        phaseStateView.setPhaseStates(game, phaseMeta, phaseStates);
+                        phaseStateView.setPhaseStates(game, phaseMeta.Properties, phaseStates);
                         phaseStateView.setMembers(GameActivity.this, game, game.Members);
                     }
                 }, getResources().getString(R.string.loading_phase_settings));
@@ -797,7 +650,7 @@ public class GameActivity extends RetrofitActivity
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Gson gson = new Gson();
-                phaseMeta = gson.fromJson(gson.toJson(phaseList.get(i).phase), PhaseMeta.class);
+                phaseMeta.Properties = gson.fromJson(gson.toJson(phaseList.get(i).phase), PhaseMeta.class);
                 currentView = R.id.nav_map;
                 showMap();
             }
@@ -907,9 +760,9 @@ public class GameActivity extends RetrofitActivity
                 return true;
             }
         });
-        if (phaseMeta.Resolved) {
+        if (phaseMeta.Properties.Resolved) {
             handleReq(
-                    phaseResultService.PhaseResultLoad(game.ID, phaseMeta.PhaseOrdinal.toString()),
+                    phaseResultService.PhaseResultLoad(game.ID, phaseMeta.Properties.PhaseOrdinal.toString()),
                     new Sendable<SingleContainer<PhaseResult>>() {
                         @Override
                         public void send(SingleContainer<PhaseResult> phaseResultSingleContainer) {
@@ -938,8 +791,8 @@ public class GameActivity extends RetrofitActivity
 
     public void showPhaseStatus() {
         hideAllExcept(R.id.phase_status_view);
-        if (phaseMeta != null && phaseMeta.PhaseOrdinal != null) {
-            SingleContainer<Phase> phaseSingleContainer = phases.Properties.get(phaseMeta.PhaseOrdinal.intValue() - 1);
+        if (phaseMeta.Properties != null && phaseMeta.Properties.PhaseOrdinal != null) {
+            SingleContainer<Phase> phaseSingleContainer = phases.Properties.get(phaseMeta.Properties.PhaseOrdinal.intValue() - 1);
             Counter<String> scCount = new Counter<String>();
             if (phaseSingleContainer.Properties.SCs != null) {
                 for (SC sc : phaseSingleContainer.Properties.SCs) {
@@ -1021,10 +874,10 @@ public class GameActivity extends RetrofitActivity
 
     public void showOrders() {
         hideAllExcept(R.id.orders_view);
-        handleReq(orderService.ListOrders(game.ID, phaseMeta.PhaseOrdinal.toString()), new Sendable<MultiContainer<Order>>() {
+        handleReq(orderService.ListOrders(game.ID, phaseMeta.Properties.PhaseOrdinal.toString()), new Sendable<MultiContainer<Order>>() {
             @Override
             public void send(MultiContainer<Order> orderMultiContainer) {
-                SingleContainer<Phase> phaseSingleContainer = phases.Properties.get(phaseMeta.PhaseOrdinal.intValue() - 1);
+                SingleContainer<Phase> phaseSingleContainer = phases.Properties.get(phaseMeta.Properties.PhaseOrdinal.intValue() - 1);
                 Map<String, String> resultMap = new HashMap<String, String>();
                 if (phaseSingleContainer.Properties.Resolutions != null) {
                     for (Resolution resolution : phaseSingleContainer.Properties.Resolutions) {
@@ -1062,207 +915,12 @@ public class GameActivity extends RetrofitActivity
     public void showMap() {
         hideAllExcept(R.id.map_view);
 
-        final Sendable<String> renderer = new Sendable<String>() {
+        ((MapView) findViewById(R.id.map_view)).show(GameActivity.this, game, phaseMeta, phases, member, new Sendable<Object>() {
             @Override
-            public void send(String url) {
-                ((MapView) findViewById(R.id.map_view)).load(GameActivity.this, url);
+            public void send(Object o) {
+                draw();
             }
-        };
-
-        if (game.Started) {
-            FrameLayout rdyButtonFrame = (FrameLayout) findViewById(R.id.rdy_button_frame);
-            if (member != null) {
-                final TextView rdyButtonText = (TextView) findViewById(R.id.rdy_button_text);
-                rdyButtonFrame.setVisibility(View.VISIBLE);
-                if (member.NewestPhaseState.ReadyToResolve) {
-                    rdyButtonText.setPaintFlags(rdyButtonText.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
-                    rdyButtonText.setTextColor(Color.WHITE);
-                } else {
-                    rdyButtonText.setPaintFlags(rdyButtonText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                    rdyButtonText.setTextColor(Color.RED);
-                }
-                rdyButtonFrame.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        member.NewestPhaseState.ReadyToResolve = !member.NewestPhaseState.ReadyToResolve;
-                        handleReq(
-                                phaseStateService.PhaseStateUpdate(member.NewestPhaseState, game.ID, phaseMeta.PhaseOrdinal.toString(), member.Nation),
-                                new Sendable<SingleContainer<PhaseState>>() {
-                                    @Override
-                                    public void send(SingleContainer<PhaseState> phaseStateSingleContainer) {
-                                        member.NewestPhaseState = phaseStateSingleContainer.Properties;
-                                        GameUnserializer.manageAlarms(GameActivity.this, game, member);
-                                        if (member.NewestPhaseState.ReadyToResolve) {
-                                            rdyButtonText.setPaintFlags(rdyButtonText.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
-                                            rdyButtonText.setTextColor(Color.WHITE);
-                                        } else {
-                                            rdyButtonText.setPaintFlags(rdyButtonText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                                            rdyButtonText.setTextColor(Color.RED);
-                                        }
-                                    }
-                                }, getResources().getString(R.string.updating_phase_state));
-                    }
-                });
-            } else {
-                rdyButtonFrame.setVisibility(View.GONE);
-            }
-
-            findViewById(R.id.rewind).setVisibility(View.VISIBLE);
-            FloatingActionButton firstPhaseButton = (FloatingActionButton) findViewById(R.id.rewind);
-            if (phaseMeta.PhaseOrdinal < 3) {
-                firstPhaseButton.setEnabled(false);
-                firstPhaseButton.setAlpha(0.3f);
-            } else {
-                firstPhaseButton.setEnabled(true);
-                firstPhaseButton.setAlpha(1.0f);
-                firstPhaseButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        firstPhase();
-                    }
-                });
-            }
-            findViewById(R.id.previous).setVisibility(View.VISIBLE);
-            FloatingActionButton previousPhaseButton = (FloatingActionButton) findViewById(R.id.previous);
-            if (phaseMeta.PhaseOrdinal < 2) {
-                previousPhaseButton.setEnabled(false);
-                previousPhaseButton.setAlpha(0.3f);
-            } else {
-                previousPhaseButton.setEnabled(true);
-                previousPhaseButton.setAlpha(1.0f);
-                previousPhaseButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        prevPhase();
-                    }
-                });
-            }
-            findViewById(R.id.next).setVisibility(View.VISIBLE);
-            FloatingActionButton nextPhaseButton = (FloatingActionButton) findViewById(R.id.next);
-            if (game.NewestPhaseMeta != null && game.NewestPhaseMeta.get(0).PhaseOrdinal <= phaseMeta.PhaseOrdinal) {
-                nextPhaseButton.setEnabled(false);
-                nextPhaseButton.setAlpha(0.3f);
-            } else {
-                nextPhaseButton.setEnabled(true);
-                nextPhaseButton.setAlpha(1.0f);
-                nextPhaseButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        nextPhase();
-                    }
-                });
-            }
-            FloatingActionButton lastPhaseButton = (FloatingActionButton) findViewById(R.id.fast_forward);
-            if (game.NewestPhaseMeta != null && game.NewestPhaseMeta.get(0).PhaseOrdinal <= phaseMeta.PhaseOrdinal + 1) {
-                lastPhaseButton.setEnabled(false);
-                lastPhaseButton.setAlpha(0.3f);
-            } else{
-                lastPhaseButton.setEnabled(true);
-                lastPhaseButton.setAlpha(1.0f);
-                findViewById(R.id.fast_forward).setVisibility(View.VISIBLE);
-                lastPhaseButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        lastPhase();
-                    }
-                });
-            }
-            String url = getBaseURL() + "Game/" + game.ID + "/Phase/" + phaseMeta.PhaseOrdinal + "/Map";
-            if (getLocalDevelopmentMode() && !getLocalDevelopmentModeFakeID().equals("")) {
-                url = url + "?fake-id=" + getLocalDevelopmentModeFakeID();
-            }
-            renderer.send(url);
-            if (member != null && !phaseMeta.Resolved) {
-                handleReq(JoinObservable.when(JoinObservable
-                        .from(optionsService.GetOptions(game.ID, phaseMeta.PhaseOrdinal.toString()))
-                        .and(orderService.ListOrders(game.ID, phaseMeta.PhaseOrdinal.toString()))
-                        .then(new Func2<SingleContainer<Map<String,OptionsService.Option>>, MultiContainer<Order>, Object>() {
-                            @Override
-                            public Object call(SingleContainer<Map<String, OptionsService.Option>> opts, MultiContainer<Order> ords) {
-                                SingleContainer<Phase> phase = phases.Properties.get(phaseMeta.PhaseOrdinal.intValue() - 1);
-                                options = opts.Properties;
-                                orders.clear();
-                                for (SingleContainer<Order> orderContainer : ords.Properties) {
-                                    String srcProvince = orderContainer.Properties.Parts.get(0);
-                                    if (srcProvince.indexOf('/') != -1) {
-                                        srcProvince = srcProvince.substring(0, srcProvince.indexOf('/'));
-                                    }
-                                    orders.put(srcProvince, orderContainer.Properties);
-                                }
-                                boolean hasBuildOpts = false;
-                                boolean hasDisbandOpts = false;
-                                for (OptionsService.Option opt : options.values()) {
-                                    if (opt.Next.containsKey("Build")) {
-                                        hasBuildOpts = true;
-                                    }
-                                    if (opt.Next.containsKey("Disband")) {
-                                        hasDisbandOpts = true;
-                                    }
-                                }
-                                int units = 0;
-                                int scs = 0;
-                                if (phase.Properties.Units != null) {
-                                    for (UnitWrapper unit : phase.Properties.Units) {
-                                        if (unit.Unit.Nation.equals(member.Nation)) {
-                                            units++;
-                                        }
-                                    }
-                                }
-                                if (phase.Properties.SCs != null) {
-                                    for (SC sc : phase.Properties.SCs) {
-                                        if (sc.Owner.equals(member.Nation)) {
-                                            scs++;
-                                        }
-                                    }
-                                }
-                                if (hasBuildOpts && units < scs) {
-                                    Toast.makeText(GameActivity.this,
-                                            getResources().getString(R.string.you_can_build_n_this_phase,
-                                                    getResources().getQuantityString(R.plurals.unit,
-                                                            scs - units,
-                                                            scs - units)),
-                                            Toast.LENGTH_LONG).show();
-                                } else if (hasDisbandOpts && scs < units) {
-                                    Toast.makeText(GameActivity.this,
-                                            getResources().getString(R.string.you_have_to_disband_n_this_phase,
-                                                    getResources().getQuantityString(R.plurals.unit,
-                                                            units - scs,
-                                                            units - scs)),
-                                            Toast.LENGTH_LONG).show();
-                                }
-                                return null;
-                            }
-                        })).toObservable(), new Sendable<Object>() {
-                    @Override
-                    public void send(Object o) {
-                        acceptOrders();
-                    }
-                }, getResources().getString(R.string.loading_state));
-            }
-        } else {
-            findViewById(R.id.rewind).setVisibility(View.GONE);
-            findViewById(R.id.previous).setVisibility(View.GONE);
-            findViewById(R.id.next).setVisibility(View.GONE);
-            findViewById(R.id.fast_forward).setVisibility(View.GONE);
-            handleReq(variantService.GetStartPhase(game.Variant), new Sendable<SingleContainer<VariantService.Phase>>() {
-                @Override
-                public void send(SingleContainer<VariantService.Phase> phaseSingleContainer) {
-                    String url = null;
-                    for (Link link : phaseSingleContainer.Links) {
-                        if (link.Rel.equals("map")) {
-                            url = link.URL;
-                            break;
-                        }
-                    }
-                    if (url != null) {
-                        renderer.send(url);
-                    } else {
-                        App.firebaseCrashReport("No map URL found in variant " + game.Variant + "?");
-                        Toast.makeText(getBaseContext(), R.string.unknown_error, Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }, getResources().getString(R.string.loading_start_state));
-        }
+        });
     }
 
     @Override
