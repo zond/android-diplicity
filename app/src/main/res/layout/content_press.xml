@@ -1,15 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/press_scroll"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="se.oort.diplicity.game.PressActivity"
-    tools:showIn="@layout/activity_press">
+    android:layout_width="match_parent"
+    android:id="@+id/press_container"
+    android:layout_height="match_parent">
+
+    <se.oort.diplicity.game.MapView
+        android:id="@+id/map_view"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/press_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        tools:context="se.oort.diplicity.game.PressActivity"
+        tools:showIn="@layout/activity_press">
 
         <RelativeLayout
             android:id="@+id/press_layout"
@@ -63,7 +74,7 @@
 
             </android.support.design.widget.TextInputLayout>
 
-
         </RelativeLayout>
+    </android.support.v4.widget.NestedScrollView>
+</FrameLayout>
 
-</android.support.v4.widget.NestedScrollView>

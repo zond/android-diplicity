@@ -279,7 +279,7 @@ public class MapView extends FrameLayout {
         }
     }
 
-    private void draw() {
+    public void draw() {
         if (game.Started) {
             FrameLayout rdyButtonFrame = (FrameLayout) findViewById(R.id.rdy_button_frame);
             if (member != null && !phaseMeta.Properties.Resolved) {

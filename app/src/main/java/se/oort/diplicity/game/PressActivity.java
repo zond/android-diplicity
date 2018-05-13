@@ -11,6 +11,8 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.util.Linkify;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -39,6 +41,7 @@ import se.oort.diplicity.apigen.Member;
 import se.oort.diplicity.apigen.Message;
 import se.oort.diplicity.apigen.MultiContainer;
 import se.oort.diplicity.apigen.Phase;
+import se.oort.diplicity.apigen.PhaseMeta;
 import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.apigen.Ticker;
 
@@ -127,6 +130,41 @@ public class PressActivity extends RetrofitActivity {
         } else {
             ((TextView) findViewById(R.id.multi_line_title)).setText(TextUtils.join(", ", channel.Members));
         }
+
+        final MapView mapView = (MapView) findViewById(R.id.map_view);
+        SingleContainer<PhaseMeta> phaseMetaSingleContainer = new SingleContainer<PhaseMeta>();
+        if (game.Started) {
+            phaseMetaSingleContainer.Properties = game.NewestPhaseMeta.get(0);
+        }
+        mapView.show(PressActivity.this, game, phaseMetaSingleContainer, phases, member, new Sendable<Object>() {
+            @Override
+            public void send(Object o) {
+            }
+        });
+
+        ((FloatingActionButton) findViewById(R.id.map_toggle)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mapView.getVisibility() == View.GONE) {
+                    findViewById(R.id.press_layout).setVisibility(View.GONE);
+                    mapView.setVisibility(View.VISIBLE);
+                } else {
+                    findViewById(R.id.press_layout).setVisibility(View.VISIBLE);
+                    mapView.setVisibility(View.GONE);
+                    final NestedScrollView pressScroll = (NestedScrollView) findViewById(R.id.press_scroll);
+                    pressScroll.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            findViewById(R.id.press_layout).invalidate();
+                            findViewById(R.id.press_messages).invalidate();
+                            pressScroll.invalidate();
+                            pressScroll.fullScroll(View.FOCUS_DOWN);
+                        }
+                    });
+
+                }
+            }
+        });
 
         if (member == null) {
             findViewById(R.id.send_message_button).setVisibility(View.GONE);

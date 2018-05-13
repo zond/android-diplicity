@@ -18,12 +18,34 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/multi_line_title"
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical|center_horizontal"
-                    style="@android:style/TextAppearance.Large"/>
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/multi_line_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_centerHorizontal="true"
+                        style="@android:style/TextAppearance.Large"/>
+
+                    <android.support.design.widget.FloatingActionButton
+                        xmlns:app="http://schemas.android.com/apk/res-auto"
+                        app:elevation="6dp"
+                        app:fabSize="mini"
+                        app:rippleColor="@color/colorPrimary"
+                        android:layout_margin="6dp"
+                        android:tint="@android:color/white"
+                        android:id="@+id/map_toggle"
+                        android:src="@drawable/ic_map_black_24dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"/>
+
+                </RelativeLayout>
 
             </android.support.v7.widget.Toolbar>
 
