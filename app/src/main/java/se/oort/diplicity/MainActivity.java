@@ -58,9 +58,11 @@ import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Link;
 import se.oort.diplicity.apigen.Member;
 import se.oort.diplicity.apigen.MultiContainer;
+import se.oort.diplicity.apigen.Phase;
 import se.oort.diplicity.apigen.SingleContainer;
 import se.oort.diplicity.apigen.User;
 import se.oort.diplicity.apigen.UserStats;
+import se.oort.diplicity.game.GameActivity;
 
 import static java.util.Arrays.asList;
 
@@ -384,6 +386,26 @@ public class MainActivity extends RetrofitActivity {
                 done.send(nations);
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        MessagingService.messageSubscribers.add(this);
+    }
+
+    @Override
+    public void onPause() {
+        MessagingService.messageSubscribers.remove(this);
+        super.onPause();
+    }
+
+    @Override
+    protected boolean consumeDiplicityJSON(final MessagingService.DiplicityJSON diplicityJSON) {
+        if (diplicityJSON.type.equals("message") && gamesAdapter != null) {
+            gamesAdapter.consumeDiplicityJSON(diplicityJSON);
+        }
+        return false;
     }
 
     @Override

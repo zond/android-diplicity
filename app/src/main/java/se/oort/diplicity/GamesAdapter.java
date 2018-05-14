@@ -66,6 +66,26 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
         }
     };
 
+    public void consumeDiplicityJSON(final MessagingService.DiplicityJSON diplicityJSON) {
+        if (diplicityJSON.type.equals("message")) {
+            for (SingleContainer<Game> game : items) {
+                if (game.Properties.ID.equals(diplicityJSON.gameID)) {
+                    Member member = null;
+                    for (Member m : game.Properties.Members) {
+                        if (m.User.Id.equals(m.User.Id)) {
+                            member = m;
+                            break;
+                        }
+                    }
+                    if (member != null) {
+                        member.UnreadMessages++;
+                        notifyDataSetChanged();
+                    }
+                }
+            }
+        }
+    }
+
     public class ViewHolder extends RecycleAdapter<SingleContainer<Game>, GamesAdapter.ViewHolder>.ViewHolder {
         TextView desc, variant, deadline, state, rating,
                 minReliability, minQuickness, maxHated, maxHater,
@@ -354,7 +374,6 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
                                                     @Override
                                                     public void send(HttpException e) {
                                                         GamesAdapter.this.items.remove(pos);
-                                                        GamesAdapter.this.notifyDataSetChanged();
                                                         GamesAdapter.this.expandedItems.remove(pos);
                                                         for (int i : GamesAdapter.this.expandedItems) {
                                                             if (i > pos) {

@@ -17,10 +17,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.UnsupportedEncodingException;
+import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
@@ -36,7 +40,29 @@ public class MessagingService extends com.google.firebase.messaging.FirebaseMess
 
     public static final String FCM_NOTIFY_ACTION = "se.oort.diplicity.FCMNotify";
 
-    public static Set<RetrofitActivity> messageSubscribers = Collections.synchronizedSet(new HashSet<RetrofitActivity>());
+    public static Set<RetrofitActivity> messageSubscribers = new AbstractSet<RetrofitActivity>() {
+        private Map<RetrofitActivity, Object> backend = new ConcurrentHashMap<RetrofitActivity, Object>();
+        @Override
+        public boolean add(RetrofitActivity i) {
+            boolean rval = backend.containsKey(i);
+            backend.put(i, new Object());
+            return rval;
+        }
+        @Override
+        public boolean remove(Object i) {
+            boolean rval = backend.containsKey(i);
+            backend.remove(i);
+            return rval;
+        }
+        @Override
+        public Iterator<RetrofitActivity> iterator() {
+            return backend.keySet().iterator();
+        }
+        @Override
+        public int size() {
+            return backend.size();
+        }
+    };
 
     public static class DiplicityJSON {
         public String type;

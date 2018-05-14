@@ -199,6 +199,9 @@ public class PressActivity extends RetrofitActivity {
                 public void onClick(View view) {
                     Message message = new Message();
                     message.Body = ((EditText) findViewById(R.id.new_message_body)).getText().toString();
+                    if (message.Body.trim().length() == 0) {
+                        return;
+                    }
                     message.ChannelMembers = channel.Members;
                     message.CreatedAt = new Date();
                     message.Age = new Ticker(new Date(), (long) 0);
