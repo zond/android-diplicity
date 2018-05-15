@@ -154,16 +154,7 @@ public class PressActivity extends RetrofitActivity {
             public void onClick(View v) {
                 pressContainer.showNext();
                 if (mapShown.get(0)) {
-                    final NestedScrollView pressScroll = (NestedScrollView) findViewById(R.id.press_scroll);
-                    pressScroll.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            findViewById(R.id.press_layout).invalidate();
-                            findViewById(R.id.press_messages).invalidate();
-                            pressScroll.invalidate();
-                            pressScroll.fullScroll(View.FOCUS_DOWN);
-                        }
-                    });
+                    scrollToBottom(false);
                 } else if (!loadedProperly.get(0)){
                     mapView.load();
                     loadedProperly.set(0, true);
@@ -222,7 +213,9 @@ public class PressActivity extends RetrofitActivity {
 
                                 }
                             },
-                            getResources().getString(R.string.sending_message));
+                            null);
+                    ((LinearLayout) findViewById(R.id.press_messages)).addView(getMessageRow(member, message, false));
+                    scrollToBottom(false);
                 }
             });
         }
@@ -231,12 +224,46 @@ public class PressActivity extends RetrofitActivity {
         Toast.makeText(this, R.string.all_press_becomes_public, Toast.LENGTH_SHORT).show();
     }
 
+    private void scrollToBottom(final boolean reopenKeyboard) {
+        final NestedScrollView pressScroll = (NestedScrollView) findViewById(R.id.press_scroll);
+        pressScroll.post(new Runnable() {
+            @Override
+            public void run() {
+                findViewById(R.id.press_layout).invalidate();
+                findViewById(R.id.press_messages).invalidate();
+                pressScroll.invalidate();
+                pressScroll.fullScroll(View.FOCUS_DOWN);
+                if (reopenKeyboard) {
+                    findViewById(R.id.new_message_body).requestFocus();
+                }
+            }
+        });
+    }
+
     private void pushPhaseChange(ArrayList<SingleContainer<Phase>> phaseList) {
         Phase phase = phaseList.get(0).Properties;
         phaseList.remove(0);
         TextView phaseChange = new TextView(PressActivity.this);
         phaseChange.setText(getResources().getString(R.string.season_year_type_created, phase.Season, phase.Year, phase.Type, timeFormat.format(phase.CreatedAgo.deadlineAt())));
         ((LinearLayout) findViewById(R.id.press_messages)).addView(phaseChange);
+    }
+
+    private View getMessageRow(Member member, Message message, boolean completed) {
+        View row = getLayoutInflater().inflate(R.layout.message_list_row, (ViewGroup) findViewById(R.id.press_layout), false);
+        TextView body = (TextView) row.findViewById(R.id.body);
+        body.setText(message.Body);
+        Linkify.addLinks(body, Linkify.ALL);
+        ((TextView) row.findViewById(R.id.at)).setText(timeFormat.format(new Date()));
+        ((TextView) row.findViewById(R.id.sender)).setText(getResources().getString(R.string.x_, member.Nation));
+        if (member != null) {
+            ImageView avatar = (ImageView) row.findViewById(R.id.avatar);
+            PressActivity.this.populateImage(avatar, member.User.Picture, 36, 36);
+            avatar.setOnClickListener(UserView.getAvatarClickListener(PressActivity.this, game, member, member.User));
+        }
+        if (!completed) {
+            row.findViewById(R.id.message_progress).setVisibility(View.VISIBLE);
+        }
+        return row;
     }
 
     private void loadMessages(boolean withProgress) {
@@ -249,12 +276,11 @@ public class PressActivity extends RetrofitActivity {
                 new Sendable<MultiContainer<Message>>() {
                     @Override
                     public void send(final MultiContainer<Message> messageMultiContainer) {
-                        final EditText inputText = (EditText) findViewById(R.id.new_message_body);
+                        EditText inputText = (EditText) findViewById(R.id.new_message_body);
                         boolean reopenKeyboard = false;
                         if (inputText.equals(PressActivity.this.getCurrentFocus())) {
                             reopenKeyboard = true;
                         }
-                        final boolean finalReopenKeyboard = reopenKeyboard;
                         ((LinearLayout) findViewById(R.id.press_messages)).removeAllViews();
                         ArrayList<SingleContainer<Phase>> phaseList = new ArrayList<SingleContainer<Phase>>(phases.Properties);
                         Collections.sort(phaseList, new Comparator<SingleContainer<Phase>>() {
@@ -270,38 +296,14 @@ public class PressActivity extends RetrofitActivity {
                                 pushPhaseChange(phaseList);
                             }
 
-                            View row = getLayoutInflater().inflate(R.layout.message_list_row, (ViewGroup) findViewById(R.id.press_layout), false);
                             Member author = App.getMemberByNation(game, message.Sender);
 
-                            TextView body = (TextView) row.findViewById(R.id.body);
-                            body.setText(message.Body);
-                            Linkify.addLinks(body, Linkify.ALL);
-                            ((TextView) row.findViewById(R.id.at)).setText(timeFormat.format(message.Age.createdAt()));
-                            ((TextView) row.findViewById(R.id.sender)).setText(getResources().getString(R.string.x_, message.Sender));
-                            if (author != null) {
-                                ImageView avatar = (ImageView) row.findViewById(R.id.avatar);
-                                PressActivity.this.populateImage(avatar, author.User.Picture, 36, 36);
-                                avatar.setOnClickListener(UserView.getAvatarClickListener(PressActivity.this, game, author, author.User));
-                            }
-
-                            ((LinearLayout) findViewById(R.id.press_messages)).addView(row);
+                            ((LinearLayout) findViewById(R.id.press_messages)).addView(getMessageRow(author, message, true));
                         }
                         while (!phaseList.isEmpty()) {
                             pushPhaseChange(phaseList);
                         }
-                        final NestedScrollView pressScroll = (NestedScrollView) findViewById(R.id.press_scroll);
-                        pressScroll.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                findViewById(R.id.press_layout).invalidate();
-                                findViewById(R.id.press_messages).invalidate();
-                                pressScroll.invalidate();
-                                pressScroll.fullScroll(View.FOCUS_DOWN);
-                                if (finalReopenKeyboard) {
-                                    inputText.requestFocus();
-                                }
-                            }
-                        });
+                        scrollToBottom(reopenKeyboard);
                     }
                 }, message);
     }
