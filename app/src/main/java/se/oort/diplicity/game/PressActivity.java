@@ -188,8 +188,9 @@ public class PressActivity extends RetrofitActivity {
             ((FloatingActionButton) findViewById(R.id.send_message_button)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    EditText inputText = (EditText) findViewById(R.id.new_message_body);
                     Message message = new Message();
-                    message.Body = ((EditText) findViewById(R.id.new_message_body)).getText().toString();
+                    message.Body = inputText.getText().toString();
                     if (message.Body.trim().length() == 0) {
                         return;
                     }
@@ -198,24 +199,28 @@ public class PressActivity extends RetrofitActivity {
                     message.Age = new Ticker(new Date(), (long) 0);
                     message.GameID = channel.GameID;
                     message.Sender = member.Nation;
+
+                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(inputText.getWindowToken(), 0);
+
+                    inputText.setText("");
+
+                    prefs.edit().putString(draftKey(), "").apply();
+
+                    ((LinearLayout) findViewById(R.id.press_messages)).addView(getMessageRow(member, message, false));
+
+                    scrollToBottom(false);
+
                     handleReq(
                             messageService.MessageCreate(message, channel.GameID),
                             new Sendable<SingleContainer<Message>>() {
                                 @Override
                                 public void send(SingleContainer<Message> messageSingleContainer) {
-                                    EditText inputText = (EditText) findViewById(R.id.new_message_body);
-                                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                                    imm.hideSoftInputFromWindow(inputText.getWindowToken(), 0);
-                                    inputText.setText("");
-                                    inputText.clearFocus();
-                                    prefs.edit().putString(draftKey(), "").apply();
                                     loadMessages(false);
 
                                 }
                             },
                             null);
-                    ((LinearLayout) findViewById(R.id.press_messages)).addView(getMessageRow(member, message, false));
-                    scrollToBottom(false);
                 }
             });
         }
