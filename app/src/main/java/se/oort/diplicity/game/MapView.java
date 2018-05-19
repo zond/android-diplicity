@@ -237,12 +237,14 @@ public class MapView extends FrameLayout {
     }
 
     public void lastPhase() {
-        Gson gson = new Gson();
-        Phase phase = phases.Properties.get(game.NewestPhaseMeta.get(0).PhaseOrdinal.intValue() - 1).Properties;
-        if (phase != null) {
-            phaseMeta.Properties = gson.fromJson(gson.toJson(phase), PhaseMeta.class);
-            draw();
-            phaseChangeNotifier.send(new Object());
+        if (game.NewestPhaseMeta != null && game.NewestPhaseMeta.size() > 0 && game.NewestPhaseMeta.get(0).PhaseOrdinal <= phases.Properties.size()) {
+            Gson gson = new Gson();
+            Phase phase = phases.Properties.get(game.NewestPhaseMeta.get(0).PhaseOrdinal.intValue() - 1).Properties;
+            if (phase != null) {
+                phaseMeta.Properties = gson.fromJson(gson.toJson(phase), PhaseMeta.class);
+                draw();
+                phaseChangeNotifier.send(new Object());
+            }
         }
     }
 

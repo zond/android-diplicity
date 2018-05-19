@@ -153,10 +153,10 @@ public class PressActivity extends RetrofitActivity {
             @Override
             public void onClick(View v) {
                 pressContainer.showNext();
-                if (mapShown.get(0)) {
+                if (!mapShown.get(0)) {
                     scrollToBottom(false);
                 } else if (!loadedProperly.get(0)){
-                    mapView.load();
+                    mapView.draw();
                     loadedProperly.set(0, true);
                 }
                 mapShown.set(0, !mapShown.get(0));
