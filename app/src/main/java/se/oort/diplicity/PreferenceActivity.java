@@ -325,16 +325,18 @@ public class PreferenceActivity extends RetrofitActivity {
                         update = true;
                     }
                     if (update) {
-                        retrofitActivity().handleReq(
-                                retrofitActivity().userConfigService.UserConfigUpdate(config, retrofitActivity().getLoggedInUser().Id),
-                                new Sendable<SingleContainer<UserConfig>>() {
-                                    @Override
-                                    public void send(SingleContainer<UserConfig> userConfigSingleContainer) {
-                                        configContainer.Properties = userConfigSingleContainer.Properties;
-                                        populateColorOverrides(configContainer);
-                                    }
-                                },
-                                getResources().getString(R.string.updating_settings));
+                        if (retrofitActivity().getLoggedInUser() != null) {
+                            retrofitActivity().handleReq(
+                                    retrofitActivity().userConfigService.UserConfigUpdate(config, retrofitActivity().getLoggedInUser().Id),
+                                    new Sendable<SingleContainer<UserConfig>>() {
+                                        @Override
+                                        public void send(SingleContainer<UserConfig> userConfigSingleContainer) {
+                                            configContainer.Properties = userConfigSingleContainer.Properties;
+                                            populateColorOverrides(configContainer);
+                                        }
+                                    },
+                                    getResources().getString(R.string.updating_settings));
+                        }
                     }
                     return false;
                 }
