@@ -425,6 +425,8 @@
 
                 <se.oort.diplicity.game.ChannelTable
                     android:id="@+id/press_channel_table"
+                    android:paddingBottom="60dp"
+                    android:clipToPadding="false"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
