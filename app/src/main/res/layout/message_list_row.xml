@@ -38,7 +38,10 @@
         android:id="@+id/sender"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="?android:attr/textColorPrimary" />
+        android:textColor="?android:attr/textColorPrimary"
+        android:maxEms="4"
+        android:singleLine="true"
+        android:ellipsize="end" />
 
     <EditText
         android:inputType="none"
@@ -61,7 +64,7 @@
 
     <TextView
         android:id="@+id/at"
-        android:layout_below="@id/body"
+        android:layout_below="@id/sender"
         android:layout_toEndOf="@id/avatar"
         android:layout_toRightOf="@id/avatar"
         android:layout_width="wrap_content"
