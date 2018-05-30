@@ -274,4 +274,7 @@
     <string name="clipboard_is_empty">Clipboard is empty?</string>
     <string name="nation_preference_ranking">Nation preference ranking</string>
     <string name="everyone">Everyone</string>
+    <string name="supply_center_x">Supply center: %s</string>
+    <string name="dislodged_x">Dislodged: %s</string>
+    <string name="unit_x">Unit: %s</string>
 </resources>

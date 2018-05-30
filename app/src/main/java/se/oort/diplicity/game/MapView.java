@@ -9,6 +9,7 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,6 +40,7 @@ import se.oort.diplicity.R;
 import se.oort.diplicity.RetrofitActivity;
 import se.oort.diplicity.Sendable;
 import se.oort.diplicity.VariantService;
+import se.oort.diplicity.apigen.Dislodged;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.Link;
 import se.oort.diplicity.apigen.Member;
@@ -49,6 +51,7 @@ import se.oort.diplicity.apigen.PhaseMeta;
 import se.oort.diplicity.apigen.PhaseState;
 import se.oort.diplicity.apigen.SC;
 import se.oort.diplicity.apigen.SingleContainer;
+import se.oort.diplicity.apigen.Unit;
 import se.oort.diplicity.apigen.UnitWrapper;
 
 public class MapView extends FrameLayout {
@@ -64,6 +67,10 @@ public class MapView extends FrameLayout {
     private Map<String, Order> orders = Collections.synchronizedMap(new HashMap<String, Order>());
     private Sendable<Object> phaseChangeNotifier;
     private String url;
+    private Map<String, String> SCs = new HashMap<>();
+    private Map<String, Unit> units = new HashMap<>();
+    private Map<String, Unit> dislodged = new HashMap<>();
+
 
     private void inflate() {
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -158,7 +165,7 @@ public class MapView extends FrameLayout {
         if (optionType.equals("Province")) {
             final MapView m = (MapView) findViewById(R.id.map_view);
             for (Map.Entry<String, OptionsService.Option> opt : opts.entrySet()) {
-                m.evaluateJS("window.map.addClickListener('" + opt.getKey() + "', function(prov) { Android.provinceClicked(prov); });");
+                m.evaluateJS("window.map.addClickListener('" + opt.getKey() + "', function(prov) { Android.orderClicked(prov); });");
             }
             m.setOnClickedProvince(new Sendable<String>() {
                 @Override
@@ -282,6 +289,45 @@ public class MapView extends FrameLayout {
         }
     }
 
+    private String cleanProvince(String prov) {
+        if (prov.indexOf("/") != -1) {
+            String[] parts = prov.split("/");
+            return parts[0];
+        }
+        return prov;
+    }
+
+    private void addInfo() {
+        if (game.Started) {
+            Phase phase = phases.Properties.get(phaseMeta.Properties.PhaseOrdinal.intValue() - 1).Properties;
+            Set<String> all = new HashSet<>();
+            SCs.clear();
+            if (phase.SCs != null) {
+                for (SC sc : phase.SCs) {
+                    SCs.put(cleanProvince(sc.Province), sc.Owner);
+                    all.add(cleanProvince(sc.Province));
+                }
+            }
+            units.clear();
+            if (phase.Units != null) {
+                for (UnitWrapper unit : phase.Units) {
+                    units.put(cleanProvince(unit.Province), unit.Unit);
+                    all.add(cleanProvince(unit.Province));
+                }
+            }
+            dislodged.clear();
+            if (phase.Dislodgeds != null) {
+                for (Dislodged dis : phase.Dislodgeds) {
+                    dislodged.put(cleanProvince(dis.Province), dis.Dislodged);
+                    all.add(cleanProvince(dis.Province));
+                }
+            }
+            for (String prov : all) {
+                evaluateJS("window.map.addClickListener('" + prov + "', function(prov) { Android.infoClicked(prov); }, {nohighlight: true, permanent: true});");
+            }
+        }
+    }
+
     public void draw() {
         if (game.Started) {
             url = retrofitActivity.getBaseURL() + "Game/" + game.ID + "/Phase/" + phaseMeta.Properties.PhaseOrdinal + "/Map";
@@ -289,6 +335,7 @@ public class MapView extends FrameLayout {
                 url = url + "?fake-id=" + retrofitActivity.getLocalDevelopmentModeFakeID();
             }
             load();
+            addInfo();
 
             FrameLayout rdyButtonFrame = (FrameLayout) findViewById(R.id.rdy_button_frame);
             if (member != null && !phaseMeta.Properties.Resolved && !member.NewestPhaseState.NoOrders) {
@@ -448,11 +495,11 @@ public class MapView extends FrameLayout {
                                 return null;
                             }
                         })).toObservable(), new Sendable<Object>() {
-                    @Override
-                    public void send(Object o) {
-                        acceptOrders();
-                    }
-                }, getResources().getString(R.string.loading_state));
+                            @Override
+                            public void send(Object o) {
+                                acceptOrders();
+                            }
+                        }, getResources().getString(R.string.loading_state));
             }
         } else {
             findViewById(R.id.rewind).setVisibility(View.GONE);
@@ -528,7 +575,23 @@ public class MapView extends FrameLayout {
         });
         webView.addJavascriptInterface(new Object() {
             @JavascriptInterface
-            public void provinceClicked(String province) {
+            public void infoClicked(String province) {
+                List<String> infos = new ArrayList<>();
+                if (units.containsKey(province)) {
+                    infos.add(getResources().getString(R.string.unit_x, units.get(province).Nation));
+                }
+                if (SCs.containsKey(province)) {
+                    infos.add(getResources().getString(R.string.supply_center_x, SCs.get(province)));
+                }
+                if (dislodged.containsKey(province)) {
+                    infos.add(getResources().getString(R.string.dislodged_x, dislodged.get(province).Nation));
+                }
+                if (infos.size() > 0) {
+                    Toast.makeText(getContext(), TextUtils.join("\n", infos), Toast.LENGTH_LONG).show();
+                }
+            }
+            @JavascriptInterface
+            public void orderClicked(String province) {
                 onClickedProvince.send(province);
             }
         }, "Android");
