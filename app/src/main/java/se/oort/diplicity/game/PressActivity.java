@@ -258,7 +258,7 @@ public class PressActivity extends RetrofitActivity {
         TextView body = (TextView) row.findViewById(R.id.body);
         body.setText(message.Body);
         Linkify.addLinks(body, Linkify.ALL);
-        ((TextView) row.findViewById(R.id.at)).setText(timeFormat.format(new Date()));
+        ((TextView) row.findViewById(R.id.at)).setText(timeFormat.format(message.Age.createdAt()));
         ((TextView) row.findViewById(R.id.sender)).setText(getResources().getString(R.string.x_, member.Nation));
         if (member != null) {
             ImageView avatar = (ImageView) row.findViewById(R.id.avatar);
