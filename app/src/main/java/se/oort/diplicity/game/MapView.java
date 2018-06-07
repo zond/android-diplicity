@@ -125,7 +125,8 @@ public class MapView extends FrameLayout {
                 MapView mv = (MapView) findViewById(R.id.map_view);
                 mv.evaluateJS("window.map.removeOrders()");
                 for (Map.Entry<String, Order> entry : orders.entrySet()) {
-                    mv.evaluateJS("window.map.addOrder(" + new Gson().toJson(entry.getValue().Parts) + ", col" + entry.getValue().Nation + ");");
+                    String nationVariable = entry.getValue().Nation.replaceAll("[^A-Za-z0-9]", "");
+                    mv.evaluateJS("window.map.addOrder(" + new Gson().toJson(entry.getValue().Parts) + ", col" + nationVariable + ");");
                 }
 
             }
