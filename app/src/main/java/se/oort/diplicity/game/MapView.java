@@ -298,7 +298,7 @@ public class MapView extends FrameLayout {
     }
 
     private void addInfo() {
-        if (game.Started) {
+        if (game.Started && phases.Properties.size() > phaseMeta.Properties.PhaseOrdinal.intValue()) {
             Phase phase = phases.Properties.get(phaseMeta.Properties.PhaseOrdinal.intValue() - 1).Properties;
             Set<String> all = new HashSet<>();
             SCs.clear();
