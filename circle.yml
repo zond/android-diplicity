@@ -11,7 +11,6 @@ jobs:
       KEY_ALIAS: release
     docker:
     - image: circleci/android:api-26-alpha
-    steps:
     - restore_cache:
         keys:
         # This branch if available
@@ -20,6 +19,7 @@ jobs:
         - v1-dep-master-
         # Any branch if there are none on the default branch - this should be unnecessary if you have your default branch configured correctly
         - v1-dep-
+    - checkout
     - run: git fetch --unshallow
     - run: ./circle/download_keystore.sh
     - run: echo y | android update sdk --no-ui --all --filter "android-26"
