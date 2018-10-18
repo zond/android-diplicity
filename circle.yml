@@ -10,7 +10,7 @@ jobs:
       KEYSTORE: ${HOME}/${CIRCLE_PROJECT_REPONAME}/signing.keystore
       KEY_ALIAS: release
     docker:
-    - image: circleci/android:api-26-alpha
+      - image: circleci/android:api-26-alpha
     - restore_cache:
         keys:
         # This branch if available
