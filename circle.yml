@@ -21,7 +21,6 @@ jobs:
         # Any branch if there are none on the default branch - this should be unnecessary if you have your default branch configured correctly
         - v1-dep-
     - checkout
-    - run: git fetch --unshallow
     - run: ./circle/download_keystore.sh
     - run: echo y | android update sdk --no-ui --all --filter "android-26"
     - run: echo y | android update sdk --no-ui --all --filter "build-tools-27.0.3"
