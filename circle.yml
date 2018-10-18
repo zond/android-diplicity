@@ -22,10 +22,6 @@ jobs:
         - v1-dep-
     - checkout
     - run: ./circle/download_keystore.sh
-    - run: echo y | /opt/android/sdk/tools/android update sdk --no-ui --all --filter "android-26"
-    - run: echo y | /opt/android/sdk/tools/android update sdk --no-ui --all --filter "build-tools-27.0.3"
-    - run: echo y | /opt/android/sdk/tools/android update sdk --no-ui --all --filter "extra-android-m2repository"
-    - run: echo y | /opt/android/sdk/tools/android update sdk --no-ui --all --filter "extra-google-m2repository"
     - run: ./gradlew dependencies
     # Save dependency cache
     - save_cache:
@@ -41,7 +37,7 @@ jobs:
         - ~/.go_workspace
         - ~/.gradle
         - ~/.cache/bower
-    - run: ./gradlew assembleRelease
+    - run: env KEYSTORE="${HOME}/${CIRCLE_USERNAME}/${CIRCLE_PROJECT_REPONAME}" ./gradlew assembleRelease
     - run: cp -r app/build/outputs $CIRCLE_ARTIFACTS
     - run: ./circle/create_release.sh
     # Save test results
