@@ -976,6 +976,8 @@ public class GameActivity extends RetrofitActivity
             i.putExtra(PreferenceActivity.GAME_ID_INTENT_KEY, game.ID);
             startActivity(i);
             return true;
+        } else if (id == R.id.action_exit) {
+            finish();
         }
 
         return super.onOptionsItemSelected(item);

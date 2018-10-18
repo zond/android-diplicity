@@ -162,6 +162,12 @@ public class PressActivity extends RetrofitActivity {
                 }
             }
         });
+        ((FloatingActionButton) findViewById(R.id.exit_press)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         if (member == null) {
             findViewById(R.id.send_message_button).setVisibility(View.GONE);
