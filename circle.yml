@@ -11,6 +11,7 @@ jobs:
       KEY_ALIAS: release
     docker:
       - image: circleci/android:api-26-alpha
+    steps:
     - restore_cache:
         keys:
         # This branch if available
