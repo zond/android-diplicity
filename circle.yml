@@ -7,7 +7,6 @@ jobs:
     environment:
       CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
       CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
-      KEYSTORE: ${HOME}/${CIRCLE_PROJECT_REPONAME}/signing.keystore
       KEY_ALIAS: release
     docker:
       - image: circleci/android:api-26-alpha
@@ -37,7 +36,7 @@ jobs:
         - ~/.go_workspace
         - ~/.gradle
         - ~/.cache/bower
-    - run: env KEYSTORE="${HOME}/${CIRCLE_USERNAME}/${CIRCLE_PROJECT_REPONAME}" ./gradlew assembleRelease
+    - run: env KEYSTORE="${HOME}/${CIRCLE_USERNAME}/${CIRCLE_PROJECT_REPONAME}/signing.keystore" ./gradlew assembleRelease
     - run: cp -r app/build/outputs $CIRCLE_ARTIFACTS
     - run: ./circle/create_release.sh
     # Save test results
