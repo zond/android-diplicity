@@ -22,10 +22,10 @@ jobs:
         - v1-dep-
     - checkout
     - run: ./circle/download_keystore.sh
-    - run: echo y | /opt/android/sdk/tools/android/android update sdk --no-ui --all --filter "android-26"
-    - run: echo y | /opt/android/sdk/tools/android/android update sdk --no-ui --all --filter "build-tools-27.0.3"
-    - run: echo y | /opt/android/sdk/tools/android/android update sdk --no-ui --all --filter "extra-android-m2repository"
-    - run: echo y | /opt/android/sdk/tools/android/android update sdk --no-ui --all --filter "extra-google-m2repository"
+    - run: echo y | /opt/android/sdk/tools/android update sdk --no-ui --all --filter "android-26"
+    - run: echo y | /opt/android/sdk/tools/android update sdk --no-ui --all --filter "build-tools-27.0.3"
+    - run: echo y | /opt/android/sdk/tools/android update sdk --no-ui --all --filter "extra-android-m2repository"
+    - run: echo y | /opt/android/sdk/tools/android update sdk --no-ui --all --filter "extra-google-m2repository"
     - run: if [ -a ./gradlew ]; then gradlew dependencies; else gradle dependencies; fi
     # Save dependency cache
     - save_cache:
