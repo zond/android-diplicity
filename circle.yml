@@ -26,7 +26,7 @@ jobs:
     - run: echo y | /opt/android/sdk/tools/android update sdk --no-ui --all --filter "build-tools-27.0.3"
     - run: echo y | /opt/android/sdk/tools/android update sdk --no-ui --all --filter "extra-android-m2repository"
     - run: echo y | /opt/android/sdk/tools/android update sdk --no-ui --all --filter "extra-google-m2repository"
-    - run: if [ -a ./gradlew ]; then gradlew dependencies; else gradle dependencies; fi
+    - run: ./gradlew dependencies
     # Save dependency cache
     - save_cache:
         key: v1-dep-{{ .Branch }}-{{ epoch }}
