@@ -2,11 +2,11 @@
 
 buildscript {
     repositories {
-        jcenter()
         google()
         maven {
             url 'https://maven.fabric.io/public'
         }
+        jcenter()
     }
     dependencies {
         classpath 'org.ajoberstar:grgit:1.7.1'
