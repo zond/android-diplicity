@@ -246,6 +246,9 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                             App.firebaseCrashReport(msg, e);
                             Toast.makeText(RetrofitActivity.this, R.string.unknown_error, Toast.LENGTH_SHORT).show();
                         }
+                        if (onError != null && onError.cleanup != null) {
+                            onError.cleanup.send(new Object());
+                        }
                     }
                 } finally {
                     if (progressMessage != null) {
@@ -403,12 +406,20 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     public static class ErrorHandler {
         public List<Integer> codes;
         public Sendable<HttpException> handler;
+        public Sendable<Object> cleanup;
         public ErrorHandler(int[] codes, Sendable<HttpException> handler) {
             this.codes = new ArrayList<Integer>();
             for (int i = 0; i < codes.length; i++) {
                 this.codes.add(new Integer(codes[i]));
             }
             this.handler = handler;
+        }
+        public ErrorHandler(int[] codes, Sendable<HttpException> handler, Sendable<Object> cleanup) {
+            this(codes, handler);
+            this.cleanup = cleanup;
+        }
+        public ErrorHandler(Sendable<Object> cleanup) {
+            this.cleanup = cleanup;
         }
     }
 

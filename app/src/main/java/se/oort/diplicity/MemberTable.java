@@ -8,9 +8,11 @@ import android.widget.CompoundButton;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
+import retrofit2.adapter.rxjava.HttpException;
 import se.oort.diplicity.apigen.Game;
 import se.oort.diplicity.apigen.GameScore;
 import se.oort.diplicity.apigen.Member;
@@ -137,7 +139,7 @@ public class MemberTable extends TableLayout {
                         readyToResolve.setEnabled(false);
                     }
                     tableRow.addView(readyToResolve);
-                    CheckBox wantsDIAS = new CheckBox(retrofitActivity);
+                    final CheckBox wantsDIAS = new CheckBox(retrofitActivity);
                     wantsDIAS.setText(R.string.DRAW);
                     wantsDIAS.setLayoutParams(wrapContentParams);
                     wantsDIAS.setChecked(finalFoundState.WantsDIAS);
@@ -153,7 +155,14 @@ public class MemberTable extends TableLayout {
                                             public void send(SingleContainer<PhaseState> phaseStateSingleContainer) {
                                                 onProbation.setChecked(false);
                                             }
-                                        }, getResources().getString(R.string.updating_phase_state));
+                                        },
+                                        new RetrofitActivity.ErrorHandler(new Sendable<Object>() {
+                                            @Override
+                                            public void send(Object o) {
+                                                wantsDIAS.setChecked(finalFoundState.WantsDIAS);
+                                            }
+                                        }),
+                                        getResources().getString(R.string.updating_phase_state));
                             }
                         });
                     } else {
