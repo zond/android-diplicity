@@ -131,7 +131,14 @@ public class MemberTable extends TableLayout {
                                                 }
                                                 onProbation.setChecked(false);
                                             }
-                                        }, getResources().getString(R.string.updating_phase_state));
+                                        },
+                                        new RetrofitActivity.ErrorHandler(new Sendable<Object>() {
+                                            @Override
+                                            public void send(Object o) {
+                                                readyToResolve.setChecked(finalFoundState.ReadyToResolve);
+                                            }
+                                        }),
+                                        getResources().getString(R.string.updating_phase_state));
                             }
                         });
                         readyToResolve.setEnabled(true);
