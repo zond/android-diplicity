@@ -224,7 +224,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                         String msg = "Error " + progressMessage;
                         if (e instanceof HttpException) {
                             HttpException he = (HttpException) e;
-                            if (onError != null && onError.codes.contains(he.code())) {
+                            if (onError != null && onError.codes != null && onError.codes.contains(he.code())) {
                                 onError.handler.send(he);
                             } else {
                                 if (he.code() == 412) {
