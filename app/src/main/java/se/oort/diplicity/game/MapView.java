@@ -245,7 +245,9 @@ public class MapView extends FrameLayout {
     }
 
     public void lastPhase() {
-        if (game.NewestPhaseMeta != null && game.NewestPhaseMeta.size() > 0 && game.NewestPhaseMeta.get(0).PhaseOrdinal <= phases.Properties.size()) {
+        if (game.NewestPhaseMeta != null &&
+                game.NewestPhaseMeta.size() > 0 &&
+                game.NewestPhaseMeta.get(0).PhaseOrdinal <= phases.Properties.size()) {
             Gson gson = new Gson();
             Phase phase = phases.Properties.get(game.NewestPhaseMeta.get(0).PhaseOrdinal.intValue() - 1).Properties;
             if (phase != null) {
@@ -267,7 +269,9 @@ public class MapView extends FrameLayout {
     }
 
     public void nextPhase() {
-        if (phaseMeta.Properties != null && phaseMeta.Properties.PhaseOrdinal < game.NewestPhaseMeta.get(0).PhaseOrdinal) {
+        if (phaseMeta.Properties != null &&
+                phaseMeta.Properties.PhaseOrdinal <= phases.Properties.size() &&
+                phaseMeta.Properties.PhaseOrdinal < game.NewestPhaseMeta.get(0).PhaseOrdinal) {
             Gson gson = new Gson();
             Phase phase = phases.Properties.get(phaseMeta.Properties.PhaseOrdinal.intValue()).Properties;
             if (phase != null) {
