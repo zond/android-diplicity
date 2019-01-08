@@ -122,6 +122,9 @@ public class GameActivity extends RetrofitActivity
                     phases = phaseMultiContainer;
                     game.NewestPhaseMeta.set(0, diplicityJSON.phaseMeta);
                     Toast.makeText(GameActivity.this, R.string.the_game_has_a_new_phase, Toast.LENGTH_SHORT).show();
+                    if (currentView != R.id.nav_press) {
+                        draw();
+                    }
                 }
             }, getResources().getString(R.string.loading_phases));
             return true;
