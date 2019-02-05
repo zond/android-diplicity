@@ -30,18 +30,33 @@
         android:visibility="gone"
         android:layout_gravity="center"/>
 
-    <TextView
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@id/avatar"
-        android:layout_toRightOf="@id/avatar"
-        android:textAppearance="?attr/textAppearanceListItem"
-        android:id="@+id/sender"
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="?android:attr/textColorPrimary"
-        android:maxEms="4"
-        android:singleLine="true"
-        android:ellipsize="end" />
+        android:layout_toEndOf="@id/avatar"
+        android:layout_toRightOf="@id/avatar"
+        android:id="@+id/sender_column">
+
+        <TextView
+            android:layout_alignParentTop="true"
+            android:textAppearance="?attr/textAppearanceListItem"
+            android:id="@+id/sender"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?android:attr/textColorPrimary"
+            android:maxEms="4"
+            android:singleLine="true"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/at"
+            android:layout_below="@id/sender"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="6sp"
+            android:textColor="?android:attr/textColorPrimary" />
+
+    </RelativeLayout>
 
     <EditText
         android:inputType="none"
@@ -53,23 +68,13 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_toEndOf="@id/sender"
-        android:layout_toRightOf="@id/sender"
+        android:layout_toEndOf="@id/sender_column"
+        android:layout_toRightOf="@id/sender_column"
         android:id="@+id/body"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="?android:attr/textColorPrimary" />
-
-    <TextView
-        android:id="@+id/at"
-        android:layout_below="@id/sender"
-        android:layout_toEndOf="@id/avatar"
-        android:layout_toRightOf="@id/avatar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="6sp"
         android:textColor="?android:attr/textColorPrimary" />
 
 </RelativeLayout>
