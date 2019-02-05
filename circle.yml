@@ -1,7 +1,7 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/zond/android-diplicity
+    working_directory: ~/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
     parallelism: 1
     shell: /bin/bash --login
     environment:
@@ -36,7 +36,7 @@ jobs:
         - ~/.go_workspace
         - ~/.gradle
         - ~/.cache/bower
-    - run: env KEYSTORE="${HOME}/zond/${CIRCLE_PROJECT_REPONAME}/signing.keystore" ./gradlew assembleRelease
+    - run: env KEYSTORE="${HOME}/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/signing.keystore" ./gradlew assembleRelease
     - run: cp -r app/build/outputs $CIRCLE_ARTIFACTS
     - run: ./circle/create_release.sh
     # Save test results

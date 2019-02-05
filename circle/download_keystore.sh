@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-KEYSTORE="${HOME}/zond/${CIRCLE_PROJECT_REPONAME}/signing.keystore"
+KEYSTORE="${HOME}/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/signing.keystore"
 
 # use curl to download a keystore from $KEYSTORE_URI, if set,
 # to the path/filename set in $KEYSTORE.
