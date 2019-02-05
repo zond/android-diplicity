@@ -1,7 +1,7 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+    working_directory: ~/zond/android-diplicity
     parallelism: 1
     shell: /bin/bash --login
     environment:
