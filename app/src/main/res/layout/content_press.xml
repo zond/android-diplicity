@@ -50,25 +50,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/message_layout"
+            <EditText
+                android:id="@+id/new_message_body"
                 android:layout_below="@id/press_messages"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentLeft="true"
+                android:hint="@string/message"
                 android:layout_toStartOf="@id/send_message_button"
                 android:layout_toLeftOf="@id/send_message_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/new_message_body"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/message"
-                    android:importantForAutofill="noExcludeDescendants"
-                    android:inputType="text|textCapSentences|textAutoCorrect|textAutoComplete|textMultiLine" />
-
-            </android.support.design.widget.TextInputLayout>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text|textCapSentences|textAutoCorrect|textAutoComplete|textMultiLine">
+            </EditText>
 
         </RelativeLayout>
     </android.support.v4.widget.NestedScrollView>
