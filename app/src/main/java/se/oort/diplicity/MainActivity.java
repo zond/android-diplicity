@@ -366,6 +366,8 @@ public class MainActivity extends RetrofitActivity {
         final AlertDialog dialog = new AlertDialog.Builder(retrofitActivity).setView(R.layout.nation_preference_dialog).show();
         ListView nationPreference = (ListView) dialog.findViewById(R.id.nation_preferences);
         final List<String> nations = new ArrayList<>(variant.Nations);
+        // By randomizing the list we potentially gather slightly better information about which nations are actually popular.
+        Collections.shuffle(nations);
         final ArrayAdapter<String> adapter = new ArrayAdapter<String>(retrofitActivity, android.R.layout.simple_list_item_single_choice, nations);
         nationPreference.setAdapter(adapter);
         nationPreference.setOnItemClickListener(new AdapterView.OnItemClickListener() {
