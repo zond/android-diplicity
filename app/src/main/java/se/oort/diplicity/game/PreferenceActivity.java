@@ -25,6 +25,7 @@ import se.oort.diplicity.apigen.UserConfig;
 public class PreferenceActivity extends RetrofitActivity {
 
     public static final String GAME_ID_INTENT_KEY = "game_id_intent_key";
+    public static final String RSS_LINK_INTENT_KEY = "rss_link_intent_key";
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -51,6 +52,19 @@ public class PreferenceActivity extends RetrofitActivity {
                     ClipData clip = ClipData.newPlainText(getResources().getString(R.string.game_link), getString(R.string.game_link_x, getActivity().getIntent().getStringExtra(GAME_ID_INTENT_KEY)));
                     clipboard.setPrimaryClip(clip);
                     Toast.makeText(getActivity(), R.string.game_link_copied_to_clipboard, Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            });
+
+            Preference rssLinkPref = (Preference) findPreference(getResources().getString(R.string.rss_link_pref_key));
+            rssLinkPref.setSummary(getResources().getString(R.string.rss_link_summary));
+            rssLinkPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText(getResources().getString(R.string.rss_link), getString(R.string.rss_link_x, getActivity().getIntent().getStringExtra(GAME_ID_INTENT_KEY)));
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(getActivity(), R.string.rss_link_copied_to_clipboard, Toast.LENGTH_SHORT).show();
                     return true;
                 }
             });

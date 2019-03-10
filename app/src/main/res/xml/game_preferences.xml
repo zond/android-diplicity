@@ -3,4 +3,7 @@
     <Preference
         android:key="@string/game_id_pref_key"
         android:title="@string/game_id"/>
+    <Preference
+        android:key="@string/rss_link_pref_key"
+        android:title="@string/rss_link"/>
  </PreferenceScreen>
