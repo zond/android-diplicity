@@ -25,7 +25,6 @@ import se.oort.diplicity.apigen.UserConfig;
 public class PreferenceActivity extends RetrofitActivity {
 
     public static final String GAME_ID_INTENT_KEY = "game_id_intent_key";
-    public static final String RSS_LINK_INTENT_KEY = "rss_link_intent_key";
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
