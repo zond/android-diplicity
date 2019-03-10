@@ -106,7 +106,16 @@ public class MainActivity extends RetrofitActivity {
     public static final String HAS_JOINED_GAME_KEY = "has_joined_game";
     public static final String GAME_LIST_FILTER_KEY = "game_list_filter";
 
-    private static Pattern viewGamePattern = Pattern.compile("/Game/(.*)");
+    /**
+     * A regex to find the game id in paths like:
+     * <ul>
+     * <li>/Game/ahJzfmRpcGxpY2l0eS1lbmdpbmVyEQsSBEdhbWUYgICAiPOKhwkM</li>
+     * <li>/Game/ahJzfmRpcGxpY2l0eS1lbmdpbmVyEQsSBEdhbWUYgICAiPOKhwkM/Phase/26</li>
+     * <li>/Game/ahJzfmRpcGxpY2l0eS1lbmdpbmVyEQsSBEdhbWUYgICAiPOKhwkM/Phase/26/Map</li>
+     * </ul>
+     * Note that any phase id will not be captured.
+     */
+    private static Pattern viewGamePattern = Pattern.compile("/Game/([^/]*)(/.*)?");
 
     private class GameListFilter {
         private int FLOAT_FILTER = 0;
