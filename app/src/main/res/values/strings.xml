@@ -179,7 +179,7 @@
     <string name="game_id_copied_to_clipboard">Game ID copied to clipboard.</string>
     <string name="rss_link_pref_key">rss_link_pref_key</string>
     <string name="rss_link">RSS Link</string>
-    <string name="rss_link_summary">Copy link for this game&apos;s RSS feed</string>
+    <string name="rss_link_summary">Copy link for this game\'s RSS feed</string>
     <string name="rss_link_copied_to_clipboard">RSS feed link copied to clipboard.</string>
     <string name="rss_link_x">https://diplicity-engine.appspot.com/Rss?gameID=%s&amp;phaseLimit=8</string>
     <string name="draw">Draw</string>
