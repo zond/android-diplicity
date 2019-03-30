@@ -12,6 +12,8 @@ echo ${APK_VERSION_LINE}
 echo ${APK_VERSION_CODE}
 echo ${APK_VERSION_NAME}
 
+sudo apt-get clean all
+sudo apt-get update
 sudo apt-get install software-properties-common
 sudo add-apt-repository -y ppa:gophers/archive
 sudo apt update
