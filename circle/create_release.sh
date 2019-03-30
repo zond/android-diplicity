@@ -12,7 +12,8 @@ echo ${APK_VERSION_LINE}
 echo ${APK_VERSION_CODE}
 echo ${APK_VERSION_NAME}
 
-sudo add-apt-repository ppa:gophers/archive
+sudo apt-get install software-properties-common
+sudo add-apt-repository -y ppa:gophers/archive
 sudo apt update
 sudo apt-get install golang-1.9-go
 export GOPATH="${HOME}/go"
