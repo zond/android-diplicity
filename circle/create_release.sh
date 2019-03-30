@@ -12,7 +12,9 @@ echo ${APK_VERSION_LINE}
 echo ${APK_VERSION_CODE}
 echo ${APK_VERSION_NAME}
 
-sudo apt-get install golang-1.9
+sudo add-apt-repository ppa:gophers/archive
+sudo apt update
+sudo apt-get install golang-1.9-go
 export GOPATH="${HOME}/go"
-/usr/lib/go-1.8/bin/go get github.com/google/go-github/github golang.org/x/oauth2 google.golang.org/api/drive/v3
-/usr/lib/go-1.8/bin/go run circle/create_release.go -apk=${APK_PATH} -build=${CIRCLE_BUILD_NUM} -tag=${APK_VERSION_CODE} -short_sha=${APK_VERSION_NAME}
+/usr/lib/go-1.9/bin/go get github.com/google/go-github/github golang.org/x/oauth2 google.golang.org/api/drive/v3
+/usr/lib/go-1.9/bin/go run circle/create_release.go -apk=${APK_PATH} -build=${CIRCLE_BUILD_NUM} -tag=${APK_VERSION_CODE} -short_sha=${APK_VERSION_NAME}
