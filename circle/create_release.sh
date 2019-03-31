@@ -15,6 +15,7 @@ echo ${APK_VERSION_NAME}
 sudo apt-get clean all
 sudo apt-get update
 sudo apt-get install software-properties-common
+sudo apt-get install gnupg-agent
 
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 308C15A29AD198E9
 sudo add-apt-repository -y ppa:gophers/archive
