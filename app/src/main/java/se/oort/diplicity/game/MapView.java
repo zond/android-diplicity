@@ -110,6 +110,7 @@ public class MapView extends FrameLayout {
                         if (e.getMessage().contains("This API not supported on Android 4.3 and earlier")) {
                             mWebView.loadUrl("javascript:" + toEvaluate);
                         }
+                        Log.e("Diplicity", "While evaluating '" + toEvaluate + "'", e);
                     }
                 } else {
                     mWebView.loadUrl("javascript:" + toEvaluate);
@@ -303,7 +304,7 @@ public class MapView extends FrameLayout {
     }
 
     private void addInfo() {
-        if (game.Started && phases.Properties.size() > phaseMeta.Properties.PhaseOrdinal.intValue()) {
+        if (game.Started && phases.Properties.size() >= phaseMeta.Properties.PhaseOrdinal.intValue()) {
             Phase phase = phases.Properties.get(phaseMeta.Properties.PhaseOrdinal.intValue() - 1).Properties;
             Set<String> all = new HashSet<>();
             SCs.clear();
