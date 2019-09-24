@@ -1323,6 +1323,11 @@ public class MainActivity extends RetrofitActivity {
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(url));
             startActivity(i);
+        } else if (id == R.id.action_chat) {
+            String url = "https://discord.gg/QETtwGR";
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
         } else if (id == R.id.action_forum) {
             String url = "https://groups.google.com/forum/#!forum/diplicity-talk";
             Intent i = new Intent(Intent.ACTION_VIEW);
