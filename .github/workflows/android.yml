@@ -12,7 +12,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
       with:
         fetch-depth: 0
     - name: Set up JDK 1.8
@@ -44,3 +45,11 @@ jobs:
         path: app/build/outputs/apk/release/app-release.apk
     - name: Extract release names
       run: ./tools/extract_release_names.sh
+    - name: Create release
+      uses: actions/create-release@latest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: $(cat ${GITHUB_WORKSPACE}/versionCode.txt)
+        release_name: $(cat ${GITHUB_WORKSPACE}/versionName.txt)
+        body: To see the changes, see the changes between https://github.com/zond/android-diplicity/commit/${GITHUB_SHA} and the previous release.
