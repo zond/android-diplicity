@@ -24,6 +24,8 @@ jobs:
     - name: Build with Gradle
       env:
         KEYSTORE: signing.keystore
-        KEYSTORE_PASSWORD: ${{ secrets.keystorePassword }}
+        KEY_ALIAS: mykey
+        KEY_PASSWORD: ${{ secrets.keystorePassword }}
+        KEYSTORE_PASSWORD: 
       run: ./gradlew assembleRelease
 
