@@ -27,8 +27,8 @@
     <string name="top_reliable">Top reliable</string>
     <string name="top_quick">Top quick</string>
     <string name="top_hater">Top hater</string>
-    <string name="season_year_type">%1$s %2$s, %3$s</string>
-    <string name="season_year_type_created">%1$s %2$s, %3$s - %4$s</string>
+    <string name="season_year_type">%1$s %2$d, %3$s</string>
+    <string name="season_year_type_created">%1$s %2$d, %3$s - %4$s</string>
     <string name="x_players">%s players</string>
     <string name="rating">Rating</string>
     <string name="min_rating">Minimum rating</string>
@@ -57,15 +57,15 @@
     <string name="creating_game">Creating game</string>
     <string name="loading_user_stats">Loading user stats</string>
     <string name="must_be_below_your_rating_x">Must be below your rating (%s)</string>
-    <string name="minimum_rating_must_be_below_your_rating_x">Minimum rating must be below your rating (%s)</string>
-    <string name="maximum_rating_must_be_above_your_rating_x">Maximum rating must be above your rating (%s)</string>
-    <string name="minimum_reliability_must_be_below_your_reliability_x">Minimum reliability must be below your reliability (%s)</string>
-    <string name="minimum_quickness_must_be_below_your_quickness_x">Minimum quickness must be below your quickness (%s)</string>
-    <string name="maximum_hated_must_be_above_your_hated_x">Maximum hated must be above your hated (%s)</string>
-    <string name="maximum_hater_must_be_above_your_hater_x">Maximum hater must be above your hater (%s)</string>
+    <string name="minimum_rating_must_be_below_your_rating_x">Minimum rating must be below your rating (%d)</string>
+    <string name="maximum_rating_must_be_above_your_rating_x">Maximum rating must be above your rating (%d)</string>
+    <string name="minimum_reliability_must_be_below_your_reliability_x">Minimum reliability must be below your reliability (%d)</string>
+    <string name="minimum_quickness_must_be_below_your_quickness_x">Minimum quickness must be below your quickness (%d)</string>
+    <string name="maximum_hated_must_be_above_your_hated_x">Maximum hated must be above your hated (%d)</string>
+    <string name="maximum_hater_must_be_above_your_hater_x">Maximum hater must be above your hater (%d)</string>
     <string name="title_activity_game">GameActivity</string>
     <string name="map">Map</string>
-    <string name="desc_season_year_type">%2$s %3$s, %4$d: %1$s</string>
+    <string name="desc_season_year_type">%2$s %3$d, %4$s: %1$s</string>
     <string name="loading_start_state">Loading start state</string>
     <string name="loading_options">Loading options</string>
     <string name="cancel">Cancel</string>
@@ -110,7 +110,7 @@
     <string name="variant_version">Version:</string>
     <string name="variant_description">Description:</string>
     <string name="variant_rules">Rules:</string>
-    <string name="_scs">%s SCs</string>
+    <string name="_scs">%d SCs</string>
     <string name="_points">%s points</string>
     <string name="loading_phase_settings">Loading phase settings</string>
     <string name="ready_to_resolve">Ready to resolve</string>
@@ -208,11 +208,11 @@
     <string name="chat">Chat</string>
     <string name="source_code">Source code</string>
     <string name="use_map_to_add_orders">Use the map to add orders.</string>
-    <string name="x_of_y_players">%1$s/%2$s players</string>
+    <string name="x_of_y_players">%1$d/%2$d players</string>
     <string name="phase_length">Phase length</string>
     <string name="min_reliability_higher_is_less_nmr">Minimum reliability (high = active players)</string>
     <string name="min_quickness_higher_is_faster">Minimum quickness (high = fast games)</string>
-    <string name="name_x_players">%1$s, %2$s players</string>
+    <string name="name_x_players">%1$s, %2$d players</string>
     <string name="min_rating_high_is_skilled">Minimum rating (high = strong players)</string>
     <string name="max_rating_low_is_weak_players">Maximum rating (low = weak players)</string>
     <string name="max_hated_low_is_unbanned">Maximum hated (low = unbanned players)</string>

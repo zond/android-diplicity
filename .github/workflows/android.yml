@@ -17,5 +17,13 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+    - name: Download keystore
+      env:
+        KEYSTORE_URL: ${{ secrets.keystoreURL }}
+      run: ./tools/download_keystore.sh
     - name: Build with Gradle
-      run: ./gradlew build
+      env:
+        KEYSTORE: ${GITHUB_WORKSPACE}/android-diplicity/signing.keystore
+        KEYSTORE_PASSWORD: ${{ secrets.keystorePassword }}
+      run: ./gradlew assembleRelease
+
