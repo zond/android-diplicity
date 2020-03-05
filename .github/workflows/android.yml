@@ -25,7 +25,6 @@ jobs:
       env:
         KEYSTORE: signing.keystore
         KEY_ALIAS: mykey
-        KEY_PASSWORD: ${{ secrets.keystorePassword }}
-        KEYSTORE_PASSWORD: 
+        KEYSTORE_PASSWORD: ${{ secrets.keystorePassword }}
       run: ./gradlew assembleRelease
 
