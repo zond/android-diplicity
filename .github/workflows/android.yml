@@ -23,7 +23,7 @@ jobs:
       run: ./tools/download_keystore.sh
     - name: Build with Gradle
       env:
-        KEYSTORE: $GITHUB_WORKSPACE/android-diplicity/signing.keystore
+        KEYSTORE: $GITHUB_WORKSPACE/signing.keystore
         KEYSTORE_PASSWORD: ${{ secrets.keystorePassword }}
       run: ./gradlew assembleRelease
 
