@@ -47,10 +47,10 @@ dependencies {
     api 'io.reactivex:rxjava-joins:0.22.0'
     api 'io.reactivex:rxandroid:1.2.1'
     api 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
-    api 'com.android.support:appcompat-v7:26.1.0'
-    api 'com.android.support:design:26.1.0'
-    api "com.android.support:gridlayout-v7:26.1.0"
-    api 'com.android.support:recyclerview-v7:26.1.0'
+    api 'com.android.support:appcompat-v7:28.0.0'
+    api 'com.android.support:design:28.0.0'
+    api 'com.android.support:gridlayout-v7:28.0.0'
+    api 'com.android.support:recyclerview-v7:28.0.0'
     api 'com.android.support:multidex:1.0.3'
     api fileTree(dir: 'libs', include: ['*.jar'])
 }
