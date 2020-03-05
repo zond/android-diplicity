@@ -37,4 +37,6 @@ jobs:
         KEY_PASSWORD: ${{ secrets.keystorePassword }}
         KEYSTORE_PASSWORD: ${{ secrets.keystorePassword }}
       run: ./gradlew assembleRelease
+    - name: Publish release
+      run: ./tools/create_release.sh
 
