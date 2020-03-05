@@ -36,20 +36,16 @@ jobs:
         KEY_PASSWORD: ${{ secrets.keystorePassword }}
         KEYSTORE_PASSWORD: ${{ secrets.keystorePassword }}
       run: ./gradlew assembleRelease --refresh-dependencies
-    - name: Upload release APK
-      uses: actions/upload-artifact@v1
-      with:
-        name: Release APK
-        path: app/build/outputs/apk/release/app-release.apk
     - name: Find aapt binary
       run: echo "::set-env name=AAPT_BINARY::$(ls -1 ${ANDROID_HOME}/build-tools/*/aapt | tail -n 1)"
-    - name: Exract APK badging
+    - name: Extract APK badging
       run: echo "::set-env name=APK_BADGING::$(${AAPT_BINARY} dump badging app/build/outputs/apk/release/app-release.apk)"
     - name: Extract release name
       run: echo "::set-env name=APK_VERSION_NAME::$(echo "${APK_BADGING}" | sed -e "s/.*versionName='\([^']\+\)'.*/\1/")"
     - name: Extract release code
       run: echo "::set-env name=APK_VERSION_CODE::$(echo "${APK_BADGING}" | sed -e "s/.*versionCode='\([^']\+\)'.*/\1/")"
     - name: Create release
+      id: create_release
       uses: actions/create-release@latest
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -58,3 +54,12 @@ jobs:
         release_name: ${{ env.APK_VERSION_NAME }}
         body: |
             To download the APK, go to https://github.com/zond/android-diplicity/runs/${{ github.run_id }} and download the artifacts.
+    - name: Upload release APK
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} 
+        asset_path: app/build/outputs/apk/release/app-release.apk
+        asset_name: app-release.apk
+        asset_content_type: application/vnd.android.package-archive
