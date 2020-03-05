@@ -21,9 +21,7 @@ jobs:
       with:
         java-version: 1.8
     - name: Download keystore
-      env:
-        KEYSTORE_URL: ${{ secrets.keystoreURL }}
-      run: ./tools/download_keystore.sh
+      run: curl -L -o "${GITHUB_WORKSPACE}/app/signing.keystore" "${{ secrets.keystoreURL}}"
     - name: Cache Gradle downloads
       uses: actions/cache@v1
       with:
@@ -43,15 +41,21 @@ jobs:
       with:
         name: Release APK
         path: app/build/outputs/apk/release/app-release.apk
-    - name: Extract release names
-      run: ./tools/extract_release_names.sh
+    - name: Find aapt binary
+      run: echo "::set-env name=AAPT_BINARY::$(ls -1 "${ANDROID_HOME}/build-tools/*/aapt" | tail -n 1)"
+    - name: Exract APK badging
+      run: echo "::set-env name=APK_BADGING::$(${$AAPT_BINARY} dump badging app/build/outputs/apk/release/app-release.apk)"
+    - name: Extract release name
+      run: echo "::set-env name=APK_VERSION_NAME::$(echo "${APK_BADGING}" | sed -e "s/.*versionName='\([^']\+\)'.*/\1/")"
+    - name: Extract release code
+      run: echo "::set-env name=APK_VERSION_CODE::$(echo "${APK_BADGING}" | sed -e "s/.*versionName='\([^']\+\)'.*/\1/")"
     - name: Create release
       uses: actions/create-release@latest
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: $APK_VERSION_CODE
-        release_name: $APK_VERSION_NAME
+        tag_name: ${APK_VERSION_CODE}
+        release_name: ${APK_VERSION_NAME}
         body: |
-            To download the APK, go to https://github.com/zond/android-diplicity/runs/$GITHUB_RUN_NUMBER and download the artifacts.
-            To see the changes, list the changes between https://github.com/zond/android-diplicity/commit/$GITHUB_SHA and the previous release.
+            To download the APK, go to https://github.com/zond/android-diplicity/runs/${GITHUB_RUN_NUMBER} and download the artifacts.
+            To see the changes, list the changes between https://github.com/zond/android-diplicity/commit/${GITHUB_SHA} and the previous release.
