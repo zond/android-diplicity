@@ -50,8 +50,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${APK_VERSION_CODE}
-        release_name: ${APK_VERSION_NAME}
+        tag_name: $APK_VERSION_CODE
+        release_name: $APK_VERSION_NAME
         body: |
-            To download the APK, go to https://github.com/zond/android-diplicity/runs/${GITHUB_RUN_NUMBER} and download the artifacts.
-            To see the changes, list the changes between https://github.com/zond/android-diplicity/commit/${GITHUB_SHA} and the previous release.
+            To download the APK, go to https://github.com/zond/android-diplicity/runs/$GITHUB_RUN_NUMBER and download the artifacts.
+            To see the changes, list the changes between https://github.com/zond/android-diplicity/commit/$GITHUB_SHA and the previous release.
