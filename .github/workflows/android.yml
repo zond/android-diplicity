@@ -42,7 +42,7 @@ jobs:
         name: Release APK
         path: app/build/outputs/apk/release/app-release.apk
     - name: Find aapt binary
-      run: echo "::set-env name=AAPT_BINARY::$(ls -1 "${ANDROID_HOME}/build-tools/*/aapt" | tail -n 1)"
+      run: echo "::set-env name=AAPT_BINARY::$(ls -1 ${ANDROID_HOME}/build-tools/*/aapt | tail -n 1)"
     - name: Exract APK badging
       run: echo "::set-env name=APK_BADGING::$(${$AAPT_BINARY} dump badging app/build/outputs/apk/release/app-release.apk)"
     - name: Extract release name
