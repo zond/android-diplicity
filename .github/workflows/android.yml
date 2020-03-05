@@ -24,13 +24,6 @@ jobs:
       env:
         KEYSTORE_URL: ${{ secrets.keystoreURL }}
       run: ./tools/download_keystore.sh
-    - name: Cache Gradle downloads
-      uses: actions/cache@v1
-      with:
-        path: ~/.gradle/caches
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
     - name: Build with Gradle
       env:
         KEYSTORE: signing.keystore
