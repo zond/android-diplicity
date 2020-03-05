@@ -2,11 +2,11 @@ apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 26
     defaultConfig {
         applicationId "se.oort.diplicity"
         minSdkVersion 15
-        targetSdkVersion 28
+        targetSdkVersion 26
         versionCode gitVersionCode.toInteger()
         versionName gitVersionName
         multiDexEnabled true
