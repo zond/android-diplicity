@@ -2,6 +2,10 @@
 
 KEYSTORE="${GITHUB_WORKSPACE}/android-diplicity/signing.keystore"
 
+if [ $KEYSTORE_URL == "" ]; then
+	echo "no keystore url set?"
+fi
+
 # use curl to download a keystore from $KEYSTORE_URI, if set,
 # to the path/filename set in $KEYSTORE.
 if [ "${KEYSTORE}" != "" ] && [ "${KEYSTORE_URI}" != "" ]; then
@@ -10,5 +14,5 @@ if [ "${KEYSTORE}" != "" ] && [ "${KEYSTORE_URI}" != "" ]; then
     # expose the sensitive uri in the build logs:
     curl -L -o ${KEYSTORE} ${KEYSTORE_URI}
 else
-    echo "Keystore uri not set.  .APK artifact will not be signed."
+    echo "Keystore uri not set. APK artifact will not be signed."
 fi
