@@ -57,4 +57,4 @@ jobs:
         tag_name: ${{ env.APK_VERSION_CODE }}
         release_name: ${{ env.APK_VERSION_NAME }}
         body: |
-            To download the APK, go to https://github.com/zond/android-diplicity/runs/${{ github.run_number }} and download the artifacts.
+            To download the APK, go to https://github.com/zond/android-diplicity/runs/${{ github.run_id }} and download the artifacts.
