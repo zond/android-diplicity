@@ -14,4 +14,5 @@ echo ${APK_VERSION_LINE}
 echo ${APK_VERSION_CODE}
 echo ${APK_VERSION_NAME}
 
+go version
 go run tools/create_release.go -apk=${APK_PATH} -build=${CIRCLE_BUILD_NUM} -tag=${APK_VERSION_CODE} -short_sha=${APK_VERSION_NAME}
