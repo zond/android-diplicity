@@ -12,6 +12,6 @@ APK_VERSION_NAME=$(echo ${APK_VERSION_LINE} | sed -e "s/.*versionName='\([^']\+\
 echo "Found version code ${APK_VERSION_CODE}."
 echo "Found version name ${APK_VERSION_NAME}."
 
-echo ${APK_VERSION_CODE} > ${GITHUB_WORKSPACE}/versionCode.txt
-echo ${APK_VERSION_NAME} > ${GITHUB_WORKSPACE}/versionName.txt
+echo "::set-env name=VERSION_CODE::${APK_VERSION_CODE}"
+echo "::set-env name=VERSION_NAME::${APK_VERSION_NAME}"
 
