@@ -1,10 +1,10 @@
 #!/bin/bash
 
-if [ "${KEYSTORE_URI}" != "" ]; then
-    echo "Keystore URI found - downloading..."
+if [ "${KEYSTORE_URL}" != "" ]; then
+    echo "KEYSTORE_URL found - downloading..."
     # we're using curl instead of wget because it will not
     # expose the sensitive uri in the build logs:
-    curl -L -o "${GITHUB_WORKSPACE}/android-diplicity/signing.keystore" "${KEYSTORE_URI}"
+    curl -L -o "${GITHUB_WORKSPACE}/android-diplicity/signing.keystore" "${KEYSTORE_URL}"
 else
-    echo "Keystore uri not set. APK artifact will not be signed."
+    echo "KEYSTORE_URL not set. APK artifact will not be signed."
 fi
