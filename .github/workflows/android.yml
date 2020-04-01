@@ -32,7 +32,7 @@ jobs:
     - name: Build with Gradle
       env:
         KEYSTORE: signing.keystore
-        KEY_ALIAS: mykey
+        KEY_ALIAS: release
         KEY_PASSWORD: ${{ secrets.keystorePassword }}
         KEYSTORE_PASSWORD: ${{ secrets.keystorePassword }}
       run: ./gradlew assembleRelease --refresh-dependencies
