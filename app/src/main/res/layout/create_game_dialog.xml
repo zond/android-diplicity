@@ -142,6 +142,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
+            <TextView
+                android:id="@+id/anonymous_label"
+                android:text="@string/anonymous"
+                android:enabled="false"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <CheckBox
+                android:checked="false"
+                android:enabled="false"
+                android:id="@+id/anonymous"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/min_rating_label"
                 android:layout_columnSpan="2"

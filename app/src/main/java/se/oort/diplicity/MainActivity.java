@@ -28,6 +28,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
@@ -561,6 +562,8 @@ public class MainActivity extends RetrofitActivity {
                             final CheckBox conferenceChat = (CheckBox) dialog.findViewById(R.id.conference_chat);
                             final CheckBox groupChat = (CheckBox) dialog.findViewById(R.id.group_chat);
                             final CheckBox privateChat = (CheckBox) dialog.findViewById(R.id.private_chat);
+                            final CheckBox anonymous = (CheckBox) dialog.findViewById(R.id.anonymous);
+                            final TextView anonymousLabel = (TextView) dialog.findViewById(R.id.anonymous_label);
                             final List<Boolean> noMergeContainer = new ArrayList<Boolean>();
                             noMergeContainer.add(Boolean.FALSE);
 
@@ -639,6 +642,23 @@ public class MainActivity extends RetrofitActivity {
                                 }
                             };
 
+                            CheckBox.OnCheckedChangeListener anonymousAvailableListener = new CheckBox.OnCheckedChangeListener() {
+                                @Override
+                                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                                    if (privateView.isChecked()) {
+                                        // Anonymous option should be available for any private games.
+                                        anonymous.setEnabled(true);
+                                        anonymousLabel.setEnabled(true);
+                                    } else {
+                                        // Public gunboat games are always anonymous, other public games are never anonymous.
+                                        anonymous.setEnabled(false);
+                                        anonymousLabel.setEnabled(false);
+                                        boolean gunboat = !conferenceChat.isChecked() && !groupChat.isChecked() && !privateChat.isChecked();
+                                        anonymous.setChecked(gunboat);
+                                    }
+                                }
+                            };
+
                             setDefaultPhaseLength(phaseLengthView, phaseLengthUnitsSpinner);
                             setDefaultMinReliability(minReliabilityView, statsContainer.get(0));
 
@@ -653,6 +673,11 @@ public class MainActivity extends RetrofitActivity {
 
                             phaseLengthUnitsSpinner.setOnItemSelectedListener(phaseLengthUnitsListener);
 
+                            privateView.setOnCheckedChangeListener(anonymousAvailableListener);
+                            conferenceChat.setOnCheckedChangeListener(anonymousAvailableListener);
+                            groupChat.setOnCheckedChangeListener(anonymousAvailableListener);
+                            privateChat.setOnCheckedChangeListener(anonymousAvailableListener);
+
                             ((FloatingActionButton) dialog.findViewById(R.id.create_game_button)).setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
@@ -665,6 +690,7 @@ public class MainActivity extends RetrofitActivity {
                                     game.DisableConferenceChat = !conferenceChat.isChecked();
                                     game.DisableGroupChat = !groupChat.isChecked();
                                     game.DisablePrivateChat = !privateChat.isChecked();
+                                    game.Anonymous = anonymous.isChecked();
                                     game.NationAllocation = new Long(allocationNames.get(allocations.getSelectedItemPosition()).code);
                                     try {
                                         game.MinRating = Double.parseDouble(minRatingView.getText().toString());

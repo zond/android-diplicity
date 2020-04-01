@@ -248,6 +248,7 @@
     <string name="conference_chat_disabled">Conference chat disabled</string>
     <string name="group_chat_disabled">Group chat disabled</string>
     <string name="private_chat_disabled">Private chat disabled</string>
+    <string name="anonymous">Anonymous</string>
     <string name="nation_allocation">Nation allocation</string>
     <string name="random">Random</string>
     <string name="preferences">Preferences</string>

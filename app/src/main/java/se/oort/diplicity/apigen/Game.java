@@ -21,6 +21,7 @@ public class Game implements java.io.Serializable {
   public Boolean DisableConferenceChat;
   public Boolean DisableGroupChat;
   public Boolean DisablePrivateChat;
+  public Boolean Anonymous;
   public Long NationAllocation;
   public Long NMembers;
   public java.util.List<Member> Members;
