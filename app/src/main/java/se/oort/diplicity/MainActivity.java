@@ -642,7 +642,7 @@ public class MainActivity extends RetrofitActivity {
                                 }
                             };
 
-                            CheckBox.OnCheckedChangeListener anonymousAvailableListener = new CheckBox.OnCheckedChangeListener() {
+                            final CheckBox.OnCheckedChangeListener anonymousAvailableListener = new CheckBox.OnCheckedChangeListener() {
                                 @Override
                                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                                     if (privateView.isChecked()) {
@@ -656,6 +656,21 @@ public class MainActivity extends RetrofitActivity {
                                         boolean gunboat = !conferenceChat.isChecked() && !groupChat.isChecked() && !privateChat.isChecked();
                                         anonymous.setChecked(gunboat);
                                     }
+                                }
+                            };
+
+                            CheckBox.OnCheckedChangeListener privateGameListener = new CheckBox.OnCheckedChangeListener() {
+                                @Override
+                                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                                    if (privateView.isChecked()) {
+                                        // Private games typically don't want joining requirements.
+                                        minReliabilityView.setText("0");
+                                    } else {
+                                        // Public games probably want to avoid NMR players.
+                                        setDefaultMinReliability(minReliabilityView, statsContainer.get(0));
+                                    }
+                                    // The private game flag also affects the anonymity options for the game.
+                                    anonymousAvailableListener.onCheckedChanged(compoundButton, b);
                                 }
                             };
 
@@ -673,7 +688,8 @@ public class MainActivity extends RetrofitActivity {
 
                             phaseLengthUnitsSpinner.setOnItemSelectedListener(phaseLengthUnitsListener);
 
-                            privateView.setOnCheckedChangeListener(anonymousAvailableListener);
+                            privateView.setOnCheckedChangeListener(privateGameListener);
+
                             conferenceChat.setOnCheckedChangeListener(anonymousAvailableListener);
                             groupChat.setOnCheckedChangeListener(anonymousAvailableListener);
                             privateChat.setOnCheckedChangeListener(anonymousAvailableListener);
