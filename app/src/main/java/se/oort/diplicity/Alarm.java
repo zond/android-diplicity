@@ -33,7 +33,11 @@ public class Alarm extends BroadcastReceiver {
         String desc;
         String id;
         public Date alertAt(Context context) {
-            return new Date(deadlineAt.getTime() - (App.getDeadlineWarningMinutes(context) * 60 * 1000));
+            if (App.getDeadlineWarningDebug(context)) {
+                return new Date(new Date().getTime() + 5 * 1000);
+            } else {
+                return new Date(deadlineAt.getTime() - (App.getDeadlineWarningMinutes(context) * 60 * 1000));
+            }
         }
         public static Alert fromJSON(String s) {
             return new Gson().fromJson(s, Alert.class);
@@ -97,6 +101,8 @@ public class Alarm extends BroadcastReceiver {
                     notificationIntent,
                     context.getResources().getString(R.string.orders_needed),
                     context.getResources().getString(R.string.x_needs_orders_before_y, desc, deadlineAt.toString()));
+            Log.d("Diplicity", "Created notification for " + this);
+
         }
     }
 
@@ -118,7 +124,6 @@ public class Alarm extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Alert alert = Alert.fromIntent(intent);
-        Log.d("Diplicity", "Creating notification for " + alert);
         alert.notify(context);
         alert.turnOff(context);
     }

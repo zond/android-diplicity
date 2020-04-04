@@ -44,6 +44,9 @@ public class GameUnserializer implements JsonDeserializer<Game> {
         if (member.NewestPhaseState == null) {
             return false;
         }
+        if (App.getDeadlineWarningDebug(context)) {
+            return true;
+        }
         if (member.NewestPhaseState.ReadyToResolve) {
             return false;
         }

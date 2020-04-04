@@ -38,5 +38,9 @@
             android:title="@string/local_development_fake_id"
             android:inputType="text"
             android:key="@string/local_development_mode_fake_id_pref_key" />
+        <CheckBoxPreference
+            android:title="@string/deadline_warning_debug"
+            android:summary="@string/debug_deadline_warnings"
+            android:key="@string/deadline_warning_debug_pref_key" />
     </PreferenceCategory>
  </PreferenceScreen>

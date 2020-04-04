@@ -133,6 +133,8 @@
     <string name="members">Members</string>
     <string name="phase_length_must_be_less_than_30_days">Phase length must be less than 30 days</string>
     <string name="local_development_mode">Local development mode</string>
+    <string name="deadline_warning_debug">Debug deadline alarms</string>
+    <string name="debug_deadline_warnings">Make warnings about deadlines appear 5 seconds after loading games, instead of the configured time ahead of deadline.</string>
     <string name="connect_to_localhost_instead_of_cloud_service">Connect to localhost:8080 instead of cloud service</string>
     <string name="local_development_fake_id">Local development fake ID</string>
     <string name="development">Development</string>
@@ -148,6 +150,7 @@
     <string name="push_notifications_pref_key">push_notifications_pref_key</string>
     <string name="email_notifications_pref_key">email_notifications_pref_key</string>
     <string name="local_development_mode_pref_key">local_development_mode_pref_key</string>
+    <string name="deadline_warning_debug_pref_key">deadline_warning_debug_pref_key</string>
     <string name="local_development_mode_fake_id_pref_key">local_development_mode_fake_id_pref_key</string>
     <string name="you_can_build_n_this_phase">You can build %s this phase.</string>
     <string name="you_have_to_disband_n_this_phase">You have to disband %s this phase.</string>

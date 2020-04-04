@@ -1,5 +1,6 @@
 package se.oort.diplicity;
 
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
@@ -10,6 +11,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.os.Build;
+
 
 import rx.functions.Func2;
 import rx.observables.JoinObservable;
@@ -32,8 +35,23 @@ public class NotificationReceiveActivity extends RetrofitActivity {
     public static void sendNotification(Context context, Intent intent, String title, String body) {
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
+        NotificationCompat.Builder builder = null;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String channelID = "default_channel";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel notificationChannel = new NotificationChannel(channelID, channelID, importance);
+            notificationChannel.setDescription(channelID);
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(notificationChannel);
+            builder = new NotificationCompat.Builder(context, channelID);
+        } else {
+            builder = new NotificationCompat.Builder(context);
+        }
+
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
+
+        builder
                 .setSmallIcon(R.drawable.ic_otto)
                 .setContentTitle(title)
                 .setContentText(body)
@@ -44,7 +62,7 @@ public class NotificationReceiveActivity extends RetrofitActivity {
         NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.notify(0, notificationBuilder.build());
+        notificationManager.notify(0, builder.build());
     }
 
     @Override

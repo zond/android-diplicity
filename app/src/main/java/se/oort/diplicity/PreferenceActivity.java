@@ -236,8 +236,6 @@ public class PreferenceActivity extends RetrofitActivity {
 
                                 populateColorOverrides(userConfigSingleContainer);
 
-
-
                                 if (!prefs.getBoolean(getResources().getString(R.string.local_development_mode_pref_key), false)) {
                                     removeFakeIDPref();
                                 } else {

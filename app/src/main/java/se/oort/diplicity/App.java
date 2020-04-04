@@ -1,11 +1,15 @@
 package se.oort.diplicity;
 
 import android.app.Application;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.multidex.MultiDexApplication;
 import android.util.Log;
+import android.os.Build;
+
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.CrashlyticsInitProvider;
@@ -46,6 +50,10 @@ public class App extends MultiDexApplication {
         } catch (NumberFormatException e) {
             return 0l;
         }
+    }
+
+    public static boolean getDeadlineWarningDebug(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getResources().getString(R.string.deadline_warning_debug_pref_key), false);
     }
 
     public static Member getMemberByUser(Game game, String userId) {
