@@ -53,6 +53,8 @@ public class PressActivity extends RetrofitActivity {
     public static final String SERIALIZED_MEMBER_KEY = "serialized_member";
     public static final String SERIALIZED_GAME_KEY = "serialized_game";
     public static final String SERIALIZED_PHASES_KEY = "serialized_phases";
+    public static final String DIPLICITY_SENDER = "Diplicity";
+    public static final String DIPLICITY_SENDER_PICTURE = "https://diplicity-engine.appspot.com/img/otto.png";
 
     public static final String MESSAGE_DRAFT_KEY = "message_draft";
 
@@ -169,7 +171,7 @@ public class PressActivity extends RetrofitActivity {
             }
         });
 
-        if (member == null) {
+        if (member == null || channel.Members.contains(DIPLICITY_SENDER)) {
             findViewById(R.id.send_message_button).setVisibility(View.GONE);
             findViewById(R.id.new_message_body).setVisibility(View.GONE);
         } else {
@@ -265,11 +267,15 @@ public class PressActivity extends RetrofitActivity {
         body.setText(message.Body);
         Linkify.addLinks(body, Linkify.ALL);
         ((TextView) row.findViewById(R.id.at)).setText(timeFormat.format(message.Age.createdAt()));
-        ((TextView) row.findViewById(R.id.sender)).setText(getResources().getString(R.string.x_, member.Nation));
         if (member != null) {
+            ((TextView) row.findViewById(R.id.sender)).setText(getResources().getString(R.string.x_, member.Nation));
             ImageView avatar = (ImageView) row.findViewById(R.id.avatar);
             PressActivity.this.populateImage(avatar, member.User.Picture, 36, 36);
             avatar.setOnClickListener(UserView.getAvatarClickListener(PressActivity.this, game, member, member.User));
+        } else {
+            ((TextView) row.findViewById(R.id.sender)).setText(getResources().getString(R.string.x_, DIPLICITY_SENDER));
+            ImageView avatar = (ImageView) row.findViewById(R.id.avatar);
+            PressActivity.this.populateImage(avatar, DIPLICITY_SENDER_PICTURE, 36, 36);
         }
         if (!completed) {
             row.findViewById(R.id.message_progress).setVisibility(View.VISIBLE);
