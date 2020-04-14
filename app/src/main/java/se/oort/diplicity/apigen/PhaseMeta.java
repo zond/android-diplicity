@@ -1,6 +1,7 @@
 package se.oort.diplicity.apigen;
 
 import retrofit2.http.*;
+import java.util.*;
 	
 public class PhaseMeta implements java.io.Serializable {
   public Long PhaseOrdinal;

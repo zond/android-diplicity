@@ -1,6 +1,7 @@
 package se.oort.diplicity.apigen;
 
 import retrofit2.http.*;
+import java.util.*;
 	
 public class Member implements java.io.Serializable {
   public User User;
