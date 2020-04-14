@@ -21,5 +21,6 @@ public class UserStats implements java.io.Serializable {
   public Double Hater;
   public UserStatsNumbers PrivateStats;
   public Glicko Glicko;
+  public TrueSkill TrueSkill;
   public User User;
 }

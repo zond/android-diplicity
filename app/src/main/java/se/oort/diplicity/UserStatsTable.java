@@ -60,7 +60,7 @@ public class UserStatsTable extends TableLayout {
     }
     public void setUserStats(RetrofitActivity retrofitActivity, final UserStats userStats) {
         removeAllViews();
-        addRow(retrofitActivity, getResources().getString(R.string.rating), retrofitActivity.toString(userStats.Glicko.PracticalRating));
+        addRow(retrofitActivity, getResources().getString(R.string.rating), retrofitActivity.toString(userStats.TrueSkill.Rating));
         addRow(retrofitActivity, getResources().getString(R.string.started_games), "" + userStats.StartedGames);
         addRow(retrofitActivity, getResources().getString(R.string.finished_games), "" + userStats.FinishedGames);
         addRow(retrofitActivity, getResources().getString(R.string.solo_wins), "" + userStats.SoloGames);

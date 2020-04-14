@@ -7,4 +7,5 @@ public class GameScore implements java.io.Serializable {
   public String Member;
   public Long SCs;
   public Double Score;
+  public String Explanation;
 }

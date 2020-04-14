@@ -21,10 +21,11 @@ public class Game implements java.io.Serializable {
   public Boolean DisableConferenceChat;
   public Boolean DisableGroupChat;
   public Boolean DisablePrivateChat;
-  public Boolean Anonymous;
   public Long NationAllocation;
+  public Boolean Anonymous;
   public Long NMembers;
   public java.util.List<Member> Members;
+  public java.util.Date StartETA;
   public java.util.List<PhaseMeta> NewestPhaseMeta;
   public java.util.List<Ban> ActiveBans;
   public java.util.List<String> FailedRequirements;

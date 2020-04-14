@@ -7,4 +7,5 @@ public class UserConfig implements java.io.Serializable {
   public java.util.List<FCMToken> FCMTokens;
   public MailConfig MailConfig;
   public java.util.List<String> Colors;
+  public Long PhaseDeadlineWarningMinutesAhead;
 }
