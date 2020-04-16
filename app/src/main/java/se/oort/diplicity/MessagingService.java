@@ -104,7 +104,7 @@ public class MessagingService extends com.google.firebase.messaging.FirebaseMess
         handler.post(new Runnable() {
             @Override
             public void run() {
-                DiplicityJSON diplicityJSON = decodeDataPayload(remoteMessage.getData().get("DiplicityJSON"));
+                DiplicityJSON diplicityJSON = decodeDataPayload(remoteMessage.getData().get(NotificationReceiveActivity.DIPLICITY_JSON_EXTRA));
                 Log.d("Diplicity", "Received a " + diplicityJSON.type);
                 if (diplicityJSON != null) {
                     for (RetrofitActivity subscriber : messageSubscribers) {
@@ -119,7 +119,7 @@ public class MessagingService extends com.google.firebase.messaging.FirebaseMess
                     Log.d("Diplicity", "Nobody consumed this message, popping up a regular notification");
 
                     Intent intent = new Intent(FCM_NOTIFY_ACTION);
-                    intent.putExtra(NotificationReceiveActivity.DIPLICITY_JSON_EXTRA, remoteMessage.getData().get("diplicityJSON"));
+                    intent.putExtra(NotificationReceiveActivity.DIPLICITY_JSON_EXTRA, remoteMessage.getData().get(NotificationReceiveActivity.DIPLICITY_JSON_EXTRA));
 
                     NotificationReceiveActivity.sendNotification(
                             MessagingService.this,
