@@ -85,6 +85,7 @@ public class NotificationReceiveActivity extends RetrofitActivity {
         final MessagingService.DiplicityJSON message = MessagingService.decodeDataPayload(getIntent().getExtras().getString(DIPLICITY_JSON_EXTRA));
         if (message != null) {
             if (message.type.equals("message")) {
+                Log.d("Diplicity", "got message " + message);
                 handleReq(
                         JoinObservable.when(JoinObservable
                                 .from(gameService.GameLoad(message.message.GameID))
@@ -92,6 +93,7 @@ public class NotificationReceiveActivity extends RetrofitActivity {
                                 .then(new Func2<SingleContainer<Game>, MultiContainer<Phase>, Object>() {
                                     @Override
                                     public Object call(SingleContainer<Game> gameSingleContainer, MultiContainer<Phase> phaseMultiContainer) {
+                                        Log.d("Diplicity", "loaded game and phase");
                                         Member member = getLoggedInMember(gameSingleContainer.Properties);
                                         if (member != null) {
                                             ChannelService.Channel channel = new ChannelService.Channel();
@@ -106,6 +108,7 @@ public class NotificationReceiveActivity extends RetrofitActivity {
                                                         .addNextIntent(mainIntent)
                                                         .addNextIntent(gameIntent)
                                                         .addNextIntent(pressIntent).startActivities();
+                                                Log.d("Diplicity", "started press intent");
                                             } else {
                                                 startActivity(pressIntent);
                                             }
