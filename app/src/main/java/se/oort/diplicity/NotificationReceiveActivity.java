@@ -68,9 +68,9 @@ public class NotificationReceiveActivity extends RetrofitActivity {
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        if (getIntent().getAction().equals(MessagingService.FCM_NOTIFY_ACTION)) {
+        if (MessagingService.FCM_NOTIFY_ACTION.equals(getIntent().getAction())) {
             handleDiplicityJSON();
-        } else if (getIntent().getAction().equals(Alarm.DEADLINE_WARNING_ACTION)) {
+        } else if (Alarm.DEADLINE_WARNING_ACTION.equals(getIntent().getAction())) {
             handleAlarm();
         }
     }
