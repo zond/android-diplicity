@@ -71,6 +71,11 @@ public class MapView extends FrameLayout {
     private Map<String, Unit> units = new HashMap<>();
     private Map<String, Unit> dislodged = new HashMap<>();
 
+    static {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WebView.setWebContentsDebuggingEnabled(true);
+        }
+    }
 
     private void inflate() {
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
