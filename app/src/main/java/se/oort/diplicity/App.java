@@ -121,4 +121,11 @@ public class App extends MultiDexApplication {
         return timeLabel.toString();
     }
 
+    public static String makePhaseLengthString(int movementPhaseLength, int nonMovementPhaseLength) {
+        String phaseLengthString = minutesToDuration(movementPhaseLength);
+        if (nonMovementPhaseLength != 0 && nonMovementPhaseLength != movementPhaseLength) {
+            phaseLengthString += "/" + minutesToDuration(nonMovementPhaseLength);
+        }
+        return phaseLengthString;
+    }
 }

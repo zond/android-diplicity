@@ -11,6 +11,7 @@ public class Game implements java.io.Serializable {
   public String Desc;
   public String Variant;
   public Long PhaseLengthMinutes;
+  public Long NonMovementPhaseLengthMinutes;
   public Double MaxHated;
   public Double MaxHater;
   public Double MinRating;

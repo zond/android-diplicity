@@ -302,7 +302,9 @@ public class GamesAdapter extends RecycleAdapter<SingleContainer<Game>, GamesAda
 
             variant.setText(makeVariantText(game.Properties.Variant));
 
-            deadline.setText(App.minutesToDuration(game.Properties.PhaseLengthMinutes.intValue()));
+            Long nonMovementPhaseLengthLong = game.Properties.NonMovementPhaseLengthMinutes;
+            int nonMovementPhaseLength = (nonMovementPhaseLengthLong != null ? nonMovementPhaseLengthLong.intValue() : 0);
+            deadline.setText(App.makePhaseLengthString(game.Properties.PhaseLengthMinutes.intValue(), nonMovementPhaseLength));
 
             if (
                     game.Properties.Started &&
