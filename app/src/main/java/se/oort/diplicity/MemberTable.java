@@ -53,6 +53,7 @@ public class MemberTable extends TableLayout {
     }
     public void setMembers(final RetrofitActivity retrofitActivity, Game game, final List<Member> members) {
         removeAllViews();
+	boolean fakeFoundPhaseState = false;
         for (final Member member : members) {
             boolean rowOK = true;
             TableRow tableRow = new TableRow(retrofitActivity);
@@ -71,12 +72,14 @@ public class MemberTable extends TableLayout {
             userView.setMember(retrofitActivity, game, member, member.User, this.phaseStates == null);
             tableRow.addView(userView);
 
-            if (member.Nation != null && !member.Nation.equals("")) {
-                TextView nation = new TextView(retrofitActivity);
-                nation.setLayoutParams(wrapContentParams);
-                nation.setText(member.Nation);
-                tableRow.addView(nation);
+            String nationName = member.Nation;
+            if (nationName == null || nationName.equals("")) {
+                nationName = "TBD";
             }
+            TextView nation = new TextView(retrofitActivity);
+            nation.setLayoutParams(wrapContentParams);
+            nation.setText(nationName);
+            tableRow.addView(nation);
             if (this.scores != null) {
                 GameScore foundScore = null;
                 for (GameScore score : scores) {
@@ -104,6 +107,10 @@ public class MemberTable extends TableLayout {
                         break;
                     }
                 }
+                if (foundState == null && this.phaseStates.size() == 1 && !fakeFoundPhaseState) {
+                    foundState = this.phaseStates.get(0);
+                    fakeFoundPhaseState = true;
+                }
                 if (foundState != null) {
                     final PhaseState finalFoundState = foundState;
                     final CheckBox onProbation = new CheckBox(retrofitActivity);
@@ -111,7 +118,7 @@ public class MemberTable extends TableLayout {
                     readyToResolve.setText(R.string.rdy);
                     readyToResolve.setLayoutParams(wrapContentParams);
                     readyToResolve.setChecked(finalFoundState.ReadyToResolve);
-                    if (!foundState.NoOrders && !phaseMeta.Resolved && retrofitActivity.getLoggedInUser().Id.equals(member.User.Id)) {
+                    if ((!foundState.NoOrders || fakeFoundPhaseState) && !phaseMeta.Resolved && retrofitActivity.getLoggedInUser().Id.equals(member.User.Id)) {
                         final Game finalGame = game;
                         readyToResolve.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                             @Override
@@ -150,7 +157,7 @@ public class MemberTable extends TableLayout {
                     wantsDIAS.setText(R.string.DRAW);
                     wantsDIAS.setLayoutParams(wrapContentParams);
                     wantsDIAS.setChecked(finalFoundState.WantsDIAS);
-                    if (!foundState.Eliminated && !phaseMeta.Resolved && retrofitActivity.getLoggedInUser().Id.equals(member.User.Id)) {
+                    if (!fakeFoundPhaseState && !foundState.Eliminated && !phaseMeta.Resolved && retrofitActivity.getLoggedInUser().Id.equals(member.User.Id)) {
                         wantsDIAS.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                             @Override
                             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {

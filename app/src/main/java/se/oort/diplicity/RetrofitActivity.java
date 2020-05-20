@@ -9,6 +9,7 @@ import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.EditTextPreference;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -556,7 +557,13 @@ public abstract class RetrofitActivity extends AppCompatActivity {
     }
 
     public Member getLoggedInMember(Game game) {
-        return App.getMemberByUser(game, getLoggedInUser().Id);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String fakeID = prefs.getString(getResources().getString(R.string.local_development_mode_fake_id_pref_key), "");
+        if (fakeID.equals("")) {
+            return App.getMemberByUser(game, getLoggedInUser().Id);
+        } else {
+            return App.getMemberByUser(game, fakeID);
+        }
     }
 
     public String getLocalDevelopmentModeFakeID() {

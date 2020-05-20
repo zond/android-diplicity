@@ -349,7 +349,7 @@ public class MapView extends FrameLayout {
             addInfo();
 
             FrameLayout rdyButtonFrame = (FrameLayout) findViewById(R.id.rdy_button_frame);
-            if (member != null && !phaseMeta.Properties.Resolved && !member.NewestPhaseState.NoOrders) {
+            if (member != null && !phaseMeta.Properties.Resolved && (member.Nation.equals("") || !member.NewestPhaseState.NoOrders)) {
                 final TextView rdyButtonText = (TextView) findViewById(R.id.rdy_button_text);
                 rdyButtonFrame.setVisibility(View.VISIBLE);
                 if (member.NewestPhaseState.ReadyToResolve) {
