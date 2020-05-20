@@ -11,4 +11,6 @@ public class TrueSkill implements java.io.Serializable {
   public Double Mu;
   public Double Sigma;
   public Double Rating;
+  public java.util.List<TrueSkillContent> Previous;
+  public Long HigherRatedCount;
 }

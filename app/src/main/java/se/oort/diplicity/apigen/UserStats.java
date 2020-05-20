@@ -5,6 +5,7 @@ import java.util.*;
 	
 public class UserStats implements java.io.Serializable {
   public String UserId;
+  public Long JoinedGames;
   public Long StartedGames;
   public Long FinishedGames;
   public Long SoloGames;

@@ -4,6 +4,7 @@ import retrofit2.http.*;
 import java.util.*;
 	
 public class UserStatsNumbers implements java.io.Serializable {
+  public Long JoinedGames;
   public Long StartedGames;
   public Long FinishedGames;
   public Long SoloGames;

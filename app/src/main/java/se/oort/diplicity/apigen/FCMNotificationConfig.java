@@ -7,4 +7,6 @@ public class FCMNotificationConfig implements java.io.Serializable {
   public String ClickActionTemplate;
   public String TitleTemplate;
   public String BodyTemplate;
+  public Boolean DontSendData;
+  public Boolean DontSendNotification;
 }

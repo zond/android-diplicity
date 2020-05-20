@@ -364,7 +364,7 @@ public class MapView extends FrameLayout {
                     public void onClick(View v) {
                         member.NewestPhaseState.ReadyToResolve = !member.NewestPhaseState.ReadyToResolve;
                         retrofitActivity.handleReq(
-                                retrofitActivity.phaseStateService.PhaseStateUpdate(member.NewestPhaseState, game.ID, game.NewestPhaseMeta.get(0).PhaseOrdinal.toString(), member.Nation),
+                                retrofitActivity.phaseStateService.PhaseStateUpdate(member.NewestPhaseState, game.ID, game.NewestPhaseMeta.get(0).PhaseOrdinal.toString()),
                                 new Sendable<SingleContainer<PhaseState>>() {
                                     @Override
                                     public void send(SingleContainer<PhaseState> phaseStateSingleContainer) {

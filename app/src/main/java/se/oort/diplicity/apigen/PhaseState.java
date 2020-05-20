@@ -12,5 +12,6 @@ public class PhaseState implements java.io.Serializable {
   public Boolean OnProbation;
   public Boolean NoOrders;
   public Boolean Eliminated;
+  public String Messages;
   public String Note;
 }

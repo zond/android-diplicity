@@ -25,4 +25,5 @@ public class Phase implements java.io.Serializable {
   public java.util.List<Bounce> Bounces;
   public java.util.List<Resolution> Resolutions;
   public String Host;
+  public java.util.List<GameScore> PreliminaryScores;
 }
