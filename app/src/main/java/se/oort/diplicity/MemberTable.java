@@ -103,7 +103,7 @@ public class MemberTable extends TableLayout {
             if (this.phaseStates != null) {
                 PhaseState foundState = null;
                 for (PhaseState state : phaseStates) {
-                    if (state.Nation.equals(member.Nation)) {
+                    if (!state.Nation.equals("") && state.Nation.equals(member.Nation)) {
                         foundState = state;
                         break;
                     }
