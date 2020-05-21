@@ -285,11 +285,7 @@ public class GameActivity extends RetrofitActivity
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         Menu nav_Menu = navigationView.getMenu();
-        if (game.Started) {
-            if (!game.Finished && game.DisableConferenceChat && game.DisableGroupChat && game.DisablePrivateChat) {
-                nav_Menu.findItem(R.id.nav_press).setVisible(false);
-            }
-        } else {
+        if (!game.Started) {
             nav_Menu.findItem(R.id.nav_orders).setVisible(false);
             nav_Menu.findItem(R.id.nav_phases).setVisible(false);
             nav_Menu.findItem(R.id.nav_press).setVisible(false);
@@ -376,7 +372,7 @@ public class GameActivity extends RetrofitActivity
 
     public void showPress() {
         hideAllExcept(R.id.press_view);
-        if (member != null) {
+        if (member != null && !(game.DisableConferenceChat && game.DisableGroupChat && game.DisablePrivateChat)) {
             FloatingActionButton button = (FloatingActionButton) findViewById(R.id.create_channel_button);
             button.setVisibility(View.VISIBLE);
             button.setOnClickListener(new View.OnClickListener() {

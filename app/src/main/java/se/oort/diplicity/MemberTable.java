@@ -53,7 +53,8 @@ public class MemberTable extends TableLayout {
     }
     public void setMembers(final RetrofitActivity retrofitActivity, Game game, final List<Member> members) {
         removeAllViews();
-	boolean fakeFoundPhaseState = false;
+        Member loggedInMember = retrofitActivity.getLoggedInMember(game);
+    	boolean fakeFoundPhaseState = false;
         for (final Member member : members) {
             boolean rowOK = true;
             TableRow tableRow = new TableRow(retrofitActivity);
@@ -118,7 +119,7 @@ public class MemberTable extends TableLayout {
                     readyToResolve.setText(R.string.rdy);
                     readyToResolve.setLayoutParams(wrapContentParams);
                     readyToResolve.setChecked(finalFoundState.ReadyToResolve);
-                    if ((!foundState.NoOrders || fakeFoundPhaseState) && !phaseMeta.Resolved && retrofitActivity.getLoggedInUser().Id.equals(member.User.Id)) {
+                    if ((!foundState.NoOrders || fakeFoundPhaseState) && !phaseMeta.Resolved && loggedInMember.User.Id.equals(member.User.Id)) {
                         final Game finalGame = game;
                         readyToResolve.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                             @Override
