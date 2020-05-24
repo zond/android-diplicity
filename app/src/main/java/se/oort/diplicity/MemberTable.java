@@ -54,7 +54,6 @@ public class MemberTable extends TableLayout {
     public void setMembers(final RetrofitActivity retrofitActivity, Game game, final List<Member> members) {
         removeAllViews();
         Member loggedInMember = retrofitActivity.getLoggedInMember(game);
-    	boolean fakeFoundPhaseState = false;
         for (final Member member : members) {
             boolean rowOK = true;
             TableRow tableRow = new TableRow(retrofitActivity);
@@ -108,9 +107,8 @@ public class MemberTable extends TableLayout {
                         break;
                     }
                 }
-                if (foundState == null && this.phaseStates.size() == 1 && !fakeFoundPhaseState) {
+                if (foundState == null && this.phaseStates.size() == 1 && loggedInMember.User.Id.equals(member.User.Id)) {
                     foundState = this.phaseStates.get(0);
-                    fakeFoundPhaseState = true;
                 }
                 if (foundState != null) {
                     final PhaseState finalFoundState = foundState;
@@ -119,7 +117,7 @@ public class MemberTable extends TableLayout {
                     readyToResolve.setText(R.string.rdy);
                     readyToResolve.setLayoutParams(wrapContentParams);
                     readyToResolve.setChecked(finalFoundState.ReadyToResolve);
-                    if ((!foundState.NoOrders || fakeFoundPhaseState) && !phaseMeta.Resolved && loggedInMember.User.Id.equals(member.User.Id)) {
+                    if ((!foundState.NoOrders || member.Nation.equals("")) && !phaseMeta.Resolved && loggedInMember.User.Id.equals(member.User.Id)) {
                         final Game finalGame = game;
                         readyToResolve.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                             @Override
@@ -158,7 +156,7 @@ public class MemberTable extends TableLayout {
                     wantsDIAS.setText(R.string.DRAW);
                     wantsDIAS.setLayoutParams(wrapContentParams);
                     wantsDIAS.setChecked(finalFoundState.WantsDIAS);
-                    if (!fakeFoundPhaseState && !foundState.Eliminated && !phaseMeta.Resolved && retrofitActivity.getLoggedInUser().Id.equals(member.User.Id)) {
+                    if (!foundState.Eliminated && !phaseMeta.Resolved && retrofitActivity.getLoggedInUser().Id.equals(member.User.Id)) {
                         wantsDIAS.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                             @Override
                             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
