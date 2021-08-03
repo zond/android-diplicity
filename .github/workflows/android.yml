@@ -37,12 +37,10 @@ jobs:
               run: ./gradlew assembleRelease --refresh-dependencies
             - name: Find aapt binary
               run: echo "AAPT_BINARY=$(ls -1 ${ANDROID_HOME}/build-tools/*/aapt | tail -n 1)" >> $GITHUB_ENV
-            - name: Extract APK badging
-              run: echo "APK_BADGING=$(${AAPT_BINARY} dump badging app/build/outputs/apk/release/app-release.apk)" >> $GITHUB_ENV
             - name: Extract release name
-              run: echo "APK_VERSION_NAME=$(echo "${APK_BADGING}" | sed -e "s/.*versionName='\([^']\+\)'.*/\1/")" >> $GITHUB_ENV
+              run: echo "APK_VERSION_NAME=$(${AAPT_BINARY} dump badging app/build/outputs/apk/release/app-release.apk | sed -e "s/.*versionName='\([^']\+\)'.*/\1/")" >> $GITHUB_ENV
             - name: Extract release code
-              run: echo "APK_VERSION_CODE=$(echo "${APK_BADGING}" | sed -e "s/.*versionCode='\([^']\+\)'.*/\1/")" >> $GITHUB_ENV
+              run: echo "APK_VERSION_CODE=$(${AAPT_BINARY} dump badging app/build/outputs/apk/release/app-release.apk | sed -e "s/.*versionCode='\([^']\+\)'.*/\1/")" >> $GITHUB_ENV
             - name: Create release
               id: create_release
               uses: actions/create-release@latest
