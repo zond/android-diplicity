@@ -355,7 +355,7 @@ public abstract class RetrofitActivity extends AppCompatActivity {
                                         .writeTimeout(10, TimeUnit.SECONDS)
                                         .build()
                                         .newCall(request).execute();
-                                if (response.code() != 307) {
+                                if (response.code() < 300 || response.code() > 399) {
                                     throw new RuntimeException("Unsuccessful response " + response.body().string());
                                 }
                                 url = response.headers().get("Location");
